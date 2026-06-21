@@ -6,10 +6,10 @@ authors = ["Bentroen <bemcdc@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
-beet = {extras = ["image"], version = "^0.108.5"}
+python = "^3.14"
+beet = "^0.115.0"
 pynbs = "^1.1.0"
-bolt = "^0.49.1"
+bolt = "^0.50.1"
 
 [tool.poetry.group.dev.dependencies]
 snakeviz = "^2.2.0"
