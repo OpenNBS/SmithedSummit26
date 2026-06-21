@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "nbs-smithed-summit-24"
+name = "nbs-smithed-summit-26"
 version = "0.1.0"
-description = "Note Block Studio data pack + resource pack for Smithed Summit 2024"
+description = "Note Block Studio data pack + resource pack for Smithed Summit 2026"
 authors = ["Bentroen <bemcdc@gmail.com>"]
 readme = "README.md"
 

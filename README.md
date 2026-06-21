@@ -1,8 +1,8 @@
-# Note Block Studio @ Smithed Summit '24
+# Note Block Studio @ Smithed Summit '26
 
 <img src="https://smithed.net/assets/mountain2-1b30efda.webp" width="512px" />
 
-This repository holds the data pack and resource pack created for [Note Block Studio](https://noteblock.studio/)'s booth in the [Smithed Summit 2024](https://smithed.net/summit).
+This repository holds the data pack and resource pack created for [Note Block Studio](https://noteblock.studio/)'s booth in the [Smithed Summit 2026](https://smithed.net/summit).
 
 We've decided to make this project public so everyone can learn from what we've made for our participation in the event!
 
