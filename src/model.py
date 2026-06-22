@@ -1,6 +1,6 @@
 from fnmatch import fnmatch
 
-from beet import Context, Model, Texture, TextureMcmeta
+from beet import Context, ItemModel, Model, Texture, TextureMcmeta
 from PIL import Image, ImageChops
 
 models = [
@@ -36,24 +36,17 @@ CMD_OFFSET = 48184
 MONITOR_TEXTURE_SIZE = 512
 
 
-def generate_model_predicates(parent: str, models: list[str] | dict[str, int]) -> Model:
-    if isinstance(models, list):
-        models_cmd = {model: cmd for cmd, model in enumerate(models)}
-    else:
-        models_cmd = models
-
-    return Model(
-        {
-            "parent": parent,
-            "overrides": [
-                {
-                    "predicate": {"custom_model_data": CMD_OFFSET + cmd + 1},
-                    "model": f"nbs:{model}",
+def create_item_models(ctx: Context) -> None:
+    for model in models:
+        ctx.assets.item_models[f"nbs:{model}"] = ItemModel(
+            {
+                "model": {
+                    "type": "minecraft:model",
+                    "model": f"nbs:item/{model}",
+                    "tints": [{"type": "minecraft:constant", "value": 66046}],
                 }
-                for model, cmd in models_cmd.items()
-            ],
-        }
-    )
+            }
+        )
 
 
 def generate_scrolling_texture(img: Image.Image, scroll_factor: int = 4) -> Texture:
@@ -248,16 +241,9 @@ def create_balloon_models(ctx: Context) -> None:
 
 
 def beet_default(ctx: Context):
+    create_item_models(ctx)
     create_note_models(ctx)
     create_monitor_models(ctx)
     create_balloon_models(ctx)
-
-    ctx.assets["minecraft:item/note_block"] = generate_model_predicates(
-        "block/note_block", models_cmd
-    )
-    ctx.assets["minecraft:item/carved_pumpkin"] = generate_model_predicates(
-        "block/carved_pumpkin", ["headphones"]
-    )
-
     generate_scrolling_animation(ctx)
     apply_emissive_textures(ctx)
