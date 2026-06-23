@@ -11,6 +11,8 @@ beet = "^0.115.0"
 pynbs = "^1.1.0"
 bolt = "^0.50.1"
 numpy = "2.3.2"
+boto3 = "^1.38.0"
+python-dotenv = "^1.1.0"
 
 [tool.poetry.group.dev.dependencies]
 snakeviz = "^2.2.0"
