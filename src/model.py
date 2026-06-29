@@ -22,8 +22,6 @@ models = [
     "balloon_nbs",
 ]
 
-models_cmd = {model: i for i, model in enumerate(models)}
-
 emissive_textures = ["scroll_panel_*", "note_sign_*", "monitor_*", "open_sign"]
 
 no_shade_textures = ["nbw_*"]
@@ -36,17 +34,21 @@ CMD_OFFSET = 48184
 MONITOR_TEXTURE_SIZE = 512
 
 
+def create_item_definition(ctx: Context, model_name: str) -> None:
+    ctx.assets.item_models[f"nbs:{model_name}"] = ItemModel(
+        {
+            "model": {
+                "type": "minecraft:model",
+                "model": f"nbs:item/{model_name}",
+                "tints": [{"type": "minecraft:constant", "value": 66046}],
+            }
+        }
+    )
+
+
 def create_item_models(ctx: Context) -> None:
     for model in models:
-        ctx.assets.item_models[f"nbs:{model}"] = ItemModel(
-            {
-                "model": {
-                    "type": "minecraft:model",
-                    "model": f"nbs:item/{model}",
-                    "tints": [{"type": "minecraft:constant", "value": 66046}],
-                }
-            }
-        )
+        create_item_definition(ctx, model)
 
 
 def generate_scrolling_texture(img: Image.Image, scroll_factor: int = 4) -> Texture:
@@ -140,7 +142,7 @@ def create_note_models(ctx: Context) -> None:
         )
         filename = texture.split("/")[-1]
         ctx.assets.models[f"nbs:{filename}"] = note_model
-        models_cmd[filename] = i + 100
+        create_item_definition(ctx, filename)
 
 
 def create_monitor_models(ctx: Context) -> None:
@@ -169,7 +171,7 @@ def create_monitor_models(ctx: Context) -> None:
         filename = texture.split("/")[-1]
         ctx.assets.models[f"nbs:{filename}"] = monitor_model
 
-        models_cmd[f"monitor_{i}"] = i + 200
+        create_item_definition(ctx, filename)
 
 
 def apply_alpha(img: Image.Image, alpha_texture: Image.Image) -> Image.Image:
@@ -228,7 +230,7 @@ def create_balloon_models(ctx: Context) -> None:
         )
         filename = texture.split("/")[-1]
         ctx.assets.models[f"nbs:{filename}"] = balloon_model
-        models_cmd[filename] = i + 300
+        create_item_definition(ctx, filename)
 
         # Apply alpha to the balloon texture
         balloon_texture = ctx.assets.textures[texture].image
