@@ -1,15 +1,15 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "nbs:block/wall_art",
-		"particle": "nbs:block/wall_art"
+		"0": "nbs:item/wall_art",
+		"particle": "nbs:item/wall_art"
 	},
 	"elements": [
 		{
 			"from": [0, 0, 0],
 			"to": [16, 16, 0],
 			"faces": {
-				"north": {"uv": [0, 0, 16, 16], "texture": "#0"}
+				"north": { "uv": [0, 0, 16, 16], "texture": "#0" }
 			}
 		}
 	]

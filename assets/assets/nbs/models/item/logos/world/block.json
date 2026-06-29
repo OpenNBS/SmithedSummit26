@@ -1,0 +1,29 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "nbs:item/logos/world/block_left",
+		"1": "nbs:item/logos/world/block_right",
+		"2": "nbs:item/logos/world/block_top"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 16, 16],
+			"shade": false,
+			"light_emission": 15,
+			"faces": {
+				"north": { "uv": [0, 0, 16, 16], "texture": "#1", "tintindex": 0 },
+				"east": { "uv": [0, 0, 16, 16], "texture": "#0", "tintindex": 0 },
+				"south": { "uv": [0, 0, 16, 16], "texture": "#1", "tintindex": 0 },
+				"west": { "uv": [0, 0, 16, 16], "texture": "#0", "tintindex": 0 },
+				"up": {
+					"uv": [0, 0, 16, 16],
+					"rotation": 270,
+					"texture": "#2",
+					"tintindex": 0
+				},
+				"down": { "uv": [0, 0, 16, 16], "texture": "#2", "tintindex": 0 }
+			}
+		}
+	]
+}

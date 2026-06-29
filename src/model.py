@@ -1,30 +1,27 @@
+from collections import namedtuple
 from fnmatch import fnmatch
 
 from beet import Context, ItemModel, Model, Texture, TextureMcmeta
-from PIL import Image, ImageChops
+from PIL import Image
 
 models = [
-    "nbw_block",
-    "nbw_text",
-    "scroll_panel",
-    "flat_note_block",
-    "gramophone_base",
-    "gramophone",
-    "record_player",
-    "speakers",
-    "headphones",
-    "records_double",
-    "records_triple",
-    "piano",
-    "guitar",
-    "open_sign",
+    "logos/world/block",
+    "logos/world/wordmark",
+    "logos/world/scrolling_panel",
+    "props/speakers",
+    "props/headphones",
+    "props/piano",
+    "props/guitar",
+    "props/open_sign",
+    "globe/sandstone",
+    "globe/stone",
     "wall_art",
     "balloon_nbs",
 ]
 
-emissive_textures = ["scroll_panel_*", "note_sign_*", "monitor_*", "open_sign"]
+emissive_textures = ["logos/world/scrolling_panel_*", "note_sign_*", "props/open_sign"]
 
-no_shade_textures = ["nbw_*"]
+no_shade_textures = ["logos/*", "globe/*"]
 
 EMISSIVE_ALPHA = 254
 NO_SHADE_ALPHA = 253
@@ -33,13 +30,22 @@ CMD_OFFSET = 48184
 
 MONITOR_TEXTURE_SIZE = 512
 
+NAMESPACE = "nbs"
 
-def create_item_definition(ctx: Context, model_name: str) -> None:
-    ctx.assets.item_models[f"nbs:{model_name}"] = ItemModel(
+
+AssetPaths = namedtuple("AssetPaths", ["texture", "model"])
+
+
+def get_asset_paths(path: str) -> AssetPaths:
+    return AssetPaths(texture=f"{NAMESPACE}:item/{path}", model=f"{NAMESPACE}:{path}")
+
+
+def create_item_definition(ctx: Context, asset_paths: AssetPaths) -> None:
+    ctx.assets.item_models[asset_paths.model] = ItemModel(
         {
             "model": {
                 "type": "minecraft:model",
-                "model": f"nbs:item/{model_name}",
+                "model": asset_paths.texture,
                 "tints": [{"type": "minecraft:constant", "value": 66046}],
             }
         }
@@ -48,7 +54,9 @@ def create_item_definition(ctx: Context, model_name: str) -> None:
 
 def create_item_models(ctx: Context) -> None:
     for model in models:
-        create_item_definition(ctx, model)
+        paths = get_asset_paths(model)
+
+        create_item_definition(ctx, paths)
 
 
 def generate_scrolling_texture(img: Image.Image, scroll_factor: int = 4) -> Texture:
@@ -101,13 +109,19 @@ def generate_scrolling_mcmetas(
 
 
 def generate_scrolling_animation(ctx: Context) -> None:
-    panel_texture = ctx.assets.textures["nbs:block/nbw_32x"]
-    texture = generate_scrolling_texture(panel_texture.image)
-    mcmetas = generate_scrolling_mcmetas(texture)
+    target_parent = "logos/world"
+
+    static_panel_paths = get_asset_paths(f"{target_parent}/static_panel")
+
+    static_panel_texture = ctx.assets.textures[static_panel_paths.texture]
+    scrolling_panel_texture = generate_scrolling_texture(static_panel_texture.image)
+    mcmetas = generate_scrolling_mcmetas(scrolling_panel_texture)
     for i, mcmeta in enumerate(mcmetas, start=1):
-        ctx.assets.textures[f"nbs:block/scroll_panel_{i}"] = texture
-        ctx.assets.textures_mcmeta[f"nbs:block/scroll_panel_{i}"] = mcmeta
-    del ctx.assets.textures["nbs:block/nbw_32x"]
+        scrolling_panel_path = get_asset_paths(f"{target_parent}/scrolling_panel_{i}")
+
+        ctx.assets.textures[scrolling_panel_path.texture] = scrolling_panel_texture
+        ctx.assets.textures_mcmeta[scrolling_panel_path.texture] = mcmeta
+    del ctx.assets.textures[static_panel_paths.texture]
 
 
 def apply_emissive_textures(ctx: Context) -> None:
@@ -128,50 +142,29 @@ def apply_emissive_textures(ctx: Context) -> None:
 
 
 def create_note_models(ctx: Context) -> None:
+    target_parent = "notes"
+
+    target_variant_paths = get_asset_paths(f"{target_parent}/")
+    base_texture_paths = get_asset_paths(f"{target_parent}/base")
+
     note_variants = filter(
-        lambda name: name.startswith("nbs:block/note_sign_"), ctx.assets.textures
+        lambda name: name.startswith(target_variant_paths.texture), ctx.assets.textures
     )
 
     global models
     for i, texture in enumerate(note_variants):
         note_model = Model(
             {
-                "parent": "nbs:note_base",
+                "parent": base_texture_paths.model,
                 "textures": {"0": texture},
             }
         )
         filename = texture.split("/")[-1]
-        ctx.assets.models[f"nbs:{filename}"] = note_model
-        create_item_definition(ctx, filename)
 
+        note_paths = get_asset_paths(f"{target_parent}/{filename}")
 
-def create_monitor_models(ctx: Context) -> None:
-    monitor_variants = filter(
-        lambda name: name.startswith("nbs:block/monitor_"), ctx.assets.textures
-    )
-
-    global models
-    for texture in monitor_variants:
-        size = MONITOR_TEXTURE_SIZE
-        # The monitor is 12x10 pixels. We stretch the image to a 512x512 texture
-        src_img: Image.Image = ctx.assets.textures[texture].image
-        resized_img = src_img.resize((size, size), Image.Resampling.LANCZOS)
-        ctx.assets.textures[texture] = Texture(resized_img)
-
-    for i in range(6):
-        texture = f"nbs:block/monitor_{i}"
-        if texture not in ctx.assets.textures:
-            texture = "nbs:block/monitor_0"
-        monitor_model = Model(
-            {
-                "parent": "nbs:monitor",
-                "textures": {"content": f"nbs:block/monitor_{i}"},
-            }
-        )
-        filename = texture.split("/")[-1]
-        ctx.assets.models[f"nbs:{filename}"] = monitor_model
-
-        create_item_definition(ctx, filename)
+        ctx.assets.models[note_paths.texture] = note_model
+        create_item_definition(ctx, note_paths)
 
 
 def apply_alpha(img: Image.Image, alpha_texture: Image.Image) -> Image.Image:
@@ -204,16 +197,13 @@ def apply_alpha(img: Image.Image, alpha_texture: Image.Image) -> Image.Image:
 
 
 def create_balloon_models(ctx: Context) -> None:
+    target_parent = "balloons"
 
-    # Apply alpha to the note block balloon texture
-    balloon_texture = ctx.assets.textures["nbs:item/balloons/balloon_nbs"].image
-    alpha_texture = ctx.assets.textures["nbs:item/balloons/balloon_nbs_alpha"].image
-    balloon_texture = apply_alpha(balloon_texture, alpha_texture)
-    ctx.assets.textures["nbs:item/balloons/balloon_nbs"] = Texture(balloon_texture)
-    del ctx.assets.textures["nbs:item/balloons/balloon_nbs_alpha"]
+    base_texture_path = get_asset_paths(f"{target_parent}/base")
+    alpha_texture_path = get_asset_paths(f"{target_parent}/balloon_alpha")
 
     balloon_variants = filter(
-        lambda name: name.startswith("nbs:item/balloons/balloon_note"),
+        lambda name: name.startswith(f"{target_parent}/balloon_"),
         ctx.assets.textures,
     )
 
@@ -224,28 +214,30 @@ def create_balloon_models(ctx: Context) -> None:
         # Create models for each balloon variant
         balloon_model = Model(
             {
-                "parent": "nbs:balloon_note_base",
+                "parent": base_texture_path.texture,
                 "textures": {"balloon": texture},
             }
         )
+
         filename = texture.split("/")[-1]
-        ctx.assets.models[f"nbs:{filename}"] = balloon_model
-        create_item_definition(ctx, filename)
+
+        balloon_paths = get_asset_paths(f"{target_parent}/{filename}")
+
+        ctx.assets.models[balloon_paths.model] = balloon_model
+        create_item_definition(ctx, balloon_paths)
 
         # Apply alpha to the balloon texture
         balloon_texture = ctx.assets.textures[texture].image
-        alpha_texture = ctx.assets.textures[
-            "nbs:item/balloons/balloon_note_alpha"
-        ].image
+        alpha_texture = ctx.assets.textures[alpha_texture_path.texture].image
         balloon_texture = apply_alpha(balloon_texture, alpha_texture)
+
         ctx.assets.textures[texture] = Texture(balloon_texture)
-    del ctx.assets.textures["nbs:item/balloons/balloon_note_alpha"]
+    del ctx.assets.textures[alpha_texture_path.texture]
 
 
 def beet_default(ctx: Context):
     create_item_models(ctx)
     create_note_models(ctx)
-    create_monitor_models(ctx)
     create_balloon_models(ctx)
     generate_scrolling_animation(ctx)
     apply_emissive_textures(ctx)
