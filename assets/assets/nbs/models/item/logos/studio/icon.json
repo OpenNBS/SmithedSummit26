@@ -1,0 +1,17 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "nbs:item/logos/studio/icon",
+		"1": "nbs:item/logos/studio/icon_back"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 16, 0],
+			"faces": {
+				"north": { "uv": [0, 0, 16, 16], "texture": "#0", "tintindex": 0 },
+				"south": { "uv": [16, 0, 0, 16], "texture": "#1", "tintindex": 1 }
+			}
+		}
+	]
+}
