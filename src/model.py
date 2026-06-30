@@ -19,17 +19,6 @@ models = [
     "balloon_nbs",
 ]
 
-emissive_textures = ["logos/world/scrolling_panel_*", "note_sign_*", "props/open_sign"]
-
-no_shade_textures = ["logos/*", "globe/*"]
-
-EMISSIVE_ALPHA = 254
-NO_SHADE_ALPHA = 253
-
-CMD_OFFSET = 48184
-
-MONITOR_TEXTURE_SIZE = 512
-
 NAMESPACE = "nbs"
 
 
@@ -122,23 +111,6 @@ def generate_scrolling_animation(ctx: Context) -> None:
         ctx.assets.textures[scrolling_panel_path.texture] = scrolling_panel_texture
         ctx.assets.textures_mcmeta[scrolling_panel_path.texture] = mcmeta
     del ctx.assets.textures[static_panel_paths.texture]
-
-
-def apply_emissive_textures(ctx: Context) -> None:
-    def multiply_alpha(img: Image.Image, alpha: int) -> Image.Image:
-        if img.mode != "RGBA":
-            img = img.convert("RGBA")
-        # set the alpha value to the desired value where it is not 0
-        mask = Image.eval(img.split()[3], lambda a: 0 if a == 0 else alpha)
-        img.putalpha(mask)
-        return img
-
-    for name, texture in ctx.assets.textures.items():
-        name = name.split("/")[-1]
-        if any(fnmatch(name, pattern) for pattern in emissive_textures):
-            texture.image = multiply_alpha(texture.image, EMISSIVE_ALPHA)
-        if any(fnmatch(name, pattern) for pattern in no_shade_textures):
-            texture.image = multiply_alpha(texture.image, NO_SHADE_ALPHA)
 
 
 def create_note_models(ctx: Context) -> None:
@@ -240,4 +212,3 @@ def beet_default(ctx: Context):
     create_note_models(ctx)
     create_balloon_models(ctx)
     generate_scrolling_animation(ctx)
-    apply_emissive_textures(ctx)
