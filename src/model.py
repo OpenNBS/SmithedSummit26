@@ -127,7 +127,7 @@ def create_note_models(ctx: Context) -> None:
     for i, texture in enumerate(note_variants):
         note_model = Model(
             {
-                "parent": base_texture_paths.model,
+                "parent": base_texture_paths.texture,
                 "textures": {"0": texture},
             }
         )
