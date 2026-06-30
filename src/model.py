@@ -190,7 +190,7 @@ def apply_alpha(img: Image.Image, alpha_texture: Image.Image) -> Image.Image:
                 continue
             level = alpha_texture.getpixel((x, y))
             if not isinstance(level, int):
-                raise ValueError(f"Alpha mask image must be in grayscale (L) mode")
+                raise ValueError("Alpha mask image must be in grayscale (L) mode")
             alpha = get_alpha_from_level(level)
             img.putpixel((x, y), (r, g, b, alpha))
     return img
