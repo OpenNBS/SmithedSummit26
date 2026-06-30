@@ -35,7 +35,18 @@ def create_item_definition(ctx: Context, asset_paths: AssetPaths) -> None:
             "model": {
                 "type": "minecraft:model",
                 "model": asset_paths.texture,
-                "tints": [{"type": "minecraft:constant", "value": 66046}],
+                "tints": [
+                    {
+                        # no shading
+                        "type": "minecraft:constant",
+                        "value": 66046,
+                    },
+                    {
+                        # darkened
+                        "type": "minecraft:constant",
+                        "value": -13426150,
+                    },
+                ],
             }
         }
     )
