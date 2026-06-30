@@ -5,7 +5,7 @@ from beet import Context, ItemModel, Model, Texture, TextureMcmeta
 from oxipng import StripChunks, optimize_from_memory
 from PIL import Image
 
-models = [
+MODELS = [
     "logos/world/block",
     "logos/world/wordmark",
     "logos/world/scrolling_panel",
@@ -26,8 +26,13 @@ models = [
     "globe/sandstone",
     "globe/stone",
     "wall_art",
-    "balloon_nbs",
 ]
+
+IGNORED_NOTE_MODELS = ["blue", "cyan", "light_blue", "lime", "orange", "pink", "purple"]
+
+IGNORED_THUMBNAIL_MODELS = []
+
+IGNORED_BALLOON_MODELS = []
 
 NAMESPACE = "nbs"
 
@@ -63,7 +68,7 @@ def create_item_definition(ctx: Context, asset_paths: AssetPaths) -> None:
 
 
 def create_item_models(ctx: Context) -> None:
-    for model in models:
+    for model in MODELS:
         paths = get_asset_paths(model)
 
         create_item_definition(ctx, paths)
@@ -134,15 +139,25 @@ def generate_scrolling_animation(ctx: Context) -> None:
     del ctx.assets.textures[static_panel_paths.texture]
 
 
-def create_models(ctx: Context, target_parent: str) -> None:
-    target_variant_paths = get_asset_paths(f"{target_parent}/")
+def create_models(
+    ctx: Context, target_parent: str, ignored_textures: list[str] = []
+) -> list[AssetPaths]:
+    target_variant_paths = get_asset_paths(f"{target_parent}")
     base_texture_paths = get_asset_paths(f"{target_parent}/base")
+
+    for i, texture in enumerate(ignored_textures):
+        filename = texture.split("/")[-1]
+        variant_paths = get_asset_paths(f"{target_parent}/{filename}")
+
+        del ctx.assets.textures[variant_paths.texture]
 
     variants = filter(
         lambda name: name.startswith(target_variant_paths.texture), ctx.assets.textures
     )
 
-    global models
+    all_variant_paths: list[AssetPaths] = []
+
+    global MODELS
     for i, texture in enumerate(variants):
         model = Model(
             {
@@ -158,13 +173,17 @@ def create_models(ctx: Context, target_parent: str) -> None:
         ctx.assets.models[variant_paths.texture] = model
         create_item_definition(ctx, variant_paths)
 
+        all_variant_paths.append(variant_paths)
+
+    return all_variant_paths
+
 
 def create_note_models(ctx: Context) -> None:
-    create_models(ctx, "notes")
+    create_models(ctx, "notes", IGNORED_NOTE_MODELS)
 
 
 def create_thumbnail_models(ctx: Context) -> None:
-    create_models(ctx, "thumbnails")
+    create_models(ctx, "thumbnails", IGNORED_THUMBNAIL_MODELS)
 
 
 def apply_alpha(img: Image.Image, alpha_texture: Image.Image) -> Image.Image:
@@ -204,7 +223,7 @@ def create_balloon_models(ctx: Context) -> None:
 
     del ctx.assets.textures[alpha_texture_path.texture]
 
-    all_variant_paths = create_models(ctx, target_parent)
+    all_variant_paths = create_models(ctx, target_parent, IGNORED_BALLOON_MODELS)
 
     for i, variant_paths in enumerate(all_variant_paths):
         balloon_texture = ctx.assets.textures[variant_paths.texture].image
