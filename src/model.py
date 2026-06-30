@@ -8,7 +8,7 @@ models = [
     "logos/world/block",
     "logos/world/wordmark",
     "logos/world/scrolling_panel",
-    "props/speakers",
+    "props/speaker",
     "props/headphones",
     "props/piano",
     "props/guitar",
