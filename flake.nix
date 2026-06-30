@@ -72,12 +72,19 @@
               EOF
               }
 
+              export MATURIN_NO_INSTALL_RUST=1
+              export PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1
+
               venvVersionWarn
             '';
 
             packages =
               (with pkgs; [
                 poetry
+
+                cargo
+                rustc
+                gcc
 
                 prettier
               ])
@@ -87,6 +94,7 @@
 
                 python-dotenv
 
+                pyoxipng
                 numpy
                 boto3
 

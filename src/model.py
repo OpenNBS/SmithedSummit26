@@ -1,7 +1,8 @@
+import io
 from collections import namedtuple
-from fnmatch import fnmatch
 
 from beet import Context, ItemModel, Model, Texture, TextureMcmeta
+from oxipng import Deflaters, StripChunks, optimize_from_memory
 from PIL import Image
 
 models = [
@@ -227,8 +228,27 @@ def create_balloon_models(ctx: Context) -> None:
     del ctx.assets.textures[alpha_texture_path.texture]
 
 
+def optimize_textures(ctx: Context):
+    namespaced_assets = filter(
+        lambda name: name.startswith(NAMESPACE),
+        ctx.assets.textures,
+    )
+
+    for i, texture in enumerate(namespaced_assets):
+        texture_image = ctx.assets.textures[texture].image
+        texture_bytes = ctx.assets.textures[texture].to_bytes(texture_image)
+
+        optimized_texture_bytes = optimize_from_memory(
+            texture_bytes, level=6, strip=StripChunks.all()
+        )
+        optimized_texture_image = Image.open(io.BytesIO(optimized_texture_bytes))
+
+        ctx.assets.textures[texture].image = optimized_texture_image
+
+
 def beet_default(ctx: Context):
     create_item_models(ctx)
     create_note_models(ctx)
     create_balloon_models(ctx)
     generate_scrolling_animation(ctx)
+    optimize_textures(ctx)
