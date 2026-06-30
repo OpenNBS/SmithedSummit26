@@ -2,7 +2,7 @@ import io
 from collections import namedtuple
 
 from beet import Context, ItemModel, Model, Texture, TextureMcmeta
-from oxipng import Deflaters, StripChunks, optimize_from_memory
+from oxipng import StripChunks, optimize_from_memory
 from PIL import Image
 
 models = [
@@ -134,30 +134,37 @@ def generate_scrolling_animation(ctx: Context) -> None:
     del ctx.assets.textures[static_panel_paths.texture]
 
 
-def create_note_models(ctx: Context) -> None:
-    target_parent = "notes"
-
+def create_models(ctx: Context, target_parent: str) -> None:
     target_variant_paths = get_asset_paths(f"{target_parent}/")
     base_texture_paths = get_asset_paths(f"{target_parent}/base")
 
-    note_variants = filter(
+    variants = filter(
         lambda name: name.startswith(target_variant_paths.texture), ctx.assets.textures
     )
 
     global models
-    for i, texture in enumerate(note_variants):
-        note_model = Model(
+    for i, texture in enumerate(variants):
+        model = Model(
             {
                 "parent": base_texture_paths.texture,
                 "textures": {"0": texture},
             }
         )
+
         filename = texture.split("/")[-1]
 
-        note_paths = get_asset_paths(f"{target_parent}/{filename}")
+        variant_paths = get_asset_paths(f"{target_parent}/{filename}")
 
-        ctx.assets.models[note_paths.texture] = note_model
-        create_item_definition(ctx, note_paths)
+        ctx.assets.models[variant_paths.texture] = model
+        create_item_definition(ctx, variant_paths)
+
+
+def create_note_models(ctx: Context) -> None:
+    create_models(ctx, "notes")
+
+
+def create_thumbnail_models(ctx: Context) -> None:
+    create_models(ctx, "thumbnails")
 
 
 def apply_alpha(img: Image.Image, alpha_texture: Image.Image) -> Image.Image:
@@ -250,5 +257,6 @@ def beet_default(ctx: Context):
     create_item_models(ctx)
     create_note_models(ctx)
     create_balloon_models(ctx)
+    create_thumbnail_models(ctx)
     generate_scrolling_animation(ctx)
     optimize_textures(ctx)
