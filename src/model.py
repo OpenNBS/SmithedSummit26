@@ -186,50 +186,8 @@ def create_thumbnail_models(ctx: Context) -> None:
     create_models(ctx, "thumbnails", IGNORED_THUMBNAIL_MODELS)
 
 
-def apply_alpha(img: Image.Image, alpha_texture: Image.Image) -> Image.Image:
-    def get_alpha_from_level(level: int) -> int:
-        if level < 64:
-            return 8
-        elif level < 128:
-            return 7
-        elif level < 192:
-            return 6
-        else:
-            return 5
-
-    img = img.convert("RGBA")
-    alpha_texture = alpha_texture.convert("L")
-    for x in range(img.width):
-        for y in range(img.height):
-            pixel = img.getpixel((x, y))
-            if not isinstance(pixel, tuple):
-                raise ValueError(f"Expected RGBA pixel, got {pixel}")
-            r, g, b, a = pixel
-            if a == 0:
-                continue
-            level = alpha_texture.getpixel((x, y))
-            if not isinstance(level, int):
-                raise ValueError("Alpha mask image must be in grayscale (L) mode")
-            alpha = get_alpha_from_level(level)
-            img.putpixel((x, y), (r, g, b, alpha))
-    return img
-
-
 def create_balloon_models(ctx: Context) -> None:
-    target_parent = "balloons"
-
-    alpha_texture_path = get_asset_paths(f"{target_parent}/balloon_alpha")
-    alpha_texture = ctx.assets.textures[alpha_texture_path.texture].image
-
-    del ctx.assets.textures[alpha_texture_path.texture]
-
-    all_variant_paths = create_models(ctx, target_parent, IGNORED_BALLOON_MODELS)
-
-    for i, variant_paths in enumerate(all_variant_paths):
-        balloon_texture = ctx.assets.textures[variant_paths.texture].image
-        balloon_texture = apply_alpha(balloon_texture, alpha_texture)
-
-        ctx.assets.textures[variant_paths.texture] = Texture(balloon_texture)
+    create_models(ctx, "balloons", IGNORED_BALLOON_MODELS)
 
 
 def optimize_textures(ctx: Context):
