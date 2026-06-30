@@ -199,40 +199,18 @@ def apply_alpha(img: Image.Image, alpha_texture: Image.Image) -> Image.Image:
 def create_balloon_models(ctx: Context) -> None:
     target_parent = "balloons"
 
-    base_texture_path = get_asset_paths(f"{target_parent}/base")
     alpha_texture_path = get_asset_paths(f"{target_parent}/balloon_alpha")
+    alpha_texture = ctx.assets.textures[alpha_texture_path.texture].image
 
-    balloon_variants = filter(
-        lambda name: name.startswith(f"{target_parent}/balloon_"),
-        ctx.assets.textures,
-    )
+    del ctx.assets.textures[alpha_texture_path.texture]
 
-    for i, texture in enumerate(balloon_variants):
-        if "alpha" in texture:
-            continue
+    all_variant_paths = create_models(ctx, target_parent)
 
-        # Create models for each balloon variant
-        balloon_model = Model(
-            {
-                "parent": base_texture_path.texture,
-                "textures": {"balloon": texture},
-            }
-        )
-
-        filename = texture.split("/")[-1]
-
-        balloon_paths = get_asset_paths(f"{target_parent}/{filename}")
-
-        ctx.assets.models[balloon_paths.model] = balloon_model
-        create_item_definition(ctx, balloon_paths)
-
-        # Apply alpha to the balloon texture
-        balloon_texture = ctx.assets.textures[texture].image
-        alpha_texture = ctx.assets.textures[alpha_texture_path.texture].image
+    for i, variant_paths in enumerate(all_variant_paths):
+        balloon_texture = ctx.assets.textures[variant_paths.texture].image
         balloon_texture = apply_alpha(balloon_texture, alpha_texture)
 
-        ctx.assets.textures[texture] = Texture(balloon_texture)
-    del ctx.assets.textures[alpha_texture_path.texture]
+        ctx.assets.textures[variant_paths.texture] = Texture(balloon_texture)
 
 
 def optimize_textures(ctx: Context):
