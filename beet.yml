@@ -6,13 +6,13 @@ data_pack:
     load:
         - data/nbs/module: src
         - data: src/data
-    #zipped: true
+    zipped: true
 
 resource_pack:
     name: nbs-smithed-summit-26-rp
     description: "Resource pack for NBS on the Smithed Summit 2026"
     load: [assets]
-    #zipped: true
+    zipped: true
 
 require: [bolt]
 pipeline:
@@ -20,6 +20,7 @@ pipeline:
     - mecha
     - src.sound_config
     - src.interaction
+    - beet.contrib.minify_json
 
 output: dist
 
