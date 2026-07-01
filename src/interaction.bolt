@@ -128,7 +128,25 @@ function ~/props/microwave/5:
     scoreboard players set microwave_active nbs 0
 
 function ~/props/headphones:
-    give @s minecraft:note_block[minecraft:rarity="rare", minecraft:item_model="nbs:props/headphones", minecraft:item_name={translate: "item.nbs.headphones"}, minecraft:equippable={slot: "head"}]
+    rarity_component = "rare"
+    item_model_component = "nbs:props/headphones"
+    max_stack_size_component = 1
+
+    equippable_component = {
+        slot: "head"
+    }
+
+    item_name_component = {
+        translate: "item.nbs.headphones"
+    }
+
+    custom_data_component = {
+        summit: {
+            persist: {}
+        }
+    }
+
+    give_item(f"minecraft:note_block[minecraft:equippable={equippable_component}, minecraft:max_stack_size={max_stack_size_component}, minecraft:item_model='{item_model_component}', minecraft:item_name={item_name_component}, minecraft:rarity='{rarity_component}', minecraft:custom_data={custom_data_component}]")
 
 function ~/props/piano:
     swing @s
