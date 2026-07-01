@@ -1,5 +1,5 @@
 import io
-from collections import namedtuple
+from typing import NamedTuple
 
 from beet import Context, ItemModel, Model, Texture, TextureMcmeta
 from oxipng import StripChunks, optimize_from_memory
@@ -41,7 +41,11 @@ IGNORED_BALLOON_MODELS = []
 NAMESPACE = "nbs"
 
 
-AssetPaths = namedtuple("AssetPaths", ["texture", "model"])
+class AssetPaths(NamedTuple):
+    texture: str
+    model: str
+
+
 AssetType = Literal["block", "item"]
 
 
