@@ -1,22 +1,56 @@
+from enum import Enum
+from typing import NamedTuple
+
 append function ~/load:
     scoreboard players set microwave_active nbs 0
-
-shared_food_component = {
-    nutrition: 0,
-    saturation: 0,
-    can_always_eat: true
-}
-
-shared_custom_data_component = {
-    microwavable: true
-}
 
 microwave_position = (-194.5, 65.5, 54.5)
 piano_position = (-194.0, 88.0, 58.5)
 guitar_position = (-190.5, 87.0, 55.5)
 
-def give_food(namespace: str, path: str, consumable_component = {}, translation_component = {}) -> None:
+SHARED_FOOD_COMPONENT = {
+    nutrition: 0,
+    saturation: 0,
+    can_always_eat: true
+}
+
+SHARED_CUSTOM_DATA_COMPONENT = {
+    microwavable: true
+}
+
+class EdibleType(Enum):
+    FOOD = 1
+    DRINK = 2
+
+class EdibleComponents(NamedTuple):
+    consumable: dict
+    max_stack_size: int
+
+EDIBLE_COMPONENTS: dict[EdibleType, EdibleComponents] = {
+    EdibleType.FOOD: {
+        consumable: {},
+        max_stack_size: 64
+    },
+    EdibleType.DRINK: {
+        consumable: {
+          animation: "drink",
+          sound: "entity.generic.drink"
+        },
+        max_stack_size: 16
+    }
+}
+
+def give_item(item: str) -> None:
     swing @s
+
+    if items entity @s weapon.mainhand *:
+        give @s item
+    unless items entity @s weapon.mainhand *:
+        item replace entity @s weapon.mainhand with item
+
+def give_edible(namespace: str, path: str, edible_type: EdibleType, translation_component = {}) -> None:
+    item_model_component = f"{namespace}:{path}"
+    edible_component = EDIBLE_COMPONENTS[edible_type]
 
     translation_component = {
         translate: f"item.{namespace}.{path}",
@@ -30,32 +64,25 @@ def give_food(namespace: str, path: str, consumable_component = {}, translation_
         italic: false
     }]
 
-    item_model_component = f"{namespace}:{path}"
+    give_item(f"minecraft:note_block[minecraft:food={SHARED_FOOD_COMPONENT}, minecraft:consumable={edible_component.consumable}, minecraft:max_stack_size={edible_component.max_stack_size}, minecraft:item_model='{item_model_component}', minecraft:item_name={translation_component}, minecraft:lore={lore_component}, minecraft:custom_data={SHARED_CUSTOM_DATA_COMPONENT}]")
 
-    if items entity @s weapon.mainhand *:
-        give @s minecraft:note_block[minecraft:food=shared_food_component, minecraft:consumable=consumable_component, minecraft:custom_data=shared_custom_data_component, minecraft:item_model=item_model_component, minecraft:item_name=translation_component, minecraft:lore=lore_component]
-    unless items entity @s weapon.mainhand *:
-        item replace entity @s weapon.mainhand with minecraft:note_block[minecraft:food=shared_food_component, minecraft:consumable=consumable_component, minecraft:custom_data=shared_custom_data_component, minecraft:item_model=item_model_component, minecraft:item_name=translation_component, minecraft:lore=lore_component]
 
-function ~/food/pink_donut:
-    give_food("cnk", "pink_donut")
+function ~/edible/pink_donut:
+    give_edible("cnk", "pink_donut", EdibleType.FOOD)
 
-function ~/food/cinnamon_roll:
-    give_food("cnk", "cinnamon_roll")
+function ~/edible/cinnamon_roll:
+    give_edible("cnk", "cinnamon_roll", EdibleType.FOOD)
 
-function ~/food/pizza:
-    give_food("cnk", "pizza")
+function ~/edible/pizza:
+    give_edible("cnk", "pizza", EdibleType.FOOD)
 
-function ~/food/cake_slice:
-    give_food("foodstuffs", "cake_slice", translation_component={
+function ~/edible/cake_slice:
+    give_edible("foodstuffs", "cake_slice", EdibleType.FOOD, translation_component={
         fallback: "Cake Slice"
     })
 
-function ~/food/pumpkin_latte:
-    give_food("cnk", "pumpkin_latte", consumable_component={
-      animation: "drink",
-      sound: "entity.generic.drink"
-    })
+function ~/edible/pumpkin_latte:
+    give_edible("cnk", "pumpkin_latte", EdibleType.DRINK)
 
 function ~/props/microwave:
     if score microwave_active nbs matches 0 if items entity @s weapon.mainhand minecraft:note_block[minecraft:custom_data~{microwavable: true}]:
