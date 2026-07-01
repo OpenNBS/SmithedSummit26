@@ -1,7 +1,7 @@
 {
 	"textures": {
-		"0": "nbs:item/logos/world/text_base",
-		"1": "nbs:item/logos/world/text_variant_world"
+		"0": "nbs:block/logos/world/text_base",
+		"1": "nbs:block/logos/world/text_variant_world"
 	},
 	"elements": [
 		{

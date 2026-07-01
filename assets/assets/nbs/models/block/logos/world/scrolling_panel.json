@@ -1,11 +1,11 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "nbs:item/logos/world/scrolling_panel_1",
-		"1": "nbs:item/logos/world/scrolling_panel_2",
-		"2": "nbs:item/logos/world/scrolling_panel_3",
-		"3": "nbs:item/logos/world/scrolling_panel_4",
-		"4": "nbs:item/logos/world/scrolling_panel_5"
+		"0": "nbs:block/logos/world/scrolling_panel_1",
+		"1": "nbs:block/logos/world/scrolling_panel_2",
+		"2": "nbs:block/logos/world/scrolling_panel_3",
+		"3": "nbs:block/logos/world/scrolling_panel_4",
+		"4": "nbs:block/logos/world/scrolling_panel_5"
 	},
 	"elements": [
 		{

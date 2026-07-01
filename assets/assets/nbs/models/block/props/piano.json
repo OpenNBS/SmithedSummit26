@@ -1,8 +1,7 @@
 {
 	"texture_size": [64, 64],
 	"textures": {
-		"0": "nbs:item/props/piano",
-		"particle": "nbs:item/props/piano"
+		"0": "nbs:block/props/piano"
 	},
 	"elements": [
 		{

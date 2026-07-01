@@ -1,9 +1,9 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "nbs:item/logos/world/block_left",
-		"1": "nbs:item/logos/world/block_right",
-		"2": "nbs:item/logos/world/block_top"
+		"0": "nbs:block/logos/world/block_left",
+		"1": "nbs:block/logos/world/block_right",
+		"2": "nbs:block/logos/world/block_top"
 	},
 	"elements": [
 		{

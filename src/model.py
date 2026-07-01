@@ -4,8 +4,15 @@ from collections import namedtuple
 from beet import Context, ItemModel, Model, Texture, TextureMcmeta
 from oxipng import StripChunks, optimize_from_memory
 from PIL import Image
+from typing_extensions import Literal
 
-MODELS = [
+BLOCK_MODELS = [
+    "globe/sandstone",
+    "globe/stone",
+    "props/piano",
+    "props/guitar",
+    "props/speaker",
+    "props/open_sign",
     "logos/world/block",
     "logos/world/wordmark",
     "logos/world/scrolling_panel",
@@ -18,13 +25,10 @@ MODELS = [
     "logos/studio/text_shadow",
     "logos/studio/icon",
     "logos/cafe",
-    "props/speaker",
+]
+
+ITEM_MODELS = [
     "props/headphones",
-    "props/piano",
-    "props/guitar",
-    "props/open_sign",
-    "globe/sandstone",
-    "globe/stone",
     "wall_art",
 ]
 
@@ -38,10 +42,14 @@ NAMESPACE = "nbs"
 
 
 AssetPaths = namedtuple("AssetPaths", ["texture", "model"])
+AssetType = Literal["block", "item"]
 
 
-def get_asset_paths(path: str) -> AssetPaths:
-    return AssetPaths(texture=f"{NAMESPACE}:item/{path}", model=f"{NAMESPACE}:{path}")
+def get_asset_paths(path: str, type: AssetType) -> AssetPaths:
+    return AssetPaths(
+        texture=f"{NAMESPACE}:{type}/{path}",
+        model=f"{NAMESPACE}:{path}",
+    )
 
 
 def create_item_definition(ctx: Context, asset_paths: AssetPaths) -> None:
@@ -67,11 +75,18 @@ def create_item_definition(ctx: Context, asset_paths: AssetPaths) -> None:
     )
 
 
-def create_item_models(ctx: Context) -> None:
-    for model in MODELS:
-        paths = get_asset_paths(model)
+def create_block_models(ctx: Context) -> None:
+    for model in BLOCK_MODELS:
+        asset_paths = get_asset_paths(model, "block")
 
-        create_item_definition(ctx, paths)
+        create_item_definition(ctx, asset_paths)
+
+
+def create_item_models(ctx: Context) -> None:
+    for model in ITEM_MODELS:
+        asset_paths = get_asset_paths(model, "item")
+
+        create_item_definition(ctx, asset_paths)
 
 
 def generate_scrolling_texture(img: Image.Image, scroll_factor: int = 4) -> Texture:
@@ -126,13 +141,15 @@ def generate_scrolling_mcmetas(
 def generate_scrolling_animation(ctx: Context) -> None:
     target_parent = "logos/world"
 
-    static_panel_paths = get_asset_paths(f"{target_parent}/static_panel")
+    static_panel_paths = get_asset_paths(f"{target_parent}/static_panel", "block")
 
     static_panel_texture = ctx.assets.textures[static_panel_paths.texture]
     scrolling_panel_texture = generate_scrolling_texture(static_panel_texture.image)
     mcmetas = generate_scrolling_mcmetas(scrolling_panel_texture)
     for i, mcmeta in enumerate(mcmetas, start=1):
-        scrolling_panel_path = get_asset_paths(f"{target_parent}/scrolling_panel_{i}")
+        scrolling_panel_path = get_asset_paths(
+            f"{target_parent}/scrolling_panel_{i}", "block"
+        )
 
         ctx.assets.textures[scrolling_panel_path.texture] = scrolling_panel_texture
         ctx.assets.textures_mcmeta[scrolling_panel_path.texture] = mcmeta
@@ -140,14 +157,14 @@ def generate_scrolling_animation(ctx: Context) -> None:
 
 
 def create_models(
-    ctx: Context, target_parent: str, ignored_textures: list[str] = []
+    ctx: Context, target_parent: str, type: AssetType, ignored_textures: list[str] = []
 ) -> list[AssetPaths]:
-    target_variant_paths = get_asset_paths(f"{target_parent}")
-    base_texture_paths = get_asset_paths(f"{target_parent}/base")
+    target_variant_paths = get_asset_paths(f"{target_parent}", type)
+    base_texture_paths = get_asset_paths(f"{target_parent}/base", type)
 
     for i, texture in enumerate(ignored_textures):
         filename = texture.split("/")[-1]
-        variant_paths = get_asset_paths(f"{target_parent}/{filename}")
+        variant_paths = get_asset_paths(f"{target_parent}/{filename}", type)
 
         del ctx.assets.textures[variant_paths.texture]
 
@@ -157,7 +174,7 @@ def create_models(
 
     all_variant_paths: list[AssetPaths] = []
 
-    global MODELS
+    global ITEM_MODELS
     for i, texture in enumerate(variants):
         model = Model(
             {
@@ -168,7 +185,7 @@ def create_models(
 
         filename = texture.split("/")[-1]
 
-        variant_paths = get_asset_paths(f"{target_parent}/{filename}")
+        variant_paths = get_asset_paths(f"{target_parent}/{filename}", type)
 
         ctx.assets.models[variant_paths.texture] = model
         create_item_definition(ctx, variant_paths)
@@ -179,15 +196,15 @@ def create_models(
 
 
 def create_note_models(ctx: Context) -> None:
-    create_models(ctx, "notes", IGNORED_NOTE_MODELS)
+    create_models(ctx, "notes", "block", IGNORED_NOTE_MODELS)
 
 
 def create_thumbnail_models(ctx: Context) -> None:
-    create_models(ctx, "thumbnails", IGNORED_THUMBNAIL_MODELS)
+    create_models(ctx, "thumbnails", "block", IGNORED_THUMBNAIL_MODELS)
 
 
 def create_balloon_models(ctx: Context) -> None:
-    create_models(ctx, "balloons", IGNORED_BALLOON_MODELS)
+    create_models(ctx, "balloons", "item", IGNORED_BALLOON_MODELS)
 
 
 def optimize_textures(ctx: Context):
@@ -209,6 +226,7 @@ def optimize_textures(ctx: Context):
 
 
 def beet_default(ctx: Context):
+    create_block_models(ctx)
     create_item_models(ctx)
     create_note_models(ctx)
     create_balloon_models(ctx)

@@ -1,6 +1,6 @@
 {
 	"textures": {
-		"0": "nbs:item/logos/studio/text"
+		"0": "nbs:block/logos/world/text_background"
 	},
 	"elements": [
 		{
