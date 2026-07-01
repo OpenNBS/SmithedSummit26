@@ -82,6 +82,7 @@ function ~/props/microwave/3:
     schedule function ~/../4 4t
 
 function ~/props/microwave/4:
+    # TODO: out-of-range note
     positioned microwave_position run playsound minecraft:block.note_block.bit block @a[distance=..8] ~ ~ ~ 0.3 0
     positioned microwave_position run playsound minecraft:block.brewing_stand.brew block @a[distance=..8] ~ ~ ~ 0.05 0.07
 
@@ -127,6 +128,9 @@ function ~/props/piano/5:
     playsound minecraft:block.note_block.pling block @a[distance=..8] ~-0.25 ~ ~ 1 1.335
 
 function ~/props/piano/hit:
+    execute positioned piano_position function ~/play
+
+function ~/props/piano/hit/play:
     playsound minecraft:block.note_block.pling block @a[distance=..8] ~0.13 ~ ~ 1 0.707
     playsound minecraft:block.note_block.pling block @a[distance=..8] ~0.02 ~ ~ 0.7 0.841
     playsound minecraft:block.note_block.pling block @a[distance=..8] ~-0.13 ~ ~ 1 1.059
@@ -158,6 +162,10 @@ function ~/props/guitar/5:
     playsound minecraft:block.note_block.guitar block @a[distance=..8] ~ ~ ~ 1 1.782
 
 function ~/props/guitar/hit:
+    execute positioned guitar_position function ~/play
+
+function ~/props/guitar/hit/play:
+    # TODO: out-of-range note
     playsound minecraft:block.note_block.guitar block @a[distance=..8] ~ ~ ~ 1 0.891
     playsound minecraft:block.note_block.guitar block @a[distance=..8] ~ ~ ~ 1 0.794
     playsound minecraft:block.note_block.guitar block @a[distance=..8] ~ ~ ~ 1 1.059
