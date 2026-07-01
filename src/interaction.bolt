@@ -94,4 +94,4 @@ function ~/props/microwave/5:
     scoreboard players set microwave_active nbs 0
 
 function ~/props/headphones:
-    give @s minecraft:note_block[minecraft:rarity="rare", minecraft:item_model="nbs:props/headphones", minecraft:item_name="Headphones", minecraft:equippable={slot: "head"}]
+    give @s minecraft:note_block[minecraft:rarity="rare", minecraft:item_model="nbs:props/headphones", minecraft:item_name={translate: "item.nbs.headphones"}, minecraft:equippable={slot: "head"}]
