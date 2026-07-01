@@ -1,44 +1,75 @@
 {
-    "namespace": "<booth_id>",
-    "booth_name": "<Booth Name>",
-    "bounding_boxes": {
-        "my_box": {
-            "position": {
-                "x": {"min": -135, "max": -102},
-                "y": {"min": 70, "max": 95},
-                "z": {"min": -39, "max": -20}
-            },
-            "on_player_enter": "<function_location>",
-            "on_player_exit": "<function_location>"
-        },
-        ...
-    },
-    "on_player_enter": "<function_location>",
-    "on_player_exit": "<function_location>",
-    "ticking_functions": {
-        "<booth_id>:tick": "1t",
-        "<booth_id>:sec": "1s",
-        ...
-    },
-    "sticker_book": {
-        "background_color": "#1a48c3",
-        "region": "textured_tropics",
-        "stickers": [
-            {
-                "sticker_id": "<sticker_id>",
-                "sticker_texture": "<texture_location>",
-                "sticker_name": "Welcome to Booth",
-                "unobtained_text": "Enter the Booth",
-                "obtained_text": "Rewarded for entering the Booth"
-            },
-            ...
-        ]
-    },
-    "balloons": [
-        {
-            "balloon_id": "smithie",
-            "balloon_name": "Smithie",
-            "balloon_model": "summit_balloons:item/smithie"
-        }
-    ]
+	"namespace": "nbs",
+	"booth_name": "OpenNBS",
+	"bounding_boxes": {
+		"nbs": {
+			"position": {
+				"x": { "min": -216, "max": -187 },
+				"y": { "min": 62, "max": 99 },
+				"z": { "min": 34, "max": 65 }
+			}
+		},
+		"studio": {
+			"position": {
+				"x": { "min": -198, "max": -188 },
+				"y": { "min": 64, "max": 89 },
+				"z": { "min": 47, "max": 60 }
+			},
+			"on_player_enter": "nbs:stickers/studio"
+		},
+		"world": {
+			"position": {
+				"x": { "min": -214, "max": -200 },
+				"y": { "min": 62, "max": 81 },
+				"z": { "min": 39, "max": 53 }
+			},
+			"on_player_enter": "nbs:stickers/world"
+		}
+	},
+	"sticker_book": {
+		"background_color": "#06c35d",
+		"region": "textured_tropics",
+		"stickers": [
+			{
+				"sticker_id": "visited_studio",
+				"sticker_texture": "nbs:items/stickers/studio",
+				"sticker_name": "Note Block Studio",
+				"unobtained_text": "Visit the Note Block Studio booth",
+				"obtained_text": "Rewarded for entering the booth"
+			},
+			{
+				"sticker_id": "visited_world",
+				"sticker_texture": "nbs:items/stickers/world",
+				"sticker_name": "Note Block World",
+				"unobtained_text": "Visit the Note Block World booth",
+				"obtained_text": "Rewarded for entering the booth"
+			},
+			{
+				"sticker_id": "collected_all_foods",
+				"sticker_texture": "nbs:items/stickers/cinnamon_roll",
+				"sticker_name": "Living to Eat",
+				"unobtained_text": "Have an appetite for delicacies in the OpenNBS booths!",
+				"obtained_text": "Collected all food items in the OpenNBS booths"
+			},
+			{
+				"sticker_id": "heard_all_songs",
+				"sticker_texture": "nbs:items/stickers/headphones",
+				"sticker_name": "Melomaniac",
+				"unobtained_text": "Traverse the Summit, feel the beat!",
+				"obtained_text": "Heard all songs in the Summit soundtrack"
+			}
+		]
+	},
+	"balloons": [
+		{
+			"balloon_id": "note_lime",
+			"balloon_name": "Lime Note",
+			"balloon_model": "nbs:item/balloons/lime"
+		},
+		{
+			"balloon_id": "note_pink",
+			"balloon_name": "Pink Note",
+			"balloon_model": "nbs:item/balloons/pink"
+		}
+	]
 }
