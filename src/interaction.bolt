@@ -1,34 +1,81 @@
-function ~/fix_entities:
-    tag @e[type=minecraft:interaction,tag=nbs_painting_overlordvizeon] add nbs_painting_vizeon
-    tag @e[type=minecraft:interaction,tag=nbs_painting_overlordvizeon] remove nbs_painting_overlordvizeon
-    tag @e[type=minecraft:interaction,tag=nbs_painting_superbaconbro2] add nbs_painting_superbaconbro
-    tag @e[type=minecraft:interaction,tag=nbs_painting_superbaconbro2] remove nbs_painting_superbaconbro2
-    execute unless entity @e[type=item_display,tag=nbs_wall_art] run summon minecraft:item_display -55.0 81.0 -0.99 {item: {components: {"minecraft:custom_model_data": 48199, "minecraft:custom_name": '{"color":"yellow","italic":false,"text":"nbs:wall_art"}'}, count: 1, id: "minecraft:note_block"}, transformation: {left_rotation: [0.0f, 0.0f, 0.0f, 1.0f], right_rotation: [0.0f, 0.0f, 0.0f, 1.0f], scale: [16.0f, 16.0f, 0.01f], translation: [0.0f, 0.0f, 0.0f]},Tags:["nbs","nbs_wall_art"]}
+append function ~/load:
+    scoreboard players set microwave_active nbs 0
 
-function ~/headphones:
-    give @s minecraft:carved_pumpkin[minecraft:custom_model_data=48185,minecraft:item_name=Headphones,minecraft:rarity=rare,minecraft:max_stack_size=1,minecraft:lore=['{text:"Equip in your head slot to",italic:false,color:gray}','{text:"hear music everywhere!",italic:false,color:gray}','{text:""}','["",{text:"by ",italic:false,color:gray},{text:"Note Block Studio",italic:false,color:green}]']] 1
-    execute unless entity @s[tag=nbs_headphones_collected] run scoreboard players add headphones_players nbs_stats 1
-    scoreboard players add headphones_collected nbs_stats 1
-    tag @s add nbs_headphones_collected
+shared_food_component = {
+    nutrition: 0,
+    saturation: 0,
+    can_always_eat: true
+}
 
-function ~/headphones_equip:
-    tag @s add nbs_headphones
-    scoreboard players add headphones_equipped nbs_stats 1
-    function ~/../title with storage nbs:main playing
-    function ~/../headphones_equip2 with storage nbs:main playing
+microwave_position = (-195, 65.5, 54)
 
-function ~/headphones_equip2:
-    $title @s actionbar {"text":"","extra":[{"text":"🎧 Listening to: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}
+def give_food(namespace: str, path: str, consumable_component = {}, translation = {}) -> None:
+    translation = {
+        translate: f"item.{namespace}.{path}",
+        **translation
+    }
 
-function ~/headphones_unequip:
-    tag @s remove nbs_headphones
-    advancement revoke @s only nbs:headphones_equip
-    advancement revoke @s only nbs:headphones_unequip
+    give @s minecraft:note_block[food=shared_food_component, minecraft:consumable=consumable_component, minecraft:custom_data={microwavable: true}, minecraft:item_model=f"{namespace}:{path}", minecraft:item_name=translation, minecraft:lore=[{translate: f"{namespace}.tooltip", font: f"{namespace}:tooltip", color: "white", italic: false}]]
 
-function ~/nbs_link:
-    scoreboard players add nbs_link nbs_stats 1
-    tellraw @p ["","\n",{"text":"╔══════════════════╗","color":"yellow"},"\n","\n",{"text":"   Click to open in your browser!","color":"yellow"},"\n","\n",{"text":"      >> ","color":"gray"},{"text":"noteblock.studio","bold":true,"underlined":true,"color":"green","clickEvent":{"action":"open_url","value":"https://noteblock.studio/"},"hoverEvent":{"action":"show_text","contents":[{"text":"https://noteblock.studio/","color":"yellow"}]}},{"text":" <<","color":"gray"},"\n","\n",{"text":"   You can also find us on:","color":"yellow"},"\n","\n","        ",{"text":"Discord","bold":true,"underlined":true,"color":"#5865F2","clickEvent":{"action":"open_url","value":"https://discord.gg/open-note-block-studio-608692895179997252"},"hoverEvent":{"action":"show_text","contents":[{"text":"https://discord.gg/open-note-block-studio-608692895179997252","color":"yellow"}]}}," 🎮 • 💻 ",{"text":"GitHub","bold":true,"underlined":true,"color":"dark_purple","clickEvent":{"action":"open_url","value":"https://github.com/OpenNBS"},"hoverEvent":{"action":"show_text","contents":[{"text":"https://github.com/OpenNBS","color":"yellow"}]}},"\n","\n","       ",{"text":"YouTube","bold":true,"underlined":true,"color":"#FF0000","clickEvent":{"action":"open_url","value":"https://youtube.com/@OpenNBS"},"hoverEvent":{"action":"show_text","contents":[{"text":"https://youtube.com/OpenNBS","color":"yellow"}]}}," 🎞 • ❤ ",{"text":"Donate","bold":true,"underlined":true,"color":"#7EADF1","clickEvent":{"action":"open_url","value":"https://opencollective.com/OpenNBS"},"hoverEvent":{"action":"show_text","contents":[{"text":"https://opencollective.com/OpenNBS","color":"yellow"}]}},"\n","\n",{"text":"╚══════════════════╝","color":"yellow"}]
+function ~/food/pink_donut:
+    give_food("cnk", "pink_donut")
 
-function ~/nbw_link:
-    scoreboard players add nbw_link nbs_stats 1
-    tellraw @p ["","\n",{"text":"╔══════════════════╗","color":"green"},"\n","\n",{"text":"   Click to open in your browser!","color":"green"},"\n","\n",{"text":"      >> ","color":"gray"},{"text":"noteblock.world","bold":true,"underlined":true,"color":"aqua","clickEvent":{"action":"open_url","value":"https://noteblock.world/"},"hoverEvent":{"action":"show_text","contents":[{"text":"https://noteblock.world/","color":"green"}]}},{"text":" <<","color":"gray"},"\n","\n",{"text":"   You can also find us on:","color":"green"},"\n","\n","        ",{"text":"Discord","bold":true,"underlined":true,"color":"#5865F2","clickEvent":{"action":"open_url","value":"https://discord.gg/open-note-block-studio-608692895179997252"},"hoverEvent":{"action":"show_text","contents":[{"text":"https://discord.gg/","color":"green"}]}}," 🎮 • 💻 ",{"text":"GitHub","bold":true,"underlined":true,"color":"dark_purple","clickEvent":{"action":"open_url","value":"https://github.com/OpenNBS"},"hoverEvent":{"action":"show_text","contents":[{"text":"https://github.com/OpenNBS","color":"green"}]}},"\n","\n","       ",{"text":"YouTube","bold":true,"underlined":true,"color":"#FF0000","clickEvent":{"action":"open_url","value":"https://youtube.com/@OpenNBS"},"hoverEvent":{"action":"show_text","contents":[{"text":"https://youtube.com/OpenNBS","color":"green"}]}}," 🎞 • ❤ ",{"text":"Donate","bold":true,"underlined":true,"color":"#7EADF1","clickEvent":{"action":"open_url","value":"https://opencollective.com/OpenNBS"},"hoverEvent":{"action":"show_text","contents":[{"text":"https://opencollective.com/OpenNBS","color":"green"}]}},"\n","\n",{"text":"╚══════════════════╝","color":"green"}]
+function ~/food/cinnamon_roll:
+    give_food("cnk", "cinnamon_roll")
+
+function ~/food/pizza:
+    give_food("cnk", "pizza")
+
+function ~/food/cake_slice:
+    give_food("foodstuffs", "cake_slice", translation={
+        fallback: "Cake Slice"
+    })
+
+function ~/food/pumpkin_latte:
+    give_food("cnk", "pumpkin_latte", consumable_component={
+      animation: "drink",
+      sound: "entity.generic.drink"
+    })
+
+function ~/props/microwave:
+    if score microwave_active nbs matches 0 if items entity @s weapon.mainhand minecraft:note_block[minecraft:custom_data~{microwavable: true}]:
+        scoreboard players set microwave_active nbs 1
+
+        item modify entity @s weapon.mainhand nbs:remove_one
+        function ~/1
+
+function ~/props/microwave/1:
+    positioned microwave_position run playsound minecraft:block.decorated_pot.insert block @a[distance=..8] ~ ~ ~ 1 1.6
+
+    schedule function ~/../2 8t
+
+function ~/props/microwave/2:
+    positioned microwave_position run playsound minecraft:block.decorated_pot.insert block @a[distance=..8] ~ ~ ~ 1 1.82
+
+    schedule function ~/../3 4t
+
+function ~/props/microwave/3:
+    positioned microwave_position run playsound minecraft:block.decorated_pot.insert block @a[distance=..8] ~ ~ ~ 1 1.95
+
+    schedule function ~/../4 4t
+
+function ~/props/microwave/4:
+    positioned microwave_position run playsound minecraft:block.note_block.bit block @a[distance=..8] ~ ~ ~ 0.3 0
+    positioned microwave_position run playsound minecraft:block.brewing_stand.brew block @a[distance=..8] ~ ~ ~ 0.05 0.07
+
+    schedule function ~/../5 32t
+
+function ~/props/microwave/5:
+    positioned microwave_position run playsound minecraft:block.mud.break block @a[distance=..8] ~ ~ ~ 0.8 0.12
+    positioned microwave_position run playsound minecraft:block.mud.break block @a[distance=..8] ~ ~ ~ 1 0.35
+
+    positioned microwave_position run playsound minecraft:entity.sulfur_cube.squish block @a[distance=..8] -195 65.5 54 0.3 0.35
+
+    positioned microwave_position run playsound minecraft:entity.firework_rocket.large_blast block @a[distance=..8] -195 65.5 54 0.35 1.5
+
+    positioned microwave_position run particle minecraft:campfire_cosy_smoke ~.1 ~.1 ~.3 0 0.02 0 1 0
+
+    scoreboard players set microwave_active nbs 0
+
+function ~/props/headphones:
+    give @s minecraft:note_block[minecraft:rarity="rare", minecraft:item_model="nbs:props/headphones", minecraft:item_name="Headphones", minecraft:equippable={slot: "head"}]
