@@ -7,15 +7,31 @@ shared_food_component = {
     can_always_eat: true
 }
 
+shared_custom_data_component = {
+    microwavable: true
+}
+
 microwave_position = (-195, 65.5, 54)
 
-def give_food(namespace: str, path: str, consumable_component = {}, translation = {}) -> None:
-    translation = {
+def give_food(namespace: str, path: str, consumable_component = {}, translation_component = {}) -> None:
+    translation_component = {
         translate: f"item.{namespace}.{path}",
-        **translation
+        **translation_component
     }
 
-    give @s minecraft:note_block[food=shared_food_component, minecraft:consumable=consumable_component, minecraft:custom_data={microwavable: true}, minecraft:item_model=f"{namespace}:{path}", minecraft:item_name=translation, minecraft:lore=[{translate: f"{namespace}.tooltip", font: f"{namespace}:tooltip", color: "white", italic: false}]]
+    lore_component = [{
+        translate: f"{namespace}.tooltip",
+        font: f"{namespace}:tooltip",
+        color: "white",
+        italic: false
+    }]
+
+    item_model_component = f"{namespace}:{path}"
+
+    if items entity @s weapon.mainhand *:
+        give @s minecraft:note_block[minecraft:food=shared_food_component, minecraft:consumable=consumable_component, minecraft:custom_data=shared_custom_data_component, minecraft:item_model=item_model_component, minecraft:item_name=translation_component, minecraft:lore=lore_component]
+    unless items entity @s weapon.mainhand *:
+        item replace entity @s weapon.mainhand with minecraft:note_block[minecraft:food=shared_food_component, minecraft:consumable=consumable_component, minecraft:custom_data=shared_custom_data_component, minecraft:item_model=item_model_component, minecraft:item_name=translation_component, minecraft:lore=lore_component]
 
 function ~/food/pink_donut:
     give_food("cnk", "pink_donut")
@@ -27,7 +43,7 @@ function ~/food/pizza:
     give_food("cnk", "pizza")
 
 function ~/food/cake_slice:
-    give_food("foodstuffs", "cake_slice", translation={
+    give_food("foodstuffs", "cake_slice", translation_component={
         fallback: "Cake Slice"
     })
 
