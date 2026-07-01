@@ -12,6 +12,8 @@ shared_custom_data_component = {
 }
 
 microwave_position = (-194.5, 65.5, 54.5)
+piano_position = (-194.0, 88.0, 58.5)
+guitar_position = (-190.5, 87.0, 55.5)
 
 def give_food(namespace: str, path: str, consumable_component = {}, translation_component = {}) -> None:
     swing @s
@@ -99,3 +101,65 @@ function ~/props/microwave/5:
 
 function ~/props/headphones:
     give @s minecraft:note_block[minecraft:rarity="rare", minecraft:item_model="nbs:props/headphones", minecraft:item_name={translate: "item.nbs.headphones"}, minecraft:equippable={slot: "head"}]
+
+function ~/props/piano:
+    swing @s
+
+    execute store result storage nbs:main piano.key int 1 run random value 1..5
+    execute positioned piano_position function ~/play with storage nbs:main piano
+
+function ~/props/piano/play:
+    $function nbs:interaction/props/piano/$(key)
+
+function ~/props/piano/1:
+    playsound minecraft:block.note_block.pling block @a[distance=..8] ~0.25 ~ ~ 1 0.53
+
+function ~/props/piano/2:
+    playsound minecraft:block.note_block.pling block @a[distance=..8] ~0.13 ~ ~ 1 0.707
+
+function ~/props/piano/3:
+    playsound minecraft:block.note_block.pling block @a[distance=..8] ~ ~ ~ 1 0.891
+
+function ~/props/piano/4:
+    playsound minecraft:block.note_block.pling block @a[distance=..8] ~-0.13 ~ ~ 1 1.059
+
+function ~/props/piano/5:
+    playsound minecraft:block.note_block.pling block @a[distance=..8] ~-0.25 ~ ~ 1 1.335
+
+function ~/props/piano/hit:
+    playsound minecraft:block.note_block.pling block @a[distance=..8] ~0.13 ~ ~ 1 0.707
+    playsound minecraft:block.note_block.pling block @a[distance=..8] ~0.02 ~ ~ 0.7 0.841
+    playsound minecraft:block.note_block.pling block @a[distance=..8] ~-0.13 ~ ~ 1 1.059
+    playsound minecraft:block.note_block.pling block @a[distance=..8] ~-0.15 ~ ~ 0.7 1.189
+    playsound minecraft:block.note_block.pling block @a[distance=..8] ~-0.3 ~ ~ 1 1.587
+
+function ~/props/guitar:
+    swing @s
+
+    execute store result storage nbs:main guitar.key int 1 run random value 1..5
+    execute positioned guitar_position function ~/play with storage nbs:main guitar
+
+function ~/props/guitar/play:
+    $function nbs:interaction/props/guitar/$(key)
+
+function ~/props/guitar/1:
+    playsound minecraft:block.note_block.guitar block @a[distance=..8] ~ ~ ~ 1 0.891
+
+function ~/props/guitar/2:
+    playsound minecraft:block.note_block.guitar block @a[distance=..8] ~ ~ ~ 1 0.794
+
+function ~/props/guitar/3:
+    playsound minecraft:block.note_block.guitar block @a[distance=..8] ~ ~ ~ 1 1.059
+
+function ~/props/guitar/4:
+    playsound minecraft:block.note_block.guitar block @a[distance=..8] ~ ~ ~ 1 1.335
+
+function ~/props/guitar/5:
+    playsound minecraft:block.note_block.guitar block @a[distance=..8] ~ ~ ~ 1 1.782
+
+function ~/props/guitar/hit:
+    playsound minecraft:block.note_block.guitar block @a[distance=..8] ~ ~ ~ 1 0.891
+    playsound minecraft:block.note_block.guitar block @a[distance=..8] ~ ~ ~ 1 0.794
+    playsound minecraft:block.note_block.guitar block @a[distance=..8] ~ ~ ~ 1 1.059
+    playsound minecraft:block.note_block.guitar block @a[distance=..8] ~ ~ ~ 1 1.335
+    playsound minecraft:block.note_block.guitar block @a[distance=..8] ~ ~ ~ 1 1.782
