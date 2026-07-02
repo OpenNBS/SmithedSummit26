@@ -42,17 +42,17 @@ def get_translation(translation_type: TranslationType, *paths: str) -> Resource:
     return Resource(f"{translation_type.value}.{NAMESPACE}.", ".", *paths)
 
 
-def get_resource(*paths: str) -> Resource:
+def get_asset(*paths: str) -> Resource:
     return Resource(f"{NAMESPACE}:", "/", *paths)
 
 
 def get_texture(texture_type: TextureType, *paths: str) -> Resource:
     texture_path = [texture_type.value, *paths]
 
-    return get_resource(*texture_path)
+    return get_asset(*texture_path)
 
 
-def serialize(path: str) -> str:
+def serialize_path(path: str) -> str:
     return path.lower().replace(".", "")
 
 

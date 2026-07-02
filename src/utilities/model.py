@@ -96,43 +96,43 @@ def create_tinted_item_model(
 
 def create_item_model(
     ctx: Context,
-    model_path: Resource,
-    texture_path: Resource,
+    model_resource: Resource,
+    texture_resource: Resource,
 ) -> None:
-    model = ctx.assets.models[texture_path.value]
+    model = ctx.assets.models[texture_resource.value]
 
     model_tints = apply_model_tints(model)
 
-    create_tinted_item_model(ctx, model_path, texture_path, model_tints)
+    create_tinted_item_model(ctx, model_resource, texture_resource, model_tints)
 
 
 def create_from_base(
-    ctx: Context, model_path: Resource, texture_path: Resource
+    ctx: Context, model_resource: Resource, texture_resource: Resource
 ) -> None:
-    base_texture_path = texture_path.append("base")
+    base_texture_resource = texture_resource.append("base")
 
     texture_variants = filter(
-        lambda name: name.startswith(texture_path.value), ctx.assets.textures
+        lambda name: name.startswith(texture_resource.value), ctx.assets.textures
     )
 
-    base_model = ctx.assets.models[base_texture_path.value]
+    base_model = ctx.assets.models[base_texture_resource.value]
     base_model_tints = apply_model_tints(base_model)
 
     for texture_variant in texture_variants:
         model = Model(
             {
-                "parent": base_texture_path.value,
+                "parent": base_texture_resource.value,
                 "textures": {"variant": texture_variant},
             }
         )
 
         file_name = texture_variant.split("/")[-1]
 
-        variant_model_path = model_path.append(file_name)
-        variant_texture_path = texture_path.append(file_name)
+        variant_model_resource = model_resource.append(file_name)
+        variant_texture_resource = texture_resource.append(file_name)
 
-        ctx.assets.models[variant_texture_path.value] = model
+        ctx.assets.models[variant_texture_resource.value] = model
 
         create_tinted_item_model(
-            ctx, variant_model_path, variant_texture_path, base_model_tints
+            ctx, variant_model_resource, variant_texture_resource, base_model_tints
         )

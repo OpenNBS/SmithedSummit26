@@ -22,7 +22,7 @@ def generate_thumbnails(ctx: Context) -> None:
         title = thumbnail["title"]
         song_id = thumbnail["id"]
 
-        action_asset_id = resource.serialize(author)
+        action_asset_id = resource.serialize_path(author)
 
         label = f"{author} - {title}"
 

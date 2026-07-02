@@ -31,17 +31,17 @@ ITEM_MODELS = [
 
 
 def create_static_model(ctx: Context, type: TextureType, path: str) -> None:
-    model_path = resource.get_resource(path)
-    texture_path = resource.get_texture(type, path)
+    model_resource = resource.get_asset(path)
+    texture_resource = resource.get_texture(type, path)
 
-    create_item_model(ctx, model_path, texture_path)
+    create_item_model(ctx, model_resource, texture_resource)
 
 
 def create_base_model(ctx: Context, type: TextureType, path: str) -> None:
-    model_path = resource.get_resource(path)
-    texture_path = resource.get_texture(type, path)
+    model_resource = resource.get_asset(path)
+    texture_resource = resource.get_texture(type, path)
 
-    create_from_base(ctx, model_path, texture_path)
+    create_from_base(ctx, model_resource, texture_resource)
 
 
 def generate_block_models(ctx: Context) -> None:

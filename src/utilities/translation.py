@@ -15,7 +15,9 @@ def get_language_data(ctx: Context) -> JsonDict:
     return language_data
 
 
-def create_translation(ctx: Context, translation_path: Resource, value: str) -> None:
+def create_translation(
+    ctx: Context, translation_resource: Resource, value: str
+) -> None:
     language_data = get_language_data(ctx)
 
-    language_data[translation_path.value] = value
+    language_data[translation_resource.value] = value

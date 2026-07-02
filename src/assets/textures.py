@@ -58,34 +58,34 @@ def create_scrolling_mcmetas(
     return mcmetas
 
 
-def generate_scrolling_animation(ctx: Context) -> None:
+def generate_scrolling_panel(ctx: Context) -> None:
     target_parent = "logos/world"
 
-    static_panel_texture_path = resource.get_texture(
+    static_texture_resource = resource.get_texture(
         TextureType.BLOCK, target_parent, "static_panel"
     )
 
-    static_panel_texture = ctx.assets.textures[static_panel_texture_path.value]
+    static_panel_texture = ctx.assets.textures[static_texture_resource.value]
 
     scrolling_panel_texture = create_scrolling_texture(static_panel_texture.image)
     scrolling_panel_mcmetas = create_scrolling_mcmetas(scrolling_panel_texture)
 
     for i, mcmeta in enumerate(scrolling_panel_mcmetas, start=1):
-        part_texture_path = resource.get_texture(
+        part_texture_resource = resource.get_texture(
             TextureType.BLOCK, target_parent, f"scrolling_panel_{i}"
         )
 
-        ctx.assets.textures[part_texture_path.value] = scrolling_panel_texture
-        ctx.assets.textures_mcmeta[part_texture_path.value] = mcmeta
+        ctx.assets.textures[part_texture_resource.value] = scrolling_panel_texture
+        ctx.assets.textures_mcmeta[part_texture_resource.value] = mcmeta
 
-    scrolling_panel_model_path = resource.get_resource(target_parent, "scrolling_panel")
-    scrolling_panel_texture_path = resource.get_texture(
+    scrolling_model_resource = resource.get_asset(target_parent, "scrolling_panel")
+    scrolling_texture_resource = resource.get_texture(
         TextureType.BLOCK, target_parent, "scrolling_panel"
     )
 
-    create_item_model(ctx, scrolling_panel_model_path, scrolling_panel_texture_path)
+    create_item_model(ctx, scrolling_model_resource, scrolling_texture_resource)
 
-    del ctx.assets.textures[static_panel_texture_path.value]
+    del ctx.assets.textures[static_texture_resource.value]
 
 
 def optimize_textures(ctx: Context):

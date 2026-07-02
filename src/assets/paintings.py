@@ -3,7 +3,7 @@ from beet import Context
 from src.utilities import resource
 from src.utilities.dialog import DialogHelper
 from src.utilities.painting import get_painting_variant
-from src.utilities.resource import TranslationType, read_data, serialize
+from src.utilities.resource import TranslationType, read_data, serialize_path
 from src.utilities.translation import create_translation
 
 
@@ -22,24 +22,24 @@ def generate_paintings(ctx: Context) -> None:
         title = painting["title"]
         size = painting["size"]
 
-        painting_asset_id = serialize(author)
+        painting_asset_id = serialize_path(author)
 
-        painting_translation_path = resource.get_translation(
+        translation_resource = resource.get_translation(
             TranslationType.PAINTING, painting_asset_id
         )
 
-        author_translation_path = painting_translation_path.append("author")
-        title_translation_path = painting_translation_path.append("title")
+        author_translation_resource = translation_resource.append("author")
+        title_translation_resource = translation_resource.append("title")
 
-        painting_variant_path = resource.get_resource(painting_asset_id)
+        painting_variant_resource = resource.get_asset(painting_asset_id)
 
-        create_translation(ctx, author_translation_path, author)
-        create_translation(ctx, title_translation_path, title)
+        create_translation(ctx, author_translation_resource, author)
+        create_translation(ctx, title_translation_resource, title)
 
-        painting_variant = get_painting_variant(ctx, painting_variant_path)
+        painting_variant = get_painting_variant(ctx, painting_variant_resource)
 
         painting_variant.data = {
-            "asset_id": painting_variant_path.value,
+            "asset_id": painting_variant_resource.value,
             "author": author,
             "title": title,
             "height": size,

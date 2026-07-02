@@ -8,7 +8,7 @@ def beet_default(ctx: Context):
         generate_item_models,
     )
     from src.assets.paintings import generate_paintings
-    from src.assets.textures import generate_scrolling_animation, optimize_textures
+    from src.assets.textures import generate_scrolling_panel, optimize_textures
     from src.assets.thumbnails import generate_thumbnails
 
     generate_paintings(ctx)
@@ -18,6 +18,6 @@ def beet_default(ctx: Context):
     generate_item_models(ctx)
     generate_base_models(ctx)
 
-    generate_scrolling_animation(ctx)
+    generate_scrolling_panel(ctx)
 
     optimize_textures(ctx)
