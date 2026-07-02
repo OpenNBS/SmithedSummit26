@@ -8,14 +8,22 @@
 			"from": [0, 0, 0],
 			"to": [16, 16, 0],
 			"faces": {
-				"north": { "uv": [0, 0, 16, 16], "texture": "#0", "tintindex": 0 }
+				"north": {
+					"uv": [0, 0, 16, 16],
+					"texture": "#0",
+					"tintindex": "#noshade"
+				}
 			}
 		},
 		{
 			"from": [0, 0, 0],
 			"to": [16, 16, 0],
 			"faces": {
-				"north": { "uv": [0, 0, 16, 16], "texture": "#1", "tintindex": 0 }
+				"north": {
+					"uv": [0, 0, 16, 16],
+					"texture": "#1",
+					"tintindex": "#noshade"
+				}
 			}
 		}
 	]

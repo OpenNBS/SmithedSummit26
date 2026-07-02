@@ -7,8 +7,16 @@
 			"from": [0, 0, 0],
 			"to": [16, 16, 0],
 			"faces": {
-				"north": { "uv": [0, 0, 16, 16], "texture": "#0", "tintindex": 0 },
-				"south": { "uv": [16, 0, 0, 16], "texture": "#0", "tintindex": 1 }
+				"north": {
+					"uv": [0, 0, 16, 16],
+					"texture": "#0",
+					"tintindex": "#noshade"
+				},
+				"south": {
+					"uv": [16, 0, 0, 16],
+					"texture": "#0",
+					"tintindex": "#darkened"
+				}
 			}
 		}
 	]

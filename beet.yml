@@ -16,10 +16,9 @@ resource_pack:
 
 require: [bolt]
 pipeline:
-    - src.model
     - mecha
+    - src.default
     - src.sound_config
-    - src.interaction
     - beet.contrib.minify_json
 
 output: dist
