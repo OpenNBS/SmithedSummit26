@@ -9,19 +9,19 @@ from src.utilities.model import (
 from src.utilities.resource import Resource, TextureType
 
 BLOCK_MODELS = [
-    "props/piano",
-    "props/guitar",
-    "props/speaker",
-    "props/open_sign",
-    "logos/world/block",
-    "logos/world/wordmark",
-    "logos/world/text_variant_world",
-    "logos/world/text_variant_world_shadow",
-    "logos/world/text_variant_cafe",
-    "logos/world/text_background",
     "logos/studio/icon",
     "logos/studio/text",
     "logos/studio/text_shadow",
+    "logos/world/block",
+    "logos/world/text_background",
+    "logos/world/text_variant_cafe",
+    "logos/world/text_variant_world",
+    "logos/world/text_variant_world_shadow",
+    "logos/world/wordmark",
+    "props/guitar",
+    "props/open_sign",
+    "props/piano",
+    "props/speaker",
 ]
 
 ITEM_MODELS = [
