@@ -1,17 +1,12 @@
 [
 	{
-		"author": "StunningWheel94",
-		"title": "Overview",
-		"size": 2
+		"author": "KaliumI",
+		"title": "Abyss",
+		"size": 1
 	},
 	{
 		"author": "BuilderAltWCF1",
 		"title": "Creature",
-		"size": 2
-	},
-	{
-		"author": "superbaconbro",
-		"title": "Irrupt",
 		"size": 2
 	},
 	{
@@ -20,13 +15,18 @@
 		"size": 2
 	},
 	{
-		"author": "KaliumI",
-		"title": "Abyss",
-		"size": 1
+		"author": "superbaconbro",
+		"title": "Irrupt",
+		"size": 2
 	},
 	{
 		"author": "playfulpotato",
 		"title": "Stable",
 		"size": 1
+	},
+	{
+		"author": "StunningWheel94",
+		"title": "Overview",
+		"size": 2
 	}
 ]
