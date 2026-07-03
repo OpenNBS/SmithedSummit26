@@ -1,7 +1,11 @@
 from beet import Context
 
 from src.utilities import resource
-from src.utilities.model import create_from_base, create_item_model
+from src.utilities.model import (
+    create_item_model,
+    create_item_models_from_base,
+    create_models_from_base,
+)
 from src.utilities.resource import TextureType
 
 BLOCK_MODELS = [
@@ -25,36 +29,47 @@ ITEM_MODELS = [
     "wall_art",
 ]
 
-# TODO: ignored models
 
-
-def create_static_model(ctx: Context, type: TextureType, path: str) -> None:
+def create_static_models(ctx: Context, type: TextureType, path: str) -> None:
     model_resource = resource.get_asset(path)
     texture_resource = resource.get_texture(type, path)
 
     create_item_model(ctx, model_resource, texture_resource)
 
 
-def create_base_model(ctx: Context, type: TextureType, path: str) -> None:
+def create_dynamic_models(
+    ctx: Context, type: TextureType, path: str, ignored_variants=[]
+) -> None:
+    texture_resource = resource.get_texture(type, path)
+
+    create_models_from_base(ctx, texture_resource, ignored_variants)
+
+
+def create_dynamic_pair(
+    ctx: Context, type: TextureType, path: str, ignored_variants=[]
+) -> None:
     model_resource = resource.get_asset(path)
     texture_resource = resource.get_texture(type, path)
 
-    create_from_base(ctx, model_resource, texture_resource)
+    create_models_from_base(ctx, texture_resource, ignored_variants)
+    create_item_models_from_base(
+        ctx, model_resource, texture_resource, ignored_variants
+    )
 
 
 def generate_block_models(ctx: Context) -> None:
     for path in BLOCK_MODELS:
-        create_static_model(ctx, TextureType.BLOCK, path)
+        create_static_models(ctx, TextureType.BLOCK, path)
 
 
 def generate_item_models(ctx: Context) -> None:
     for path in ITEM_MODELS:
-        create_static_model(ctx, TextureType.ITEM, path)
+        create_static_models(ctx, TextureType.ITEM, path)
 
 
 def generate_base_models(ctx: Context) -> None:
-    create_base_model(ctx, TextureType.BLOCK, "notes")
-    create_base_model(ctx, TextureType.BLOCK, "thumbnails")
-    create_base_model(ctx, TextureType.BLOCK, "globe")
+    create_dynamic_pair(ctx, TextureType.BLOCK, "notes")
+    create_dynamic_pair(ctx, TextureType.BLOCK, "thumbnails")
+    create_dynamic_pair(ctx, TextureType.BLOCK, "globe")
 
-    create_base_model(ctx, TextureType.ITEM, "balloons")
+    create_dynamic_models(ctx, TextureType.ITEM, "balloons", ["string"])
