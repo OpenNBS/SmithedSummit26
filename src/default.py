@@ -3,8 +3,8 @@ from beet import Context
 
 def beet_default(ctx: Context):
     from src.assets.models import (
-        generate_base_models,
         generate_block_models,
+        generate_dynamic_models,
         generate_item_models,
     )
     from src.assets.paintings import generate_paintings
@@ -16,7 +16,7 @@ def beet_default(ctx: Context):
 
     generate_block_models(ctx)
     generate_item_models(ctx)
-    generate_base_models(ctx)
+    generate_dynamic_models(ctx)
 
     generate_scrolling_panel(ctx)
 
