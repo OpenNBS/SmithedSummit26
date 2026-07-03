@@ -135,7 +135,7 @@ def create_models_from_base(
         model = Model(
             {
                 "parent": base_texture_resource.value,
-                "textures": {"variant": variant_texture_resource},
+                "textures": {"variant": variant_texture_resource.value},
             }
         )
 
