@@ -62,11 +62,6 @@
 	},
 	"balloons": [
 		{
-			"balloon_id": "blue",
-			"balloon_name": "Blue Note",
-			"balloon_model": "nbs:item/balloons/blue"
-		},
-		{
 			"balloon_id": "lime",
 			"balloon_name": "Lime Note",
 			"balloon_model": "nbs:item/balloons/lime"
@@ -75,6 +70,11 @@
 			"balloon_id": "purple",
 			"balloon_name": "Purple Note",
 			"balloon_model": "nbs:item/balloons/purple"
+		},
+		{
+			"balloon_id": "red",
+			"balloon_name": "Red Note",
+			"balloon_model": "nbs:item/balloons/red"
 		}
 	]
 }
