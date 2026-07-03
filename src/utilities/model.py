@@ -107,7 +107,7 @@ def create_item_model(
 
 
 def get_variants(
-    ctx: Context, texture_resource: Resource, ignored_variants: list[str] = []
+    ctx: Context, texture_resource: Resource, unused_variants: list[str] = []
 ) -> list[Tuple[str, str]]:
     variant_texture_resources = list(
         filter(
@@ -119,15 +119,15 @@ def get_variants(
         map(lambda path: (path.split("/")[-1], path), variant_texture_resources)
     )
 
-    return list(filter(lambda variant: variant[0] not in ignored_variants, variants))
+    return list(filter(lambda variant: variant[0] not in unused_variants, variants))
 
 
 def create_models_from_base(
-    ctx: Context, texture_resource: Resource, ignored_variants: list[str] = []
+    ctx: Context, texture_resource: Resource, unused_variants: list[str] = []
 ) -> None:
     base_texture_resource = texture_resource.append("base")
 
-    texture_variants = get_variants(ctx, texture_resource, ignored_variants)
+    texture_variants = get_variants(ctx, texture_resource, unused_variants)
 
     for variant_name, variant_texture_resource in texture_variants:
         variant_texture_resource = texture_resource.append(variant_name)
@@ -146,14 +146,14 @@ def create_item_models_from_base(
     ctx: Context,
     model_resource: Resource,
     texture_resource: Resource,
-    ignored_variants: list[str] = [],
+    unused_variants: list[str] = [],
 ) -> None:
     base_texture_resource = texture_resource.append("base")
 
     base_model = ctx.assets.models[base_texture_resource.value]
     base_model_tints = apply_model_tints(base_model)
 
-    texture_variants = get_variants(ctx, texture_resource, ignored_variants)
+    texture_variants = get_variants(ctx, texture_resource, unused_variants)
 
     for variant_name, _ in texture_variants:
         variant_texture_resource = texture_resource.append(variant_name)

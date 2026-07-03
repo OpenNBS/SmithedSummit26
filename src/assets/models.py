@@ -29,7 +29,7 @@ ITEM_MODELS = [
     "wall_art",
 ]
 
-IGNORED_NOTE_VARIANTS = [
+UNUSED_NOTE_VARIANTS = [
     "blue",
     "cyan",
     "light_blue",
@@ -39,11 +39,11 @@ IGNORED_NOTE_VARIANTS = [
     "purple",
 ]
 
-IGNORED_THUMBNAIL_VARIANTS = []
+UNUSED_THUMBNAIL_VARIANTS = []
 
-IGNORED_GLOBE_VARIANTS = []
+UNUSED_GLOBE_VARIANTS = []
 
-IGNORED_BALLOON_VARIANTS = []
+UNUSED_BALLOON_VARIANTS = []
 
 
 def create_static_models(ctx: Context, type: TextureType, path: str) -> None:
@@ -54,23 +54,21 @@ def create_static_models(ctx: Context, type: TextureType, path: str) -> None:
 
 
 def create_dynamic_models(
-    ctx: Context, type: TextureType, path: str, ignored_variants=[]
+    ctx: Context, type: TextureType, path: str, unused_variants: list[str] = []
 ) -> None:
     texture_resource = resource.get_texture(type, path)
 
-    create_models_from_base(ctx, texture_resource, ignored_variants)
+    create_models_from_base(ctx, texture_resource, unused_variants)
 
 
 def create_dynamic_pair(
-    ctx: Context, type: TextureType, path: str, ignored_variants=[]
+    ctx: Context, type: TextureType, path: str, unused_variants: list[str] = []
 ) -> None:
     model_resource = resource.get_asset(path)
     texture_resource = resource.get_texture(type, path)
 
-    create_models_from_base(ctx, texture_resource, ignored_variants)
-    create_item_models_from_base(
-        ctx, model_resource, texture_resource, ignored_variants
-    )
+    create_models_from_base(ctx, texture_resource, unused_variants)
+    create_item_models_from_base(ctx, model_resource, texture_resource, unused_variants)
 
 
 def generate_block_models(ctx: Context) -> None:
@@ -84,12 +82,10 @@ def generate_item_models(ctx: Context) -> None:
 
 
 def generate_dynamic_models(ctx: Context) -> None:
-    create_dynamic_pair(ctx, TextureType.BLOCK, "notes", IGNORED_NOTE_VARIANTS)
-    create_dynamic_pair(ctx, TextureType.BLOCK, "globe", IGNORED_GLOBE_VARIANTS)
-    create_dynamic_pair(
-        ctx, TextureType.BLOCK, "thumbnails", IGNORED_THUMBNAIL_VARIANTS
-    )
+    create_dynamic_pair(ctx, TextureType.BLOCK, "notes", UNUSED_NOTE_VARIANTS)
+    create_dynamic_pair(ctx, TextureType.BLOCK, "globe", UNUSED_GLOBE_VARIANTS)
+    create_dynamic_pair(ctx, TextureType.BLOCK, "thumbnails", UNUSED_THUMBNAIL_VARIANTS)
 
     create_dynamic_models(
-        ctx, TextureType.ITEM, "balloons", ["string", *IGNORED_BALLOON_VARIANTS]
+        ctx, TextureType.ITEM, "balloons", ["string", *UNUSED_BALLOON_VARIANTS]
     )
