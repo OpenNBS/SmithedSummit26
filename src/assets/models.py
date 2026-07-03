@@ -5,8 +5,6 @@ from src.utilities.model import create_from_base, create_item_model
 from src.utilities.resource import TextureType
 
 BLOCK_MODELS = [
-    "globe/sandstone",
-    "globe/stone",
     "props/piano",
     "props/guitar",
     "props/speaker",
@@ -57,5 +55,6 @@ def generate_item_models(ctx: Context) -> None:
 def generate_base_models(ctx: Context) -> None:
     create_base_model(ctx, TextureType.BLOCK, "notes")
     create_base_model(ctx, TextureType.BLOCK, "thumbnails")
+    create_base_model(ctx, TextureType.BLOCK, "globe")
 
     create_base_model(ctx, TextureType.ITEM, "balloons")
