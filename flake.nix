@@ -86,7 +86,7 @@
                 rustc
                 gcc
 
-                prettier
+                black
               ])
               ++ (with python.pkgs; [
                 venvShellHook

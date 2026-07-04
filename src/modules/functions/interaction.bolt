@@ -1,0 +1,238 @@
+from enum import Enum
+from typing import NamedTuple
+
+append function ~/load:
+    scoreboard players set microwave_active nbs 0
+
+microwave_position = (-194.5, 65.5, 54.5)
+piano_position = (-194.0, 88.0, 58.5)
+guitar_position = (-190.5, 87.0, 55.5)
+
+SHARED_FOOD_COMPONENT = {
+    nutrition: 0,
+    saturation: 0,
+    can_always_eat: true
+}
+
+SHARED_CUSTOM_DATA_COMPONENT = {
+    microwavable: true
+}
+
+class EdibleType(Enum):
+    FOOD = 1
+    DRINK = 2
+
+class EdibleComponents(NamedTuple):
+    consumable: dict
+    max_stack_size: int
+
+EDIBLE_COMPONENTS: dict[EdibleType, EdibleComponents] = {
+    EdibleType.FOOD: {
+        consumable: {},
+        max_stack_size: 64
+    },
+    EdibleType.DRINK: {
+        consumable: {
+          animation: "drink",
+          sound: "entity.generic.drink"
+        },
+        max_stack_size: 16
+    }
+}
+
+class Project(Enum):
+    NBS = 1
+    CNK = 2
+    FOODSTUFFS = 3
+
+PROJECT_LORE_COMPONENTS: dict[Project, dict] = {
+    Project.NBS: {
+        translate: f"nbs.tooltip",
+        color: "blue",
+        italic: false
+    },
+    Project.CNK: {
+        translate: "cnk.tooltip",
+        font: "cnk:tooltip",
+        color: "white",
+        italic: false
+    },
+    Project.FOODSTUFFS: {
+        translate: "foodstuffs.tooltip",
+        fallback: "Foodstuffs",
+        color: "blue",
+        italic: false
+    }
+}
+
+def give_item(item: str) -> None:
+    swing @s
+
+    if items entity @s weapon.mainhand *:
+        give @s item
+    unless items entity @s weapon.mainhand *:
+        item replace entity @s weapon.mainhand with item
+
+def give_edible(namespace: str, path: str, edible_type: EdibleType, translation_component = {}) -> None:
+    item_model_component = f"{namespace}:{path}"
+    edible_component = EDIBLE_COMPONENTS[edible_type]
+    lore_component = PROJECT_LORE_COMPONENTS[Project[namespace.upper()]]
+
+    translation_component = {
+        translate: f"item.{namespace}.{path}",
+        **translation_component
+    }
+
+    give_item(f"minecraft:note_block[minecraft:food={SHARED_FOOD_COMPONENT}, minecraft:consumable={edible_component.consumable}, minecraft:max_stack_size={edible_component.max_stack_size}, minecraft:item_model='{item_model_component}', minecraft:item_name={translation_component}, minecraft:lore=[{lore_component}], minecraft:custom_data={SHARED_CUSTOM_DATA_COMPONENT}]")
+
+
+function ~/edible/pink_donut:
+    give_edible("cnk", "pink_donut", EdibleType.FOOD)
+
+function ~/edible/cinnamon_roll:
+    give_edible("cnk", "cinnamon_roll", EdibleType.FOOD)
+
+function ~/edible/pizza:
+    give_edible("cnk", "pizza", EdibleType.FOOD)
+
+function ~/edible/cake_slice:
+    give_edible("foodstuffs", "cake_slice", EdibleType.FOOD, translation_component={
+        fallback: "Cake Slice"
+    })
+
+function ~/edible/pumpkin_latte:
+    give_edible("cnk", "pumpkin_latte", EdibleType.DRINK)
+
+function ~/props/microwave:
+    if score microwave_active nbs matches 0 if items entity @s weapon.mainhand minecraft:note_block[minecraft:custom_data~{microwavable: true}]:
+        swing @s
+
+        scoreboard players set microwave_active nbs 1
+
+        item modify entity @s weapon.mainhand nbs:remove_one
+        function ~/1
+
+function ~/props/microwave/1:
+    positioned microwave_position run playsound minecraft:block.decorated_pot.insert block @a[distance=..8] ~ ~ ~ 1 1.6
+
+    schedule function ~/../2 8t
+
+function ~/props/microwave/2:
+    positioned microwave_position run playsound minecraft:block.decorated_pot.insert block @a[distance=..8] ~ ~ ~ 1 1.82
+
+    schedule function ~/../3 4t
+
+function ~/props/microwave/3:
+    positioned microwave_position run playsound minecraft:block.decorated_pot.insert block @a[distance=..8] ~ ~ ~ 1 1.95
+
+    schedule function ~/../4 4t
+
+function ~/props/microwave/4:
+    # TODO: out-of-range note
+    positioned microwave_position run playsound minecraft:block.note_block.bit block @a[distance=..8] ~ ~ ~ 0.3 0
+    positioned microwave_position run playsound minecraft:block.brewing_stand.brew block @a[distance=..8] ~ ~ ~ 0.05 0.07
+
+    schedule function ~/../5 32t
+
+function ~/props/microwave/5:
+    positioned microwave_position run playsound minecraft:block.mud.break block @a[distance=..8] ~ ~ ~ 0.8 0.12
+    positioned microwave_position run playsound minecraft:block.mud.break block @a[distance=..8] ~ ~ ~ 1 0.35
+
+    positioned microwave_position run playsound minecraft:entity.sulfur_cube.squish block @a[distance=..8] -195 65.5 54 0.3 0.35
+
+    positioned microwave_position run playsound minecraft:entity.firework_rocket.large_blast block @a[distance=..8] -195 65.5 54 0.35 1.5
+
+    positioned microwave_position run particle minecraft:campfire_cosy_smoke ~0.1 ~0.1 ~0.3 0 0.02 0 1 0
+
+    scoreboard players set microwave_active nbs 0
+
+function ~/props/headphones:
+    rarity_component = "rare"
+    item_model_component = "nbs:props/headphones"
+    max_stack_size_component = 1
+    lore_component = PROJECT_LORE_COMPONENTS[Project.NBS]
+
+    equippable_component = {
+        slot: "head"
+    }
+
+    item_name_component = {
+        translate: "item.nbs.headphones"
+    }
+
+    custom_data_component = {
+        summit: {
+            persist: {}
+        }
+    }
+
+    give_item(f"minecraft:note_block[minecraft:equippable={equippable_component}, minecraft:max_stack_size={max_stack_size_component}, minecraft:item_model='{item_model_component}', minecraft:item_name={item_name_component}, minecraft:rarity='{rarity_component}', minecraft:lore=[{lore_component}], minecraft:custom_data={custom_data_component}]")
+
+function ~/props/piano:
+    swing @s
+
+    execute store result storage nbs:main piano.key int 1 run random value 1..5
+    execute positioned piano_position function ~/play with storage nbs:main piano
+
+function ~/props/piano/play:
+    $function nbs:interaction/props/piano/$(key)
+
+function ~/props/piano/1:
+    playsound minecraft:block.note_block.pling block @a[distance=..12] ~0.25 ~ ~ 1 0.53
+
+function ~/props/piano/2:
+    playsound minecraft:block.note_block.pling block @a[distance=..12] ~0.13 ~ ~ 1 0.707
+
+function ~/props/piano/3:
+    playsound minecraft:block.note_block.pling block @a[distance=..12] ~ ~ ~ 1 0.891
+
+function ~/props/piano/4:
+    playsound minecraft:block.note_block.pling block @a[distance=..12] ~-0.13 ~ ~ 1 1.059
+
+function ~/props/piano/5:
+    playsound minecraft:block.note_block.pling block @a[distance=..12] ~-0.25 ~ ~ 1 1.335
+
+function ~/props/piano/hit:
+    execute positioned piano_position function ~/play
+
+function ~/props/piano/hit/play:
+    playsound minecraft:block.note_block.pling block @a[distance=..12] ~0.13 ~ ~ 1 0.707
+    playsound minecraft:block.note_block.pling block @a[distance=..12] ~0.02 ~ ~ 0.7 0.841
+    playsound minecraft:block.note_block.pling block @a[distance=..12] ~-0.13 ~ ~ 1 1.059
+    playsound minecraft:block.note_block.pling block @a[distance=..12] ~-0.15 ~ ~ 0.7 1.189
+    playsound minecraft:block.note_block.pling block @a[distance=..12] ~-0.3 ~ ~ 1 1.587
+
+function ~/props/guitar:
+    swing @s
+
+    execute store result storage nbs:main guitar.key int 1 run random value 1..5
+    execute positioned guitar_position function ~/play with storage nbs:main guitar
+
+function ~/props/guitar/play:
+    $function nbs:interaction/props/guitar/$(key)
+
+function ~/props/guitar/1:
+    playsound minecraft:block.note_block.guitar block @a[distance=..12] ~ ~ ~ 1 0.891
+
+function ~/props/guitar/2:
+    playsound minecraft:block.note_block.guitar block @a[distance=..12] ~ ~ ~ 1 0.794
+
+function ~/props/guitar/3:
+    playsound minecraft:block.note_block.guitar block @a[distance=..12] ~ ~ ~ 1 1.059
+
+function ~/props/guitar/4:
+    playsound minecraft:block.note_block.guitar block @a[distance=..12] ~ ~ ~ 1 1.335
+
+function ~/props/guitar/5:
+    playsound minecraft:block.note_block.guitar block @a[distance=..12] ~ ~ ~ 1 1.782
+
+function ~/props/guitar/hit:
+    execute positioned guitar_position function ~/play
+
+function ~/props/guitar/hit/play:
+    # TODO: out-of-range note
+    playsound minecraft:block.note_block.guitar block @a[distance=..12] ~ ~ ~ 1 0.891
+    playsound minecraft:block.note_block.guitar block @a[distance=..12] ~ ~ ~ 1 0.794
+    playsound minecraft:block.note_block.guitar block @a[distance=..12] ~ ~ ~ 1 1.059
+    playsound minecraft:block.note_block.guitar block @a[distance=..12] ~ ~ ~ 1 1.335
+    playsound minecraft:block.note_block.guitar block @a[distance=..12] ~ ~ ~ 1 1.782

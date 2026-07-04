@@ -168,5 +168,6 @@ cython_debug/
 .venv/
 .direnv/
 
-# Zed editor
+# code editors
 .zed/
+.vscode/

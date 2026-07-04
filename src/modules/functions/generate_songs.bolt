@@ -1,0 +1,95 @@
+from pathlib import Path
+from beet.core.utils import normalize_string
+from beet import Sound, SoundConfig
+import pynbs
+
+from src.modules.utilities.note_block import get_notes
+
+SOURCE = "record"
+
+SOUNDS = Path("sounds")
+SONGS = Path("songs")
+
+# memo:
+ctx.meta["instruments"] = set()
+
+append function ~/../global/load:
+    data modify storage nbs:main songs set value []
+
+for song_stuff in enumerate(SONGS.glob("*.nbs")):
+    song_index = song_stuff[0]
+    path = song_stuff[1]
+    song = pynbs.read(path)
+
+    song_name = normalize_string(path.stem.split(" - ")[0].split("(")[0])
+    formatted_string = path.stem
+    title = song.header.song_name
+    author = song.header.song_author
+    original_author = song.header.original_author
+
+    print("processing", song_name)
+
+    append function ~/../global/load:
+        data modify storage nbs:main songs append value {
+            "name": song_name,
+            "index": song_index,
+            "formatted_string": formatted_string,
+            "title": title,
+            "author": author,
+            "original_author": original_author,
+        }
+
+    for chord in get_notes(song):
+        tick = chord[0]
+        notes = chord[1]
+            #data modify storage nbs:main playing set from storage nbs:main songs[0]
+        function f"nbs:song/{song_name}/{tick}/root":
+            # iterate through speaker UUIDs
+            data modify storage nbs:temp input set value {}
+            data modify storage nbs:temp input.song set value (song_name)
+            data modify storage nbs:temp input.tick set value (tick)
+            for entity in ["speaker", "loudspeaker"]:
+                store result score #len nbs if data storage nbs:main f"locations.{entity}[]"
+                store result storage nbs:temp input.i int 1 scoreboard players set #iter nbs 0
+                data modify storage nbs:temp input.speaker_type set value (entity)
+
+                function nbs:global/speaker_iter with storage nbs:temp input
+
+            as @a[tag=nbs_headphones] at @s function ~/../headphones
+
+            scoreboard players add notes_played nbs_stats f"{len(notes)}"
+            scoreboard players add ticks_played nbs_stats 1
+
+            for note in notes:
+                if note.instrument == "BEAT":
+                    append function ~/../headphones:
+                        particle ("note") ~ ~2.25 ~ 0 0 0 1 1
+
+                    for entity, dist in [("speaker", 12), ("loudspeaker", 48)]:
+                        append function ~/../{entity}:
+                            store result score #random nbs random value 1..4
+                            for i in range(4):
+                                execute
+                                    if score #random nbs matches (i+1)
+                                    if entity @a[distance=(0, dist)]
+                                    function f"animated_java:music_speaker/animations/animation_speaker_beat_{(i+1)}/play"
+
+                    continue
+
+                ctx.meta["instruments"].add(note.instrument)
+
+                append function ~/../speaker:
+                    playsound f"{note.play_speakers()}"
+
+                append function ~/../loudspeaker:
+                    playsound f"{note.play_loudspeakers()}"
+
+                append function ~/../headphones:
+                    playsound f"{note.play_headphones()}"
+
+
+    function f"nbs:song/{song_name}/{tick + 40}/root":
+        function nbs:global/advance
+
+
+print("🎉 LGTM")
