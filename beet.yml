@@ -3,9 +3,7 @@ id: nbs
 data_pack:
   name: nbs-smithed-summit-26-dp
   description: "Data pack for NBS on the Smithed Summit 2026"
-  load:
-    - data/nbs/module: src
-    - data: src/data
+  load: [src]
   zipped: true
 
 resource_pack:
