@@ -1,0 +1,61 @@
+{
+	"model": {
+		"type": "minecraft:select",
+		"property": "minecraft:custom_model_data",
+		"cases": [
+			{
+				"when": "AJ_INTERNAL_EMPTY",
+				"model": {
+					"type": "minecraft:empty"
+				}
+			},
+			{
+				"when": "red",
+				"model": {
+					"type": "minecraft:model",
+					"model": "animated_java:blueprint/music_speaker/red/speaker_2",
+					"tints": [
+						{"type": "minecraft:dye", "default": [1, 1, 1]}
+					]
+				}
+			},
+			{
+				"when": "green",
+				"model": {
+					"type": "minecraft:model",
+					"model": "animated_java:blueprint/music_speaker/green/speaker_2",
+					"tints": [
+						{"type": "minecraft:dye", "default": [1, 1, 1]}
+					]
+				}
+			},
+			{
+				"when": "purple",
+				"model": {
+					"type": "minecraft:model",
+					"model": "animated_java:blueprint/music_speaker/purple/speaker_2",
+					"tints": [
+						{"type": "minecraft:dye", "default": [1, 1, 1]}
+					]
+				}
+			},
+			{
+				"when": "blue",
+				"model": {
+					"type": "minecraft:model",
+					"model": "animated_java:blueprint/music_speaker/blue/speaker_2",
+					"tints": [
+						{"type": "minecraft:dye", "default": [1, 1, 1]}
+					]
+				}
+			}
+		],
+		"fallback": {
+			"type": "minecraft:model",
+			"model": "animated_java:blueprint/music_speaker/speaker_2",
+			"tints": [
+				{"type": "minecraft:dye", "default": [1, 1, 1]}
+			]
+		}
+	}
+}

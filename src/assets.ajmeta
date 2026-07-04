@@ -1,0 +1,63 @@
+{
+	"formatVersion": "1.0.0",
+	"rigs": {
+		"animated_java:music_speaker": {
+			"coreFiles": ["assets/minecraft/atlases/blocks.json", "pack.mcmeta"],
+			"versionedFiles": [
+				"assets/animated_java/items/blueprint/music_speaker/antenna.json",
+				"assets/animated_java/items/blueprint/music_speaker/details.json",
+				"assets/animated_java/items/blueprint/music_speaker/speaker_1.json",
+				"assets/animated_java/items/blueprint/music_speaker/speaker_2.json",
+				"assets/animated_java/items/blueprint/music_speaker/stereo.json",
+				"assets/animated_java/models/blueprint/music_speaker/antenna.json",
+				"assets/animated_java/models/blueprint/music_speaker/blue/antenna.json",
+				"assets/animated_java/models/blueprint/music_speaker/blue/details.json",
+				"assets/animated_java/models/blueprint/music_speaker/blue/speaker_1.json",
+				"assets/animated_java/models/blueprint/music_speaker/blue/speaker_2.json",
+				"assets/animated_java/models/blueprint/music_speaker/blue/stereo.json",
+				"assets/animated_java/models/blueprint/music_speaker/details.json",
+				"assets/animated_java/models/blueprint/music_speaker/green/antenna.json",
+				"assets/animated_java/models/blueprint/music_speaker/green/details.json",
+				"assets/animated_java/models/blueprint/music_speaker/green/speaker_1.json",
+				"assets/animated_java/models/blueprint/music_speaker/green/speaker_2.json",
+				"assets/animated_java/models/blueprint/music_speaker/green/stereo.json",
+				"assets/animated_java/models/blueprint/music_speaker/purple/antenna.json",
+				"assets/animated_java/models/blueprint/music_speaker/purple/details.json",
+				"assets/animated_java/models/blueprint/music_speaker/purple/speaker_1.json",
+				"assets/animated_java/models/blueprint/music_speaker/purple/speaker_2.json",
+				"assets/animated_java/models/blueprint/music_speaker/purple/stereo.json",
+				"assets/animated_java/models/blueprint/music_speaker/red/antenna.json",
+				"assets/animated_java/models/blueprint/music_speaker/red/details.json",
+				"assets/animated_java/models/blueprint/music_speaker/red/speaker_1.json",
+				"assets/animated_java/models/blueprint/music_speaker/red/speaker_2.json",
+				"assets/animated_java/models/blueprint/music_speaker/red/stereo.json",
+				"assets/animated_java/models/blueprint/music_speaker/speaker_1.json",
+				"assets/animated_java/models/blueprint/music_speaker/speaker_2.json",
+				"assets/animated_java/models/blueprint/music_speaker/stereo.json",
+				"assets/animated_java/textures/blueprint/music_speaker/blue.png",
+				"assets/animated_java/textures/blueprint/music_speaker/green.png",
+				"assets/animated_java/textures/blueprint/music_speaker/music_speaker.png",
+				"assets/animated_java/textures/blueprint/music_speaker/notes.png",
+				"assets/animated_java/textures/blueprint/music_speaker/purple.png",
+				"assets/animated_java/textures/blueprint/music_speaker/red.png"
+			]
+		},
+		"animated_java:music_speaker/red": {
+			"coreFiles": ["assets/minecraft/atlases/blocks.json", "pack.mcmeta"],
+			"versionedFiles": [
+				"assets/animated_java/items/blueprint/music_speaker/red/antenna.json",
+				"assets/animated_java/items/blueprint/music_speaker/red/details.json",
+				"assets/animated_java/items/blueprint/music_speaker/red/speaker_1.json",
+				"assets/animated_java/items/blueprint/music_speaker/red/speaker_2.json",
+				"assets/animated_java/items/blueprint/music_speaker/red/stereo.json",
+				"assets/animated_java/models/blueprint/music_speaker/red/antenna.json",
+				"assets/animated_java/models/blueprint/music_speaker/red/details.json",
+				"assets/animated_java/models/blueprint/music_speaker/red/speaker_1.json",
+				"assets/animated_java/models/blueprint/music_speaker/red/speaker_2.json",
+				"assets/animated_java/models/blueprint/music_speaker/red/stereo.json",
+				"assets/animated_java/textures/blueprint/music_speaker/red/notes.png",
+				"assets/animated_java/textures/blueprint/music_speaker/red/speaker.png"
+			]
+		}
+	}
+}

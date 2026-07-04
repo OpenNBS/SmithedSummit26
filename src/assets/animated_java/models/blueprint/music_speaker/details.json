@@ -1,0 +1,29 @@
+{
+	"textures": {
+		"1": "animated_java:blueprint/music_speaker/notes",
+		"particle": "minecraft:item/pufferfish"
+	},
+	"display": {
+		"head": {
+			"rotation": [0, 180, 0]
+		}
+	},
+	"elements": [
+		{
+			"from": [7, 8, 7],
+			"to": [10.5, 9.5, 7],
+			"rotation": {
+				"x": 0,
+				"y": 0,
+				"z": 0,
+				"origin": [8, 8, 8]
+			},
+			"faces": {
+				"north": {
+					"uv": [0, 0, 14, 6],
+					"texture": "#1"
+				}
+			}
+		}
+	]
+}
