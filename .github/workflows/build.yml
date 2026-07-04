@@ -1,0 +1,28 @@
+name: Build
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.3
+
+      - name: Set up Nix
+        uses: JRMurr/direnv-nix-action@v4.2.0
+
+      - name: Build data and resource packs
+        run: |
+          poetry install
+
+          beet build
+
+      - name: Upload data and resource packs
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmithedSummit26
+          path: dist/*.zip
+          compression-level: 0
