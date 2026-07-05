@@ -34,7 +34,7 @@ class DialogHelper:
 
         self.__dialog_resource__ = resource.get_asset(dialog_asset_id)
         self.__translation_resource__ = resource.get_translation(
-            TranslationType.DICTIONARY, dialog_asset_id
+            TranslationType.DICTIONARY, dialog_asset_id.replace("/", ".")
         )
 
         self.__dialog__ = get_dialog(ctx, self.__dialog_resource__)
