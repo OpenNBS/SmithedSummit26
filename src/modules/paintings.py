@@ -55,6 +55,6 @@ def generate_paintings(ctx: Context) -> None:
         dialog_helper.create_action(
             painting_asset_id,
             label,
-            {"type": "copy_to_clipboard", "value": label},
-            {"width": 200},
+            action={"type": "copy_to_clipboard", "value": label},
+            other={"width": 200},
         )

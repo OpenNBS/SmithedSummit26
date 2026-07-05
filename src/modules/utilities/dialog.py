@@ -57,7 +57,12 @@ class DialogHelper:
         }
 
     def create_action(
-        self, action_asset_id: str, label: str, action: JsonDict, other: JsonDict = {}
+        self,
+        action_asset_id: str,
+        label: str,
+        action: JsonDict,
+        icon: str | None = None,
+        other: JsonDict = {},
     ) -> None:
         try:
             self.__action_data__
@@ -71,9 +76,20 @@ class DialogHelper:
 
         create_translation(self.__ctx__, translation_resource, label)
 
+        label_component = {"translate": translation_resource.value}
+
+        if icon is not None:
+            label_component["font"] = "minecraft:default"
+
+            label_component = [
+                {"font": "summit_icons:icons", "translate": f"summit_icons.{icon}"},
+                {"font": "minecraft:default", "text": " "},
+                label_component,
+            ]
+
         self.__action_data__.append(
             {
-                "label": {"translate": translation_resource.value},
+                "label": label_component,
                 "action": action,
                 **other,
             }

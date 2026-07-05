@@ -29,6 +29,9 @@ def generate_thumbnails(ctx: Context) -> None:
         dialog_helper.create_action(
             action_asset_id,
             label,
-            {"type": "open_url", "url": f"https://noteblock.world/song/{song_id}"},
-            {"width": 200},
+            action={
+                "type": "open_url",
+                "url": f"https://noteblock.world/song/{song_id}",
+            },
+            other={"width": 200},
         )
