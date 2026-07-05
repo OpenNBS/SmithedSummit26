@@ -2,6 +2,7 @@ from beet import Context, subproject
 
 
 def beet_default(ctx: Context):
+    from src.modules.dialogs import generate_link_dialogs
     from src.modules.models import (
         generate_block_models,
         generate_dynamic_models,
@@ -19,6 +20,8 @@ def beet_default(ctx: Context):
     generate_dynamic_models(ctx)
 
     generate_scrolling_panel(ctx)
+
+    generate_link_dialogs(ctx)
 
     optimize_textures(ctx)
 

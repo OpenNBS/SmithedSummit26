@@ -236,3 +236,24 @@ function ~/props/guitar/hit/play:
     playsound minecraft:block.note_block.guitar block @a[distance=..12] ~ ~ ~ 1 1.059
     playsound minecraft:block.note_block.guitar block @a[distance=..12] ~ ~ ~ 1 1.335
     playsound minecraft:block.note_block.guitar block @a[distance=..12] ~ ~ ~ 1 1.782
+
+function ~/links/studio:
+    dialog show @s nbs:links/studio
+
+function ~/links/world:
+    dialog show @s nbs:links/world
+
+function ~/credits/paintings:
+    dialog show @s nbs:credits/paintings
+
+function ~/credits/thumbnails:
+    dialog show @s nbs:credits/thumbnails
+
+function ~/credits/patched_plataeus:
+    dialog show @s nbs:credits/patched_plataeus
+
+function ~/credits/textured_tropics:
+    dialog show @s nbs:credits/textured_tropics
+
+function ~/credits/welded_woodlands:
+    dialog show @s nbs:credits/welded_woodlands

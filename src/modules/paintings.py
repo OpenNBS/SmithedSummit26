@@ -12,11 +12,13 @@ from src.modules.utilities.translation import create_translation
 
 
 def generate_paintings(ctx: Context) -> None:
-    dialog_asset_id = "painting_credits"
+    dialog_asset_id = "credits/paintings"
     dialog_helper = DialogHelper(ctx, dialog_asset_id)
 
     dialog_helper.create_root(
-        title="Painting Credits", body="Lorem ipsum", other={"columns": 1}
+        title="Painting Credits",
+        body="These paintings were provided by community members who participated in the Summit jam.",
+        other={"columns": 1},
     )
 
     painting_data = read_resource(ctx, "paintings.json")

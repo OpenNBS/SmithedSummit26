@@ -6,12 +6,12 @@ from src.modules.utilities.resource import read_resource
 
 
 def generate_thumbnails(ctx: Context) -> None:
-    dialog_asset_id = "thumbnail_credits"
+    dialog_asset_id = "credits/thumbnails"
     dialog_helper = DialogHelper(ctx, dialog_asset_id)
 
     dialog_helper.create_root(
         title="Thumbnail Credits",
-        body="All thumbnails were created on Note Block World",
+        body="These thumbnails have been sourced from songs uploaded to Note Block World. That's right, these are note blocks!",
         other={"columns": 1},
     )
 
