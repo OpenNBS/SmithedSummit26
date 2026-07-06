@@ -2,7 +2,7 @@ from typing import NotRequired, TypedDict
 
 from beet import Context
 
-from src.modules.utilities.dialog import DialogHelper
+from src.utilities.dialog import DialogHelper
 
 
 class LinkData(TypedDict):

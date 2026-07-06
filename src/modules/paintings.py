@@ -1,14 +1,14 @@
 from beet import Context
 
-from src.modules.utilities import resource
-from src.modules.utilities.dialog import DialogHelper
-from src.modules.utilities.painting import get_painting_variant
-from src.modules.utilities.resource import (
+from src.utilities import resource
+from src.utilities.dialog import DialogHelper
+from src.utilities.painting import get_painting_variant
+from src.utilities.resource import (
     TranslationType,
     read_resource,
     serialize_path,
 )
-from src.modules.utilities.translation import create_translation
+from src.utilities.translation import create_translation
 
 
 def generate_paintings(ctx: Context) -> None:

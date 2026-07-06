@@ -1,8 +1,8 @@
 from beet import Context
 
-from src.modules.utilities import resource
-from src.modules.utilities.dialog import DialogHelper
-from src.modules.utilities.resource import read_resource
+from src.utilities import resource
+from src.utilities.dialog import DialogHelper
+from src.utilities.resource import read_resource
 
 
 def generate_thumbnails(ctx: Context) -> None:

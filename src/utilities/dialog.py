@@ -1,9 +1,9 @@
 from beet import Context, Dialog
 from beet.core.utils import JsonDict
 
-import src.modules.utilities.resource as resource
-from src.modules.utilities.resource import Resource, TranslationType
-from src.modules.utilities.translation import create_translation
+import src.utilities.resource as resource
+from src.utilities.resource import Resource, TranslationType
+from src.utilities.translation import create_translation
 
 
 def get_dialog(ctx: Context, asset_resource: Resource) -> Dialog:

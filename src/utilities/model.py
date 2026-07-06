@@ -4,7 +4,7 @@ from beet import Context, Model
 from beet.library.resource_pack import ItemModel
 from pydantic.config import JsonDict
 
-from src.modules.utilities.resource import Resource
+from src.utilities.resource import Resource
 
 NO_SHADE_TINT = {
     "type": "minecraft:constant",

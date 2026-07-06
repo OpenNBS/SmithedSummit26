@@ -1,12 +1,12 @@
 from beet import Context
 
-from src.modules.utilities import resource
-from src.modules.utilities.model import (
+from src.utilities import resource
+from src.utilities.model import (
     create_item_model,
     create_item_models_from_base,
     create_models_from_base,
 )
-from src.modules.utilities.resource import Resource, TextureType
+from src.utilities.resource import Resource, TextureType
 
 BLOCK_MODELS = [
     "logos/studio/icon",

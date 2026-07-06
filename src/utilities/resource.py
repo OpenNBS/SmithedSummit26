@@ -9,6 +9,7 @@ NAMESPACE = "nbs"
 
 class TranslationType(Enum):
     DICTIONARY = "dialog"
+    ITEM = "item"
     PAINTING = "painting"
 
 

@@ -4,9 +4,9 @@ from beet import Context, Texture, TextureMcmeta
 from oxipng import StripChunks, optimize_from_memory
 from PIL import Image
 
-from src.modules.utilities import resource
-from src.modules.utilities.model import create_item_model
-from src.modules.utilities.resource import NAMESPACE, TextureType
+from src.utilities import resource
+from src.utilities.model import create_item_model
+from src.utilities.resource import NAMESPACE, TextureType
 
 
 def create_scrolling_texture(img: Image.Image, scroll_factor: int = 4) -> Texture:

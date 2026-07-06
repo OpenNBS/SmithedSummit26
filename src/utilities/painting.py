@@ -1,6 +1,6 @@
 from beet import Context, PaintingVariant
 
-from src.modules.utilities.resource import Resource
+from src.utilities.resource import Resource
 
 
 def get_painting_variant(ctx: Context, asset_resource: Resource):

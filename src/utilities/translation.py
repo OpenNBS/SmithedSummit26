@@ -1,7 +1,7 @@
 from beet import Context, Language
 from beet.core.utils import JsonDict
 
-from src.modules.utilities.resource import NAMESPACE, Resource
+from src.utilities.resource import NAMESPACE, Resource
 
 
 def get_language_data(ctx: Context) -> JsonDict:
