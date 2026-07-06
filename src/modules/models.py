@@ -22,6 +22,9 @@ BLOCK_MODELS = [
     "props/open_sign",
     "props/piano",
     "props/speaker",
+    "screenshots/maestro",
+    "screenshots/studio",
+    "screenshots/world",
 ]
 
 ITEM_MODELS = [
