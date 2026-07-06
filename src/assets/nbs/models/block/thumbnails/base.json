@@ -2,8 +2,7 @@
 	"format_version": "1.21.11",
 	"credit": "Made with Blockbench",
 	"textures": {
-		"1": "nbs:block/thumbnails/frame",
-		"2": "nbs:block/thumbnails/plate"
+		"1": "nbs:block/thumbnails/frame"
 	},
 	"elements": [
 		{
@@ -11,11 +10,11 @@
 			"to": [32, 21, 1],
 			"faces": {
 				"north": {
-					"uv": [0, 0, 16, 16],
+					"uv": [0, 0, 16, 10.5],
 					"texture": "#1"
 				},
 				"east": {
-					"uv": [0, 0, 0.10769, 16],
+					"uv": [0, 0, 0.5, 10.5],
 					"texture": "#1"
 				},
 				"south": {
@@ -23,15 +22,15 @@
 					"texture": "#1"
 				},
 				"west": {
-					"uv": [15.89231, 0, 16, 16],
+					"uv": [15.51731, 0, 16, 10.5],
 					"texture": "#1"
 				},
 				"up": {
-					"uv": [16, 0, 0, 0.1],
+					"uv": [16, 0, 0, 0.475],
 					"texture": "#1"
 				},
 				"down": {
-					"uv": [16, 15.9, 0, 16],
+					"uv": [16, 10.025, 0, 10.5],
 					"texture": "#1"
 				}
 			}
@@ -61,8 +60,8 @@
 			},
 			"faces": {
 				"north": {
-					"uv": [0, 0, 16.14286, 16.71429],
-					"texture": "#2"
+					"uv": [0, 10.5, 3.51786, 11.96429],
+					"texture": "#1"
 				}
 			}
 		}

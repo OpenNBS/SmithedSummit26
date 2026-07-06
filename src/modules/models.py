@@ -120,7 +120,7 @@ def generate_dynamic_models(ctx: Context) -> None:
         TextureType.BLOCK,
         "thumbnails",
         UNUSED_THUMBNAIL_VARIANTS,
-        ["frame", "plate"],
+        ["frame"],
     )
 
     create_dynamic_models(
