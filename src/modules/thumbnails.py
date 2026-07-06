@@ -35,3 +35,7 @@ def generate_thumbnails(ctx: Context) -> None:
             },
             other={"width": 200},
         )
+
+
+def beet_default(ctx: Context):
+    generate_thumbnails(ctx)

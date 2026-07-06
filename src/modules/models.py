@@ -116,3 +116,10 @@ def generate_dynamic_models(ctx: Context) -> None:
     create_dynamic_models(
         ctx, TextureType.ITEM, "balloons", UNUSED_BALLOON_VARIANTS, ["string"]
     )
+
+
+def beet_default(ctx: Context):
+    generate_block_models(ctx)
+    generate_item_models(ctx)
+
+    generate_dynamic_models(ctx)

@@ -104,3 +104,7 @@ def optimize_textures(ctx: Context):
         optimized_texture_image = Image.open(io.BytesIO(optimized_texture_bytes))
 
         ctx.assets.textures[texture].image = optimized_texture_image
+
+
+def beet_default(ctx: Context):
+    generate_scrolling_panel(ctx)

@@ -60,3 +60,7 @@ def generate_paintings(ctx: Context) -> None:
             action={"type": "copy_to_clipboard", "value": label},
             other={"width": 200},
         )
+
+
+def beet_default(ctx: Context):
+    generate_paintings(ctx)

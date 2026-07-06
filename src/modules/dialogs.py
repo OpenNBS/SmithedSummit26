@@ -114,3 +114,7 @@ def create_link_dialog(ctx: Context, link_dialog: LinkDialog):
 def generate_link_dialogs(ctx: Context):
     for link_dialog in LINK_DIALOGS:
         create_link_dialog(ctx, link_dialog)
+
+
+def beet_default(ctx: Context):
+    generate_link_dialogs(ctx)

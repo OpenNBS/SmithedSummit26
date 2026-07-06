@@ -13,6 +13,11 @@ resource_pack:
   zipped: true
 
 pipeline:
+  - src.modules.dialogs
+  - src.modules.models
+  - src.modules.paintings
+  - src.modules.textures
+  - src.modules.thumbnails
   - src.main
   - beet.contrib.minify_json
 
