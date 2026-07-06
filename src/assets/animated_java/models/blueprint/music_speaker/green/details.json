@@ -1,6 +1,0 @@
-{
-	"parent": "animated_java:blueprint/music_speaker/details",
-	"textures": {
-		"0": "animated_java:blueprint/music_speaker/green"
-	}
-}

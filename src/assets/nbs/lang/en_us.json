@@ -1,4 +1,6 @@
 {
 	"item.nbs.headphones": "Headphones",
-	"nbs.tooltip": "OpenNBS"
+	"item.nbs.headphones.lore": "Disconnected, purely cosmetic.",
+	"item.nbs.headphones.tagline": "\"What song are you listening to?\"",
+	"nbs.tooltip": "\ua001\ub001OpenNBS"
 }
