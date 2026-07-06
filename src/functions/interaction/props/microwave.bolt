@@ -1,0 +1,47 @@
+microwave_position = (-194.5, 65.5, 54.5)
+
+append function ~/load:
+    scoreboard players set microwave_active nbs 0
+
+function ~/root:
+    if score microwave_active nbs matches 0 if items entity @s weapon.mainhand minecraft:note_block[minecraft:custom_data~{"microwavable": True}]:
+        swing @s
+
+        scoreboard players set microwave_active nbs 1
+
+        item modify entity @s weapon.mainhand nbs:remove_one
+        function ~/../1
+
+function ~/1:
+    positioned microwave_position run playsound minecraft:block.decorated_pot.insert block @a[distance=..8] ~ ~ ~ 1 1.6
+
+    schedule function ~/../2 8t
+
+function ~/2:
+    positioned microwave_position run playsound minecraft:block.decorated_pot.insert block @a[distance=..8] ~ ~ ~ 1 1.82
+
+    schedule function ~/../3 4t
+
+function ~/3:
+    positioned microwave_position run playsound minecraft:block.decorated_pot.insert block @a[distance=..8] ~ ~ ~ 1 1.95
+
+    schedule function ~/../4 4t
+
+function ~/4:
+    # TODO: out-of-range note
+    positioned microwave_position run playsound minecraft:block.note_block.bit block @a[distance=..8] ~ ~ ~ 0.3 0
+    positioned microwave_position run playsound minecraft:block.brewing_stand.brew block @a[distance=..8] ~ ~ ~ 0.05 0.07
+
+    schedule function ~/../5 32t
+
+function ~/5:
+    positioned microwave_position run playsound minecraft:block.mud.break block @a[distance=..8] ~ ~ ~ 0.8 0.12
+    positioned microwave_position run playsound minecraft:block.mud.break block @a[distance=..8] ~ ~ ~ 1 0.35
+
+    positioned microwave_position run playsound minecraft:entity.sulfur_cube.squish block @a[distance=..8] -195 65.5 54 0.3 0.35
+
+    positioned microwave_position run playsound minecraft:entity.firework_rocket.large_blast block @a[distance=..8] -195 65.5 54 0.35 1.5
+
+    positioned microwave_position run particle minecraft:campfire_cosy_smoke ~0.1 ~0.1 ~0.3 0 0.02 0 1 0
+
+    scoreboard players set microwave_active nbs 0

@@ -1,0 +1,77 @@
+from typing import TypedDict
+
+
+guitar_position = (-190.5, 87.0, 55.5)
+
+class Note(TypedDict):
+    key: float
+    particle: float
+
+note_e_1: Note = {
+    # TODO: out-of-range note
+    "key": 0.891,
+    "particle": 0
+}
+
+note_a_1: Note = {
+    "key": 0.595,
+    "particle": 0.125
+}
+
+note_d_1: Note = {
+    "key": 0.794,
+    "particle": 0.333
+}
+
+note_g_2: Note = {
+    "key": 1.059,
+    "particle": 0.542
+}
+
+note_b_2: Note = {
+    "key": 1.335,
+    "particle": 0.708
+}
+
+note_e_2: Note = {
+    "key": 1.782,
+    "particle": 0.917
+}
+
+def play_note(note: Note) -> None:
+    playsound minecraft:block.note_block.guitar block @a[distance=..12] ~ ~ ~ 1 note["key"]
+    particle minecraft:note ~ ~0.75 ~ note["particle"] 0 0 1 0
+
+function ~/root:
+    swing @s
+
+    execute store result storage nbs:main guitar.key int 1 run random value 1..6
+    execute positioned guitar_position function ~/../play with storage nbs:main guitar
+
+function ~/play:
+    $function nbs:interaction/props/guitar/$(key)
+
+function ~/1:
+    play_note(note_e_1)
+
+function ~/2:
+    play_note(note_a_1)
+
+function ~/3:
+    play_note(note_d_1)
+
+function ~/4:
+    play_note(note_g_2)
+
+function ~/5:
+    play_note(note_b_2)
+
+function ~/6:
+    play_note(note_e_2)
+
+function ~/hit:
+    execute positioned guitar_position function ~/../1
+    execute positioned guitar_position function ~/../2
+    execute positioned guitar_position function ~/../3
+    execute positioned guitar_position function ~/../4
+    execute positioned guitar_position function ~/../5

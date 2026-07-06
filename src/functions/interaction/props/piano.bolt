@@ -1,0 +1,73 @@
+from typing import TypedDict
+
+piano_position = (-194.0, 88.0, 58.5)
+
+class Note(TypedDict):
+    key: float
+    particle: float
+    position: float
+
+note_g_1: Note = {
+    "key": 0.53,
+    "particle": 0.042,
+    "position": 0.25
+}
+
+note_c_1: Note = {
+    "key": 0.707,
+    "particle": 0.25,
+    "position": 0.13
+}
+
+note_e_1: Note = {
+    "key": 0.891,
+    "particle": 0.417,
+    "position": 0
+}
+
+note_g_2: Note = {
+    "key": 1.059,
+    "particle": 0.542,
+    "position": -0.13
+}
+
+note_b_2: Note = {
+    "key": 1.335,
+    "particle": 0.708,
+    "position": -0.25
+}
+
+def play_note(note: Note) -> None:
+    playsound minecraft:block.note_block.pling block @a[distance=..12] ~note["position"] ~ ~ 1 note["key"]
+    particle minecraft:note f"~{note["position"] * 3}" ~0.5 ~.25 note["particle"] 0 0 1 0
+
+function ~/root:
+    swing @s
+
+    execute store result storage nbs:main piano.key int 1 run random value 1..5
+    execute positioned piano_position function ~/../play with storage nbs:main piano
+
+function ~/play:
+    $function nbs:interaction/props/piano/$(key)
+
+function ~/1:
+    play_note(note_g_1)
+
+function ~/2:
+    play_note(note_c_1)
+
+function ~/3:
+    play_note(note_e_1)
+
+function ~/4:
+    play_note(note_g_2)
+
+function ~/5:
+    play_note(note_b_2)
+
+function ~/hit:
+    execute positioned piano_position function ~/../1
+    execute positioned piano_position function ~/../2
+    execute positioned piano_position function ~/../3
+    execute positioned piano_position function ~/../4
+    execute positioned piano_position function ~/../5

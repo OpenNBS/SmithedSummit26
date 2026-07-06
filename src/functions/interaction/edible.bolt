@@ -1,0 +1,82 @@
+from enum import Enum
+from typing import TypedDict
+
+from ../../utilities/item import give_item
+
+
+class EdibleType(Enum):
+    FOOD = 1
+    DRINK = 2
+
+
+class EdibleComponents(TypedDict):
+    consumable: dict
+    max_stack_size: int
+
+
+class Project(Enum):
+    NBS = 1
+    CNK = 2
+    FOODSTUFFS = 3
+
+
+SHARED_FOOD_COMPONENT = {"nutrition": 0, "saturation": 0, "can_always_eat": True}
+
+SHARED_CUSTOM_DATA_COMPONENT = {"microwavable": True}
+
+PROJECT_TOOLTIP_COMPONENTS: dict[Project, dict] = {
+    Project.CNK: {
+        "translate": "cnk.tooltip",
+        "font": "cnk:tooltip",
+        "color": "white",
+        "italic": False,
+    },
+    Project.FOODSTUFFS: {
+        "translate": "foodstuffs.tooltip",
+        "fallback": "Foodstuffs",
+        "color": "blue",
+        "italic": False,
+    },
+}
+
+EDIBLE_COMPONENTS: dict[EdibleType, EdibleComponents] = {
+    EdibleType.FOOD: {"consumable": {}, "max_stack_size": 64},
+    EdibleType.DRINK: {
+        "consumable": {"animation": "drink", "sound": "entity.generic.drink"},
+        "max_stack_size": 16,
+    },
+}
+
+
+def give_edible(
+    namespace: str, path: str, edible_type: EdibleType, translation_component={}
+) -> None:
+    item_model_component = f"{namespace}:{path}"
+    edible_component = EDIBLE_COMPONENTS[edible_type]
+    lore_component = [PROJECT_TOOLTIP_COMPONENTS[Project[namespace.upper()]]]
+
+    translation_component = {
+        "translate": f"item.{namespace}.{path}",
+        **translation_component,
+    }
+
+    give_item(
+        f"minecraft:note_block[minecraft:food={SHARED_FOOD_COMPONENT}, minecraft:consumable={edible_component['consumable']}, minecraft:max_stack_size={edible_component['max_stack_size']}, minecraft:item_model='{item_model_component}', minecraft:item_name={translation_component}, minecraft:lore={lore_component}, minecraft:custom_data={SHARED_CUSTOM_DATA_COMPONENT}]"
+    )
+
+function ~/pink_donut:
+    give_edible("cnk", "pink_donut", EdibleType.FOOD)
+
+function ~/cinnamon_roll:
+    give_edible("cnk", "cinnamon_roll", EdibleType.FOOD)
+
+function ~/pizza:
+    give_edible("cnk", "pizza", EdibleType.FOOD)
+
+function ~/cake_slice:
+    give_edible("foodstuffs", "cake_slice", EdibleType.FOOD, translation_component={
+        "fallback": "Cake Slice"
+    })
+
+function ~/pumpkin_latte:
+    give_edible("cnk", "pumpkin_latte", EdibleType.DRINK)

@@ -1,0 +1,22 @@
+from ../utilities/dialog import open_dialog
+
+function ~/studio:
+    open_dialog("links/studio")
+
+function ~/world:
+    open_dialog("links/world")
+
+function ~/paintings:
+    open_dialog("credits/paintings")
+
+function ~/thumbnails:
+    open_dialog("credits/thumbnails")
+
+function ~/patched_plataeus:
+    open_dialog("credits/patched_plataeus")
+
+function ~/textured_tropics:
+    open_dialog("credits/textured_tropics")
+
+function ~/welded_woodlands:
+    open_dialog("credits/welded_woodlands")

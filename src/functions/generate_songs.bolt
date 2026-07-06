@@ -3,7 +3,7 @@ from beet.core.utils import normalize_string
 from beet import Sound, SoundConfig
 import pynbs
 
-from src.modules.utilities.note_block import get_notes
+from src.utilities.note_block import get_notes
 
 SOURCE = "record"
 

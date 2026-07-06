@@ -1,0 +1,7 @@
+def give_item(item: str) -> None:
+    swing @s
+
+    if items entity @s weapon.mainhand *:
+        give @s item
+    unless items entity @s weapon.mainhand *:
+        item replace entity @s weapon.mainhand with item

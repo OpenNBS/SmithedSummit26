@@ -1,0 +1,8 @@
+from src.utilities import resource
+
+def open_dialog(dialog_asset_id: str) -> None:
+    dialog_resource = resource.get_asset(dialog_asset_id)
+
+    swing @s
+
+    dialog show @s dialog_resource

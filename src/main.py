@@ -29,7 +29,7 @@ def beet_default(ctx: Context):
         subproject(
             {
                 "require": ["bolt"],
-                "data_pack": {"load": {"data/nbs/modules": "src/modules/functions"}},
+                "data_pack": {"load": {"data/nbs/modules": "src/functions"}},
                 "pipeline": ["mecha"],
                 "meta": {"bolt": {"entrypoint": "nbs:*"}},
             }
