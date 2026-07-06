@@ -11,6 +11,11 @@
 					"uv": [0, 0, 16, 16],
 					"texture": "#0",
 					"tintindex": "#noshade"
+				},
+				"south": {
+					"uv": [16, 0, 0, 16],
+					"texture": "#0",
+					"tintindex": "#darkened"
 				}
 			}
 		}
