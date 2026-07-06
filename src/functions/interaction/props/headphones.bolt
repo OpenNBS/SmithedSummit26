@@ -15,7 +15,7 @@ max_stack_size_component = 1
 tooltip_component = {
     "translate": f"nbs.tooltip",
     "font": "nbs:tooltip",
-    "color": "#f56521",
+    "color": "#ec8c0c",
     "italic": False
 }
 
