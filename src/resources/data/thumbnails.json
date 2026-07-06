@@ -2,56 +2,122 @@
 	{
 		"author": "BuilderAltWCF1",
 		"title": "Amidst the Stars",
-		"id": "sSaAUPp9Xk"
+		"id": "sSaAUPp9Xk",
+		"thumbnailData": {
+			"zoomLevel": 1,
+			"startTick": 4240,
+			"startLayer": 176,
+			"backgroundColor": "#581c87"
+		}
 	},
 	{
 		"author": "Tzunamy",
 		"title": "Field of Hopes and Dreams",
-		"id": "l0ZSgbAmwB"
+		"id": "l0ZSgbAmwB",
+		"thumbnailData": {
+			"zoomLevel": 1,
+			"startTick": 26,
+			"startLayer": 37,
+			"backgroundColor": "#164e63"
+		}
 	},
 	{
 		"author": "chayapak1",
 		"title": "Hitorigoto",
-		"id": "eFqtXZMdoc"
+		"id": "eFqtXZMdoc",
+		"thumbnailData": {
+			"zoomLevel": 1,
+			"startTick": 0,
+			"startLayer": 52,
+			"backgroundColor": "#064e3b"
+		}
 	},
 	{
 		"author": "WitherNote",
 		"title": "Nameless Faces",
-		"id": "BTcDPBgCA3"
+		"id": "BTcDPBgCA3",
+		"thumbnailData": {
+			"zoomLevel": 1,
+			"startTick": 3104,
+			"startLayer": 6,
+			"backgroundColor": "#27272a"
+		}
 	},
 	{
 		"author": "GMHthe",
 		"title": "No Vitality",
-		"id": "mK2f4FdlGc"
+		"id": "mK2f4FdlGc",
+		"thumbnailData": {
+			"zoomLevel": 1,
+			"startTick": 0,
+			"startLayer": 71,
+			"backgroundColor": "#831843"
+		}
 	},
 	{
 		"author": "Happy_AlexRO",
 		"title": "Stereo Madness",
-		"id": "Q9CHviyH9W"
+		"id": "Q9CHviyH9W",
+		"thumbnailData": {
+			"zoomLevel": 2,
+			"startTick": 0,
+			"startLayer": 23,
+			"backgroundColor": "#1e3a8a"
+		}
 	},
 	{
 		"author": "rameezys2",
 		"title": "Sunset of Seven Suns",
-		"id": "4IiCRP7w4Q"
+		"id": "4IiCRP7w4Q",
+		"thumbnailData": {
+			"zoomLevel": 2,
+			"startTick": 42,
+			"startLayer": 67,
+			"backgroundColor": "#701a75"
+		}
 	},
 	{
 		"author": "greatgame146",
 		"title": "TV WORLD",
-		"id": "G93AOX6L7Y"
+		"id": "G93AOX6L7Y",
+		"thumbnailData": {
+			"zoomLevel": 2,
+			"startTick": 6,
+			"startLayer": 13,
+			"backgroundColor": "#164e63"
+		}
 	},
 	{
 		"author": "CreeperJuice",
 		"title": "The Ol' Jitterbug",
-		"id": "B2Cy9nMTaL"
+		"id": "B2Cy9nMTaL",
+		"thumbnailData": {
+			"zoomLevel": 1,
+			"startTick": 0,
+			"startLayer": 24,
+			"backgroundColor": "#27272a"
+		}
 	},
 	{
 		"author": "kaliumi",
 		"title": "The World Looks Red",
-		"id": "9XIFRV85iO"
+		"id": "9XIFRV85iO",
+		"thumbnailData": {
+			"zoomLevel": 2,
+			"startTick": 0,
+			"startLayer": 103,
+			"backgroundColor": "#27272a"
+		}
 	},
 	{
 		"author": "Flare",
 		"title": "Wanting to Find the Truth",
-		"id": "7tEGmwYY9q"
+		"id": "7tEGmwYY9q",
+		"thumbnailData": {
+			"zoomLevel": 1,
+			"startTick": 0,
+			"startLayer": 79,
+			"backgroundColor": "#7f1d1d"
+		}
 	}
 ]
