@@ -111,7 +111,14 @@ def generate_item_models(ctx: Context) -> None:
 def generate_dynamic_models(ctx: Context) -> None:
     create_dynamic_pair(ctx, TextureType.BLOCK, "notes", UNUSED_NOTE_VARIANTS)
     create_dynamic_pair(ctx, TextureType.BLOCK, "globes", UNUSED_GLOBE_VARIANTS)
-    create_dynamic_pair(ctx, TextureType.BLOCK, "thumbnails", UNUSED_THUMBNAIL_VARIANTS)
+
+    create_dynamic_pair(
+        ctx,
+        TextureType.BLOCK,
+        "thumbnails",
+        UNUSED_THUMBNAIL_VARIANTS,
+        ["frame", "plate"],
+    )
 
     create_dynamic_models(
         ctx, TextureType.ITEM, "balloons", UNUSED_BALLOON_VARIANTS, ["string"]
