@@ -17,7 +17,7 @@ def generate_paintings(ctx: Context) -> None:
 
     dialog_helper.create_root(
         title="Painting Credits",
-        body="These paintings were provided by community members who participated in the Summit jam.",
+        body="All paintings have been provided by community members who participated in the Summit jam.",
         other={"columns": 1},
     )
 
