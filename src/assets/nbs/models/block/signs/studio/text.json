@@ -1,7 +1,7 @@
 {
 	"textures": {
-		"0": "nbs:block/logos/studio/text",
-		"1": "nbs:block/logos/studio/text_shadow"
+		"0": "nbs:block/signs/studio/text",
+		"1": "nbs:block/signs/studio/text_shadow"
 	},
 	"elements": [
 		{

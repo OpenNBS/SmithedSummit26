@@ -1,6 +1,6 @@
 {
 	"textures": {
-		"0": "nbs:block/logos/studio/text_shadow"
+		"0": "nbs:block/signs/world/text_background"
 	},
 	"elements": [
 		{
@@ -11,6 +11,11 @@
 					"uv": [0, 0, 16, 16],
 					"texture": "#0",
 					"tintindex": "#noshade"
+				},
+				"south": {
+					"uv": [16, 0, 0, 16],
+					"texture": "#0",
+					"tintindex": "#darkened"
 				}
 			}
 		}

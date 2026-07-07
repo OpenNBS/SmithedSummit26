@@ -59,7 +59,7 @@ def create_scrolling_mcmetas(
 
 
 def generate_scrolling_panel(ctx: Context) -> None:
-    target_parent = "logos/world"
+    target_parent = "signs/world"
 
     static_texture_resource = resource.get_texture(
         TextureType.BLOCK, target_parent, "static_panel"

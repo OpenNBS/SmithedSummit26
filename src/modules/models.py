@@ -9,15 +9,6 @@ from src.utilities.model import (
 from src.utilities.resource import Resource, TextureType
 
 BLOCK_MODELS = [
-    "logos/studio/icon",
-    "logos/studio/text",
-    "logos/studio/text_shadow",
-    "logos/world/block",
-    "logos/world/text_background",
-    "logos/world/text_variant_cafe",
-    "logos/world/text_variant_world",
-    "logos/world/text_variant_world_shadow",
-    "logos/world/wordmark",
     "props/guitar",
     "props/open_sign",
     "props/piano",
@@ -25,10 +16,20 @@ BLOCK_MODELS = [
     "screenshots/maestro",
     "screenshots/studio",
     "screenshots/world",
+    "signs/studio/icon",
+    "signs/studio/text",
+    "signs/studio/text_shadow",
+    "signs/world/block",
+    "signs/world/text_background",
+    "signs/world/text_variant_cafe",
+    "signs/world/text_variant_world",
+    "signs/world/text_variant_world_shadow",
+    "signs/world/wordmark",
 ]
 
 ITEM_MODELS = [
     "props/headphones",
+    "signs/billboard",
     "wall_art",
 ]
 
