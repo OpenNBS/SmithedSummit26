@@ -11,16 +11,13 @@ import sys
 from io import BytesIO
 
 import pynbs
-from botocore.exceptions import ClientError
 from PIL import Image
 
 from src.resources.scripts.util.file_store import (
+    FileStore,
+    ObjectNotFoundError,
     PROJECT_ROOT,
     SCRIPT_DIR,
-    download_object,
-    get_b2_client,
-    get_bucket_name,
-    load_env,
 )
 
 THUMBNAILS_JSON = PROJECT_ROOT / "resources" / "data" / "thumbnails.json"
@@ -111,23 +108,16 @@ def generate_thumbnail(song: pynbs.File, thumbnail_data: dict) -> Image.Image:
     return img
 
 
-def process_thumbnail(
-    client,
-    bucket: str,
-    entry: dict,
-) -> None:
+def process_thumbnail(store: FileStore, entry: dict) -> None:
     song_id = entry["id"]
     thumbnail_data = entry["thumbnailData"]
     object_key = f"songs/{song_id}.nbs"
 
     try:
-        data = download_object(client, bucket, object_key)
-    except ClientError as exc:
-        error_code = exc.response.get("Error", {}).get("Code", "")
-        if error_code in {"404", "NoSuchKey", "NotFound"}:
-            print(f"Could not download {object_key}: object not found in bucket")
-            return
-        raise
+        data = store.download_object(object_key)
+    except ObjectNotFoundError:
+        print(f"Could not download {object_key}: object not found in bucket")
+        return
 
     song = pynbs.Parser(BytesIO(data)).read_file()
     img = generate_thumbnail(song, thumbnail_data)
@@ -140,9 +130,7 @@ def process_thumbnail(
 
 
 def main() -> None:
-    load_env()
-    client = get_b2_client()
-    bucket = get_bucket_name()
+    store = FileStore()
 
     if not THUMBNAILS_JSON.is_file():
         raise SystemExit(f"Thumbnails JSON not found: {THUMBNAILS_JSON}")
@@ -159,7 +147,7 @@ def main() -> None:
             )
 
     for entry in entries:
-        process_thumbnail(client, bucket, entry)
+        process_thumbnail(store, entry)
 
 
 if __name__ == "__main__":

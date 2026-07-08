@@ -3,21 +3,30 @@ from io import BytesIO
 from pathlib import Path
 
 import boto3
+from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 
+NOT_FOUND_ERROR_CODES = frozenset({"404", "NoSuchKey", "NotFound"})
+
+
+class FileStoreError(Exception):
+    pass
+
+
+class ObjectNotFoundError(FileStoreError):
+    def __init__(self, key: str):
+        self.key = key
+        super().__init__(f"Object not found: {key}")
+
 
 def load_env() -> None:
-    for env_path in (SCRIPT_DIR / ".env", PROJECT_ROOT / ".env"):
-        if env_path.is_file():
-            load_dotenv(env_path)
-            return
     load_dotenv()
 
 
-def get_b2_client():
+def _get_b2_client():
     key_id = os.environ.get("B2_APPLICATION_KEY_ID")
     application_key = os.environ.get("B2_APPLICATION_KEY")
     endpoint = os.environ.get("B2_ENDPOINT")
@@ -44,14 +53,30 @@ def get_b2_client():
     )
 
 
-def get_bucket_name() -> str:
+def _get_bucket_name() -> str:
     bucket = os.environ.get("B2_BUCKET_NAME")
     if not bucket:
         raise SystemExit("Missing required environment variable: B2_BUCKET_NAME")
     return bucket
 
 
-def download_object(client, bucket: str, key: str) -> bytes:
-    buffer = BytesIO()
-    client.download_fileobj(bucket, key, buffer)
-    return buffer.getvalue()
+def _is_not_found(exc: ClientError) -> bool:
+    error_code = exc.response.get("Error", {}).get("Code", "")
+    return error_code in NOT_FOUND_ERROR_CODES
+
+
+class FileStore:
+    def __init__(self):
+        load_env()
+        self._client = _get_b2_client()
+        self._bucket = _get_bucket_name()
+
+    def download_object(self, key: str) -> bytes:
+        try:
+            buffer = BytesIO()
+            self._client.download_fileobj(self._bucket, key, buffer)
+            return buffer.getvalue()
+        except ClientError as exc:
+            if _is_not_found(exc):
+                raise ObjectNotFoundError(key) from exc
+            raise FileStoreError(f"Failed to download {key}") from exc

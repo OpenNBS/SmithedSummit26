@@ -12,14 +12,10 @@ import csv
 import re
 import sys
 
-from botocore.exceptions import ClientError
-
 from resources.scripts.util.file_store import (
+    FileStore,
+    ObjectNotFoundError,
     SCRIPT_DIR,
-    download_object,
-    get_b2_client,
-    get_bucket_name,
-    load_env,
 )
 
 CSV_PATH = SCRIPT_DIR / "songs.csv"
@@ -50,7 +46,7 @@ def build_filename(title: str, author: str) -> str:
     return f"{safe_title} - {safe_author}.nbs"
 
 
-def process_song(client, bucket: str, row: dict[str, str]) -> None:
+def process_song(store: FileStore, row: dict[str, str]) -> None:
     public_id = row["publicId"]
     title = row["title"]
     author = row["uploader"]
@@ -59,13 +55,10 @@ def process_song(client, bucket: str, row: dict[str, str]) -> None:
     object_key = f"songs/{public_id}.nbs"
 
     try:
-        data = download_object(client, bucket, object_key)
-    except ClientError as exc:
-        error_code = exc.response.get("Error", {}).get("Code", "")
-        if error_code in {"404", "NoSuchKey", "NotFound"}:
-            print(f"Could not download {object_key}: object not found in bucket")
-            return
-        raise
+        data = store.download_object(object_key)
+    except ObjectNotFoundError:
+        print(f"Could not download {object_key}: object not found in bucket")
+        return
 
     region_folder = detect_region_folder(description)
     if region_folder is None:
@@ -85,9 +78,7 @@ def process_song(client, bucket: str, row: dict[str, str]) -> None:
 
 
 def main() -> None:
-    load_env()
-    client = get_b2_client()
-    bucket = get_bucket_name()
+    store = FileStore()
 
     if not CSV_PATH.is_file():
         raise SystemExit(f"CSV not found: {CSV_PATH}")
@@ -103,7 +94,7 @@ def main() -> None:
             raise SystemExit("No matching songs found in CSV for the given public IDs")
 
     for row in rows:
-        process_song(client, bucket, row)
+        process_song(store, row)
 
 
 if __name__ == "__main__":
