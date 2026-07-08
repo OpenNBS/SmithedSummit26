@@ -2,8 +2,6 @@ from beet import Context, subproject
 
 
 def beet_default(ctx: Context):
-    from src.modules.textures import optimize_textures
-
     ctx.require(
         subproject(
             {
@@ -14,5 +12,3 @@ def beet_default(ctx: Context):
             }
         )
     )
-
-    optimize_textures(ctx)

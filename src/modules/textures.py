@@ -1,12 +1,9 @@
-import io
-
 from beet import Context, Texture, TextureMcmeta
-from oxipng import StripChunks, optimize_from_memory
 from PIL import Image
 
 from src.utilities import resource
 from src.utilities.model import create_item_model
-from src.utilities.resource import NAMESPACE, TextureType
+from src.utilities.resource import TextureType
 
 
 def create_scrolling_texture(img: Image.Image, scroll_factor: int = 4) -> Texture:
@@ -86,24 +83,6 @@ def generate_scrolling_panel(ctx: Context) -> None:
     create_item_model(ctx, scrolling_model_resource, scrolling_texture_resource)
 
     del ctx.assets.textures[static_texture_resource.value]
-
-
-def optimize_textures(ctx: Context):
-    namespaced_assets = filter(
-        lambda name: name.startswith(NAMESPACE),
-        ctx.assets.textures,
-    )
-
-    for texture in namespaced_assets:
-        texture_image = ctx.assets.textures[texture].image
-        texture_bytes = ctx.assets.textures[texture].to_bytes(texture_image)
-
-        optimized_texture_bytes = optimize_from_memory(
-            texture_bytes, level=6, strip=StripChunks.all()
-        )
-        optimized_texture_image = Image.open(io.BytesIO(optimized_texture_bytes))
-
-        ctx.assets.textures[texture].image = optimized_texture_image
 
 
 def beet_default(ctx: Context):

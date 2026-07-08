@@ -19,6 +19,7 @@ pipeline:
   - src.modules.textures
   - src.modules.thumbnails
   - src.main
+  - src.modules.utilities.image.optimize_textures
   - beet.contrib.minify_json
 
 output: dist
