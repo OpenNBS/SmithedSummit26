@@ -55,6 +55,14 @@ INSTRUMENT_COLORS = [
 ]
 
 
+# zoomLevel -> Size
+# 1 -> 160×96
+# 2 -> 80×48
+# 3 -> 40×24
+# 4 -> 20×12
+# 5 -> 10×6
+
+
 def canvas_size(zoom_level: int) -> tuple[int, int]:
     zoom_level = max(MIN_ZOOM_LEVEL, min(MAX_ZOOM_LEVEL, int(zoom_level)))
     scale = 2 ** (DEFAULT_ZOOM_LEVEL - zoom_level)
