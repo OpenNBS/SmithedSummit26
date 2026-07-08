@@ -9,21 +9,24 @@ Expects a .env file (see songs/download_songs.py) with B2 credentials.
 import json
 import sys
 from io import BytesIO
-from pathlib import Path
 
 import pynbs
 from botocore.exceptions import ClientError
 from PIL import Image
-from songs.download_songs import (
+
+from src.resources.scripts.util.file_store import (
+    PROJECT_ROOT,
+    SCRIPT_DIR,
     download_object,
     get_b2_client,
     get_bucket_name,
     load_env,
 )
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-THUMBNAILS_JSON = SCRIPT_DIR / "data" / "thumbnails.json"
-OUTPUT_DIR = SCRIPT_DIR.parent / "assets" / "nbs" / "textures" / "block" / "thumbnails"
+THUMBNAILS_JSON = PROJECT_ROOT / "resources" / "data" / "thumbnails.json"
+OUTPUT_DIR = (
+    PROJECT_ROOT / "src" / "assets" / "nbs" / "textures" / "block" / "thumbnails"
+)
 
 DEFAULT_ZOOM_LEVEL = 3
 MIN_ZOOM_LEVEL = 1
