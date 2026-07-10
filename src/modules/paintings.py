@@ -18,7 +18,7 @@ def generate_paintings(ctx: Context) -> None:
     dialog_helper.create_root(
         title="Painting Credits",
         body="All paintings have been provided by community members who participated in the Summit jam.",
-        other={"columns": 1},
+        extra={"columns": 1},
     )
 
     painting_data = read_resource(ctx, "paintings.json")

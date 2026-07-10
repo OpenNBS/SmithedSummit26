@@ -2,5 +2,7 @@
 	"item.nbs.headphones": "Headphones",
 	"item.nbs.headphones.lore": "Disconnected, purely cosmetic.",
 	"item.nbs.headphones.tagline": "\"What song are you listening to?\"",
+	"item.nbs.starreact": "Starreact",
+	"item.nbs.starreact.lore": "Does nothing, but also joined.",
 	"nbs.tooltip": "\ua001\ub001OpenNBS"
 }

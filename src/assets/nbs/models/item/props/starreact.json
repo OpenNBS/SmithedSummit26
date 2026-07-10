@@ -1,0 +1,18 @@
+{
+	"parent": "minecraft:item/generated",
+	"textures": {
+		"layer0": "nbs:item/props/starreact"
+	},
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [70, -180, 0],
+			"translation": [0.5, 0.5, 13.5],
+			"scale": [0.2, 0.2, 0.2]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [70, 0, 0],
+			"translation": [0.5, 0.5, 13.5],
+			"scale": [0.2, 0.2, 0.2]
+		}
+	}
+}

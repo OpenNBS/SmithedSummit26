@@ -1,51 +1,14 @@
 from src.utilities import resource
-from src.utilities.resource import TranslationType
 
-from ../../utilities/item import give_item
+from ../../utilities/item import give_persistent_item
 
-translation_resource = resource.get_translation(TranslationType.ITEM, "headphones")
-
-lore_translation_resource = translation_resource.append("lore")
-tagline_translation_resource = translation_resource.append("tagline")
-
-rarity_component = "rare"
-item_model_component = "nbs:props/headphones"
-max_stack_size_component = 1
-
-tooltip_component = {
-    "translate": f"nbs.tooltip",
-    "font": "nbs:tooltip",
-    "color": "#ec8c0c",
-    "italic": False
-}
+asset_resource_id = "headphones"
 
 equippable_component = {
     "slot": "head"
 }
 
-item_name_component = {
-    "translate": translation_resource.value
-}
-
-custom_data_component = {
-    "summit": {
-        "persist": {}
-    }
-}
-
 function ~/root:
-    lore_component = [
-        {
-            "translate": lore_translation_resource.value,
-            "color": "#20CFF0",
-            "italic": False
-        },
-        {
-            "translate": tagline_translation_resource.value,
-            "color": "dark_gray",
-            "italic": True
-        },
-        tooltip_component
-    ]
+    item_model_component = resource.get_asset(f"props/{asset_resource_id}")
 
-    give_item(f"minecraft:note_block[minecraft:equippable={equippable_component}, minecraft:max_stack_size={max_stack_size_component}, minecraft:item_model='{item_model_component}', minecraft:item_name={item_name_component}, minecraft:rarity='{rarity_component}', minecraft:lore={lore_component}, minecraft:custom_data={custom_data_component}]")
+    give_persistent_item(asset_resource_id, item_model_component.value, {"minecraft:equippable": equippable_component})

@@ -12,7 +12,7 @@ def generate_thumbnails(ctx: Context) -> None:
     dialog_helper.create_root(
         title="Thumbnail Credits",
         body="All thumbnails have been sourced from songs uploaded to Note Block World. That's right, these pixels are note blocks!",
-        other={"columns": 1},
+        extra={"columns": 1},
     )
 
     thumbnail_data = read_resource(ctx, "thumbnails.json")

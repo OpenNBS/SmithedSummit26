@@ -1,3 +1,4 @@
+import warnings
 from typing import Tuple, TypedDict
 
 from beet import Context, Model
@@ -26,7 +27,13 @@ class ItemModelTints(TypedDict):
 
 def apply_model_tints(model: Model) -> ItemModelTints | None:
     if "parent" in model.data:
-        raise AttributeError("parent is not allowed when applying model tints")
+        file_name: str = str(model.original.ensure_source_path).split("/")[-1]
+
+        warnings.warn(
+            f'"parent" is not allowed when applying model tints in "{file_name}"'
+        )
+
+        return
 
     tints: list[JsonDict] = []
 

@@ -29,6 +29,7 @@ BLOCK_MODELS = [
 
 ITEM_MODELS = [
     "props/headphones",
+    "props/starreact",
     "signs/billboard",
     "wall_art",
 ]

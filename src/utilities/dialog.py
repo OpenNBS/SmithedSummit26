@@ -39,7 +39,7 @@ class DialogHelper:
 
         self.__dialog__ = get_dialog(ctx, self.__dialog_resource__)
 
-    def create_root(self, title: str, body: str, other: JsonDict = {}) -> None:
+    def create_root(self, title: str, body: str, extra: JsonDict = {}) -> None:
         title_translation_resource = self.__translation_resource__.append("title")
         body_translation_resource = self.__translation_resource__.append("body")
 
@@ -53,7 +53,7 @@ class DialogHelper:
                 "type": "minecraft:plain_message",
                 "contents": {"translate": body_translation_resource.value},
             },
-            **other,
+            **extra,
         }
 
     def create_action(

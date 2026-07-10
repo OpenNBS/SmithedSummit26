@@ -1,0 +1,40 @@
+from src.utilities import resource
+
+from ../../utilities/item import give_persistent_item
+
+asset_resource_id = "starreact"
+
+function ~/root:
+    item_model_component = resource.get_asset(f"props/{asset_resource_id}")
+
+    give_persistent_item(asset_resource_id, item_model_component.value, {
+        "description": {
+            "tagline": {
+                "italic": True,
+                "color": "dark_gray",
+                "text": "\"I'm the original       ",
+                "extra": [
+                    {
+                        "extra": [
+                            {
+                                "extra": [
+                                    {"color": "#FFFF44", "text": "S"},
+                                    {"color": "#FFFF53", "text": "t"},
+                                    {"color": "#FFFF62", "text": "a"},
+                                    {"color": "#FFFF71", "text": "r"},
+                                    {"color": "#FFFF81", "text": "r"},
+                                    {"color": "#FFFF90", "text": "e"},
+                                    {"color": "#FFFF9F", "text": "a"},
+                                    {"color": "#FFFFAE", "text": "c"},
+                                    {"color": "#FFFFBD", "text": "t"},
+                                ],
+                                "text": "",
+                            }
+                        ],
+                        "text": "",
+                    },
+                    '"',
+                ],
+            }
+        }
+    })
