@@ -32,28 +32,28 @@
 		"stickers": [
 			{
 				"sticker_id": "visited_studio",
-				"sticker_texture": "nbs:items/stickers/studio",
+				"sticker_texture": "nbs:item/stickers/studio",
 				"sticker_name": "Note Block Studio",
 				"unobtained_text": "Visit the Note Block Studio booth",
 				"obtained_text": "Rewarded for entering the booth"
 			},
 			{
 				"sticker_id": "visited_world",
-				"sticker_texture": "nbs:items/stickers/world",
+				"sticker_texture": "nbs:item/stickers/world",
 				"sticker_name": "Note Block World",
 				"unobtained_text": "Visit the Note Block World booth",
 				"obtained_text": "Rewarded for entering the booth"
 			},
 			{
 				"sticker_id": "collected_all_foods",
-				"sticker_texture": "nbs:items/stickers/cinnamon_roll",
+				"sticker_texture": "nbs:item/stickers/cinnamon_roll",
 				"sticker_name": "Living to Eat",
 				"unobtained_text": "Have an appetite for delicacies in the OpenNBS booths!",
 				"obtained_text": "Collected all food items in the OpenNBS booths"
 			},
 			{
 				"sticker_id": "heard_all_songs",
-				"sticker_texture": "nbs:items/stickers/headphones",
+				"sticker_texture": "nbs:item/stickers/headphones",
 				"sticker_name": "Melomaniac",
 				"unobtained_text": "Traverse the Summit, feel the beat!",
 				"obtained_text": "Heard all songs in the Summit soundtrack"
