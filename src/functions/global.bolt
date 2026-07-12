@@ -8,10 +8,11 @@ merge function_tag minecraft:load {
 append function ~/load:
     scoreboard objectives add nbs dummy
     scoreboard objectives add nbs_stats dummy
-    scoreboard players set playing nbs 1
     scoreboard players set shuffle nbs 1
-    function nbs:interaction/fix_entities
+    function ~/play
+
     schedule function ~/../tick 1t replace
+    
     execute function ~/save_speaker_positions:
         data modify storage nbs:main locations set value {speaker: [], loudspeaker: []}
         data modify storage nbs:temp input set value {}
@@ -21,26 +22,6 @@ append function ~/load:
                 function animated_java:global/internal/gu/convert_uuid_array_to_string with storage nbs:temp input
                 data modify storage nbs:main f"locations.{entity}" append from storage aj:uuid main.out
 
-
-function ~/tick:
-    schedule function (~/) 1t replace
-    execute if score playing nbs matches 1 run scoreboard players add songtime nbs 1
-    execute store result storage nbs:main playing.tick int 1 run scoreboard players get songtime nbs
-    function nbs:global/playback with storage nbs:main playing # TODO: this command works in a command block, but not here :c
-
-function ~/playback:
-    $function nbs:song/$(name)/$(tick)/root
-
-function ~/change_song:
-    scoreboard players add songs_played nbs_stats 1
-    scoreboard players set songtime nbs -1
-    execute store result storage nbs:main playing.index int 1 run scoreboard players get songindex nbs
-    function nbs:global/change_song2 with storage nbs:main playing
-
-function ~/change_song2:
-    $data modify storage nbs:main playing set from storage nbs:main songs[$(index)]
-    function nbs:global/title with storage nbs:main playing
-    
 # Helper function that iterates through all speaker and loudspeaker in the world
 # Takes {speaker_type: "speaker", i: 0, song: "song", tick: 0}
 function ~/speaker_iter:
@@ -50,59 +31,97 @@ function ~/speaker_iter:
     store result storage nbs:temp input.i int 1 scoreboard players add #iter nbs 1
     if score #iter nbs < #len nbs function (~/) with storage nbs:temp input
 
-#> Effects
 
-function ~/title:
-    $execute at @e[type=item_display,tag=nbs_speaker] run title @a[distance=..12] actionbar {"text":"","extra":[{"text":"🎵 Now Playing: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}
-    $execute at @e[type=item_display,tag=nbs_loudspeaker] run title @a[distance=..48] actionbar {"text":"","extra":[{"text":"🎵 Now Playing: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}
-    $execute as @e[tag=aj.music_speaker.root] on passengers if entity @s[tag=aj.music_speaker.bone.text_display] run data modify entity @s text set value '{"text":"🎵 $(formatted_string)","color":"green"}'
-    $execute as @e[type=item_display,tag=aj.music_speaker.root] on passengers if entity @s[tag=aj.music_speaker.bone.text_display] run data modify entity @s text set value {"text":"","extra":[{"text":"🎵 Now Playing: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}
-    $title @a[tag=nbs_headphones] actionbar {"text":"","extra":[{"text":"🎧 Now Playing: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}
+for region in ctx.meta["regions"]:
 
+    function ~/{region}/tick:
+        schedule function (~/) 1t replace
+        execute if score f"{region}_playing" nbs matches 1 run scoreboard players add f"{region}_songtime" nbs 1
+        execute store result storage nbs:main f"playing.{region}.tick" int 1 run scoreboard players get f"{region}_songtime" nbs
+        function nbs:global/playback with storage nbs:main f"playing.{region}" # TODO: this command works in a command block, but not here :c
 
-song_count = len(glob.glob("songs/*.nbs"))
+    function ~/{region}/playback:
+        $function nbs:song/$(name)/$(tick)/root
 
+    function ~/{region}/change_song:
+        scoreboard players add songs_played nbs_stats 1
+        scoreboard players set f"{region}_songtime" nbs -1
+        execute store result storage nbs:main f"playing.{region}.index" int 1 run scoreboard players get f"{region}_songindex" nbs
+        function ~/{region}/zzz_change_song with storage nbs:main f"playing.{region}"   
 
-#> Spawn Speakers
-
-function ~/place_speaker:
-    function animated_java:music_speaker/summon/default
-    tag @e[type=item_display,limit=1,distance=..1,tag=nbs_speaker_new] add nbs_speaker
-    tag @e[type=item_display,limit=1,distance=..1,tag=nbs_speaker_new] remove nbs_speaker_new
-
-function ~/place_loudspeaker:
-    function animated_java:music_speaker/summon/default
-    tag @e[type=item_display,limit=1,distance=..1,tag=nbs_speaker_new] add nbs_loudspeaker
-    tag @e[type=item_display,limit=1,distance=..1,tag=nbs_speaker_new] remove nbs_speaker_new
+    function ~/{region}/zzz_change_song:
+        $data modify storage nbs:main f"playing.{region}" set from storage nbs:main f"songs.{region}[$(index)]"
+        function ~/{region}/title with storage nbs:main f"playing.{region}"
 
 
-#> Song Controls
-function ~/next:
-    scoreboard players add songindex nbs 1
-    execute if score songindex nbs matches f"{song_count}.." run scoreboard players set songindex nbs 0
-    function ~/../change_song
+    #> Effects
 
-function ~/pause:
-    scoreboard players set playing nbs 0
+    function ~/{region}/title:
+        $execute at @e[type=item_display,tag=nbs_speaker] run title @a[distance=..12] actionbar {"text":"","extra":[{"text":"🎵 Now Playing: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}
+        $execute at @e[type=item_display,tag=nbs_loudspeaker] run title @a[distance=..48] actionbar {"text":"","extra":[{"text":"🎵 Now Playing: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}
+        $execute as @e[tag=aj.music_speaker.root] on passengers if entity @s[tag=aj.music_speaker.bone.text_display] run data modify entity @s text set value '{"text":"🎵 $(formatted_string)","color":"green"}'
+        $execute as @e[type=item_display,tag=aj.music_speaker.root] on passengers if entity @s[tag=aj.music_speaker.bone.text_display] run data modify entity @s text set value {"text":"","extra":[{"text":"🎵 Now Playing: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}
+        $title @a[tag=nbs_headphones] actionbar {"text":"","extra":[{"text":"🎧 Now Playing: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}
 
-function ~/play:
-    scoreboard players set playing nbs 1
 
-function ~/prev:
-    scoreboard players remove songindex nbs 1
-    execute if score songindex nbs matches ..-1 run scoreboard players set songindex nbs (song_count - 1)
-    function ~/../change_song
+    #> Spawn Speakers
 
-function ~/stop:
-    scoreboard players set playing nbs 0
-    scoreboard players set songtime nbs -1
+    function ~/{region}/place_speaker:
+        function animated_java:music_speaker/summon/default
+        tag @e[type=item_display,limit=1,distance=..1,tag=nbs_speaker_new] add nbs_speaker
+        tag @e[type=item_display,limit=1,distance=..1,tag=nbs_speaker_new] remove nbs_speaker_new
 
-function ~/shuffle:
-    scoreboard players operation prevsong nbs = songindex nbs
-    execute store result score songindex nbs run random value (0, song_count - 1)
-    execute if score songindex nbs = prevsong nbs run function ~/../next
-    function ~/../change_song
+    function ~/{region}/place_loudspeaker:
+        function animated_java:music_speaker/summon/default
+        tag @e[type=item_display,limit=1,distance=..1,tag=nbs_speaker_new] add nbs_loudspeaker
+        tag @e[type=item_display,limit=1,distance=..1,tag=nbs_speaker_new] remove nbs_speaker_new
 
-function ~/advance:
-    execute if score shuffle nbs matches 0 run function ~/../next
-    execute if score shuffle nbs matches 1 run function ~/../shuffle
+    #> Song Controls
+
+    song_count = len(glob.glob(f"songs/{region}/*.nbs"))
+
+    function ~/{region}/next:
+        scoreboard players add f"{region}_songindex" nbs 1
+        execute if score f"{region}_songindex" nbs matches f"{song_count}.." run scoreboard players set f"{region}_songindex" nbs 0
+        function ~/../change_song
+
+    function ~/{region}/prev:
+        scoreboard players remove f"{region}_songindex" nbs 1
+        execute if score f"{region}_songindex" nbs matches ..-1 run scoreboard players set f"{region}_songindex" nbs (song_count - 1)
+        function ~/../change_song
+
+    function ~/{region}/pause:
+        scoreboard players set f"{region}_playing" nbs 0
+
+    function ~/{region}/play:
+        scoreboard players set f"{region}_playing" nbs 1
+
+    function ~/{region}/stop:
+        scoreboard players set f"{region}_playing" nbs 0
+        scoreboard players set f"{region}_songtime" nbs -1
+
+    function ~/{region}/shuffle:
+        scoreboard players operation f"{region}_prevsong" nbs = songindex nbs
+        execute store result score f"{region}_songindex" nbs run random value (0, song_count - 1)
+        execute if score f"{region}_songindex" nbs = f"{region}_prevsong" nbs run function ~/{region}/next
+        function ~/{region}/change_song
+
+    function ~/{region}/advance:
+        execute if score shuffle nbs matches 0 run function ~/{region}/next
+        execute if score shuffle nbs matches 1 run function ~/{region}/shuffle
+
+
+    #> Global Controls
+
+    append function ~/pause:
+        scoreboard players set f"{region}_playing" nbs 0
+
+    append function ~/play:
+        scoreboard players set f"{region}_playing" nbs 1
+
+    append function ~/tick:
+        function ~/{region}/tick
+
+function ~/remove_speaker:
+    kill @n[tag=nbs_speaker,distance=..1]
+    kill @n[tag=nbs_loudspeaker,distance=..1]

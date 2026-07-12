@@ -8,15 +8,22 @@ from src.utilities.note_block import get_notes
 SOURCE = "record"
 
 SOUNDS = Path("sounds")
-SONGS = Path("songs")
+SONGS = Path("src") / "resources" / "songs"
 
 # memo:
 ctx.meta["instruments"] = set()
 
-append function ~/../global/load:
+# Define regions
+regions = list(SONGS.glob('*/'))
+ctx.meta["regions"] = []
+for region in regions:
+    region_name = normalize_string(region.stem)
+    ctx.meta["regions"].append(region_name)
+
+append function ~/../playback/load:
     data modify storage nbs:main songs set value []
 
-for song_stuff in enumerate(SONGS.glob("*.nbs")):
+for song_stuff in enumerate(SONGS.glob("**/*.nbs")):
     song_index = song_stuff[0]
     path = song_stuff[1]
     song = pynbs.read(path)
