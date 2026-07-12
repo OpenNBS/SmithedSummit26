@@ -58,7 +58,8 @@ def extract_id_from_title(title: str) -> str:
         .split("Note Block")[0]
         .split("#summit26")[0]
         .split("OST")[-1]
-        .split("Super Mario")[-1]
+        .split("Super Mario Bros Wonder")[-1]
+        .split("Super Mario 3D Land")[-1]
     )
 
     # Normalize '-' separators, then keep only the first part
