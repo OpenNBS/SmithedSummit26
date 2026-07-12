@@ -9,18 +9,23 @@ Expects a .env file in the project root (or songs/) with:
 """
 
 import csv
+import json
 import re
 import sys
+import unicodedata
 
-from resources.scripts.util.file_store import (
+from src.resources.scripts.util.file_store import (
+    SCRIPT_DIR,
     FileStore,
     ObjectNotFoundError,
-    SCRIPT_DIR,
 )
 
-CSV_PATH = SCRIPT_DIR / "songs.csv"
+SONGS_DIR = SCRIPT_DIR / "songs"
+DATA_DIR = SCRIPT_DIR / "data"
 
-REGION_FOLDERS = {
+CSV_PATH = SONGS_DIR / "songs.csv"
+
+REGIONS = {
     "Patched Plateau": "patched_plateaus",
     "Textured Tropic": "textured_tropics",
     "Welded Woodland": "welded_woodlands",
@@ -29,28 +34,65 @@ REGION_FOLDERS = {
 INVALID_FILENAME_CHARS = re.compile(r'[<>:"/\\|?*]')
 
 
-def detect_region_folder(description: str) -> str | None:
-    for region_name, folder in REGION_FOLDERS.items():
+def detect_region(description: str) -> str | None:
+    for region_name, region_id in REGIONS.items():
         if region_name in description:
-            return folder
+            return region_id
     return None
+
+
+def extract_id_from_title(title: str) -> str:
+
+    print(title)
+    # Remove region names
+    for region_name in REGIONS:
+        title = title.replace(f"{region_name}s", "").replace(region_name, " ")
+
+    # Remove anything between any opening and closing bracket, one level only
+    title = re.sub(r"[\(\[\{].*?[\)\]\}]", "", title)
+
+    # Replace non-core title elements
+    title = (
+        title.split("feat.")[0]
+        .split("Note Block")[0]
+        .split("#summit26")[0]
+        .split("OST")[-1]
+        .split("Super Mario")[-1]
+    )
+
+    # Normalize '-' separators, then keep only the first part
+    title = re.sub(r"\s*[-]\s*", "-", title)
+    title = title.strip("-").strip()
+    title = title.split("-")[0]
+
+    # Lowercase and replace spaces with underscores
+    title = title.lower()
+    title = re.sub(r"\s*[''-]\s*", "", title)
+    title = re.sub(r"\s*[,&~:;]\s*", " ", title)
+    title = title.replace(" ", "_")
+
+    # Replace diacritics
+    normalized = unicodedata.normalize("NFKD", title)
+    clean_title = normalized.encode("ascii", "ignore").decode("ascii")
+
+    return clean_title
 
 
 def sanitize_filename(name: str) -> str:
     return INVALID_FILENAME_CHARS.sub("", name).strip()
 
 
-def build_filename(title: str, author: str) -> str:
+def build_filename(title: str) -> str:
     safe_title = sanitize_filename(title)
-    safe_author = sanitize_filename(author)
-    return f"{safe_title} - {safe_author}.nbs"
+    return f"{safe_title}.nbs"
 
 
-def process_song(store: FileStore, row: dict[str, str]) -> None:
+def process_song(store: FileStore, row: dict[str, str]) -> dict[str, str] | None:
     public_id = row["publicId"]
     title = row["title"]
     author = row["uploader"]
     description = row.get("description", "")
+    song_id = extract_id_from_title(title)
 
     object_key = f"songs/{public_id}.nbs"
 
@@ -60,21 +102,24 @@ def process_song(store: FileStore, row: dict[str, str]) -> None:
         print(f"Could not download {object_key}: object not found in bucket")
         return
 
-    region_folder = detect_region_folder(description)
-    if region_folder is None:
-        print(
-            f"No region found in description for {title!r} ({public_id}); "
-            "skipping save"
-        )
-        return
+    region_id = detect_region(description)
+    if region_id is None:
+        print(f"Warning: No region found in description for {title!r} ({public_id})")
 
-    destination_dir = SCRIPT_DIR / region_folder
-    destination_dir.mkdir(parents=True, exist_ok=True)
-
-    filename = build_filename(title, author)
-    destination = destination_dir / filename
+    filename = build_filename(song_id)
+    destination = SONGS_DIR / filename
     destination.write_bytes(data)
-    print(f"Saved {destination.relative_to(SCRIPT_DIR)}")
+    print(f"Saved {filename}")
+
+    song_data = {
+        "id": song_id,
+        "title": title,
+        "region": region_id,
+        "author": author,
+        "url": f"https://noteblock.world/song/{public_id}",
+    }
+
+    return song_data
 
 
 def main() -> None:
@@ -93,8 +138,15 @@ def main() -> None:
         if not rows:
             raise SystemExit("No matching songs found in CSV for the given public IDs")
 
+    manifest_data = []
     for row in rows:
-        process_song(store, row)
+        song_data = process_song(store, row)
+        if song_data:
+            manifest_data.append(song_data)
+
+    manifest_path = DATA_DIR / "songs.json"
+    with open(manifest_path, "w", encoding="utf-8") as f:
+        json.dump(manifest_data, f, indent=4, separators=(",", ": "))
 
 
 if __name__ == "__main__":
