@@ -1,0 +1,11 @@
+function ~/studio:
+    advancement grant @s only summit.sticker_book:nbs/visited_studio
+
+function ~/world:
+    advancement grant @s only summit.sticker_book:nbs/visited_world
+
+function ~/collected_all_foods:
+    advancement grant @s only summit.sticker_book:nbs/collected_all_foods
+
+function ~/heard_all_songs:
+    advancement grant @s only summit.sticker_book:nbs/heard_all_songs

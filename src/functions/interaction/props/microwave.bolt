@@ -1,10 +1,16 @@
 microwave_position = (-194.5, 65.5, 54.5)
 
+merge function_tag minecraft:load {
+    "values": [(~/load)]
+}
+
 append function ~/load:
-    scoreboard players set microwave_active nbs 0
+    scoreboard objectives add nbs.props dummy
+
+    scoreboard players set microwave_active nbs.props 0
 
 function ~/root:
-    if score microwave_active nbs matches 0 if items entity @s weapon.mainhand minecraft:note_block[minecraft:custom_data~{"microwavable": True}]:
+    if score microwave_active nbs.props matches 0 if items entity @s weapon.mainhand minecraft:note_block[minecraft:custom_data~{"microwavable": True}]:
         swing @s
 
         scoreboard players set microwave_active nbs 1

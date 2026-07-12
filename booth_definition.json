@@ -46,7 +46,7 @@
 			},
 			{
 				"sticker_id": "collected_all_foods",
-				"sticker_texture": "nbs:item/stickers/cinnamon_roll",
+				"sticker_texture": "nbs:item/stickers/pink_donut",
 				"sticker_name": "Living to Eat",
 				"unobtained_text": "Have an appetite for delicacies in the OpenNBS booths!",
 				"obtained_text": "Collected all food items in the OpenNBS booths"

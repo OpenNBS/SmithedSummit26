@@ -47,6 +47,14 @@ EDIBLE_COMPONENTS: dict[EdibleType, EdibleComponents] = {
     },
 }
 
+EDIBLE_IDS = [
+    "pink_donut",
+    "cinnamon_roll",
+    "pizza",
+    "cake_slice",
+    "pumpkin_latte"
+]
+
 
 def give_edible(
     namespace: str, path: str, edible_type: EdibleType, translation_component={}
@@ -60,9 +68,31 @@ def give_edible(
         **translation_component,
     }
 
+    scoreboard players add @s f"nbs.edibles.obtained_{path}" 1
+
+    function ~/../refresh_sticker_progress
+
     give_item(
         f"minecraft:note_block[minecraft:food={SHARED_FOOD_COMPONENT}, minecraft:consumable={edible_component['consumable']}, minecraft:max_stack_size={edible_component['max_stack_size']}, minecraft:item_model='{item_model_component}', minecraft:item_name={translation_component}, minecraft:lore={lore_component}, minecraft:custom_data={SHARED_CUSTOM_DATA_COMPONENT}]"
     )
+
+merge function_tag minecraft:load {
+    "values": [(~/load)]
+}
+
+append function ~/load:
+    for edible_id in EDIBLE_IDS:
+        scoreboard objectives add f"nbs.edibles.obtained_{edible_id}" dummy
+
+    scoreboard objectives add nbs.edibles.obtained_all dummy
+
+function ~/refresh_sticker_progress:
+    unless score @s nbs.edibles.obtained_all matches 1:
+        # I tried to make this better, but without knowing how to return early, we get this instead
+        if score @s nbs.edibles.obtained_pink_donut matches 1.. if score @s nbs.edibles.obtained_cinnamon_roll matches 1.. if score @s nbs.edibles.obtained_pizza matches 1.. if score @s nbs.edibles.obtained_cake_slice matches 1.. if score @s nbs.edibles.obtained_pumpkin_latte matches 1..:
+            scoreboard players set @s nbs.edibles.obtained_all 1
+
+            function nbs:stickers/collected_all_foods
 
 function ~/pink_donut:
     give_edible("cnk", "pink_donut", EdibleType.FOOD)
