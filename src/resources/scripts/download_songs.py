@@ -25,6 +25,10 @@ SONGS_DIR = SCRIPT_DIR / "songs"
 DATA_DIR = SCRIPT_DIR / "data"
 
 CSV_PATH = SONGS_DIR / "songs.csv"
+MANIFEST_PATH = DATA_DIR / "songs.json"
+
+# When False, keep existing songs.json fields for songs already present (manual edits).
+OVERWRITE_METADATA = False
 
 REGIONS = {
     "Patched Plateau": "patched_plateaus",
@@ -102,12 +106,41 @@ def ensure_file_download(store: FileStore, object_key: str, destination: Path):
         print(f"Could not download {object_key}: object not found in bucket")
 
 
-def process_song(store: FileStore, row: dict[str, str]) -> dict[str, str] | None:
+def load_existing_manifest() -> dict[str, dict]:
+    if not MANIFEST_PATH.is_file():
+        return {}
+
+    with open(MANIFEST_PATH, encoding="utf-8") as f:
+        entries = json.load(f)
+
+    return {entry["id"]: entry for entry in entries if "id" in entry}
+
+
+def resolve_song_data(
+    new_data: dict[str, str | None],
+    existing_meta: dict | None,
+) -> dict:
+    """Return the metadata to write for a song.
+
+    When OVERWRITE_METADATA is False and the song already exists in songs.json,
+    existing fields win so manual edits are preserved. New fields from the CSV
+    pass are still filled in when missing from the existing entry.
+    """
+    if existing_meta is None or OVERWRITE_METADATA:
+        return new_data
+    return {**new_data, **existing_meta}
+
+
+def process_song(
+    store: FileStore,
+    row: dict[str, str],
+    song_id: str,
+    existing_meta: dict | None = None,
+) -> dict | None:
     public_id = row["publicId"]
     title = row["title"]
     author = row["uploader"]
     description = row.get("description", "")
-    song_id = extract_id_from_title(title)
 
     object_key = f"songs/{public_id}.nbs"
     filename = build_filename(song_id)
@@ -126,7 +159,7 @@ def process_song(store: FileStore, row: dict[str, str]) -> dict[str, str] | None
         "url": f"https://noteblock.world/song/{public_id}",
     }
 
-    return song_data
+    return resolve_song_data(song_data, existing_meta)
 
 
 def main() -> None:
@@ -145,14 +178,17 @@ def main() -> None:
         if not rows:
             raise SystemExit("No matching songs found in CSV for the given public IDs")
 
+    existing_by_id = load_existing_manifest()
+
     manifest_data = []
     for row in rows:
-        song_data = process_song(store, row)
+        song_id = extract_id_from_title(row["title"])
+        existing_meta = existing_by_id.get(song_id)
+        song_data = process_song(store, row, song_id, existing_meta)
         if song_data:
             manifest_data.append(song_data)
 
-    manifest_path = DATA_DIR / "songs.json"
-    with open(manifest_path, "w", encoding="utf-8") as f:
+    with open(MANIFEST_PATH, "w", encoding="utf-8") as f:
         json.dump(manifest_data, f, indent=4, separators=(",", ": "))
 
 
