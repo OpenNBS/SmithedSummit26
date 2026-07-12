@@ -13,7 +13,7 @@ function ~/root:
     if score microwave_active nbs.props matches 0 if items entity @s weapon.mainhand minecraft:note_block[minecraft:custom_data~{"microwavable": True}]:
         swing @s
 
-        scoreboard players set microwave_active nbs 1
+        scoreboard players set microwave_active nbs.props 1
 
         item modify entity @s weapon.mainhand nbs:remove_one
         function ~/../1
@@ -50,4 +50,4 @@ function ~/5:
 
     positioned microwave_position run particle minecraft:campfire_cosy_smoke ~0.1 ~0.1 ~0.3 0 0.02 0 1 0
 
-    scoreboard players set microwave_active nbs 0
+    scoreboard players set microwave_active nbs.props 0
