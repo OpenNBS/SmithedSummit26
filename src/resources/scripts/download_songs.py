@@ -13,6 +13,7 @@ import json
 import re
 import sys
 import unicodedata
+from pathlib import Path
 
 from src.resources.scripts.util.file_store import (
     SCRIPT_DIR,
@@ -87,6 +88,19 @@ def build_filename(title: str) -> str:
     return f"{safe_title}.nbs"
 
 
+def ensure_file_download(store: FileStore, object_key: str, destination: Path):
+    if Path(destination).is_file():
+        print(f"File already exists: {destination.name}")
+        return
+
+    try:
+        data = store.download_object(object_key)
+        destination.write_bytes(data)
+        print(f"Saved {destination.name}")
+    except ObjectNotFoundError:
+        print(f"Could not download {object_key}: object not found in bucket")
+
+
 def process_song(store: FileStore, row: dict[str, str]) -> dict[str, str] | None:
     public_id = row["publicId"]
     title = row["title"]
@@ -95,21 +109,13 @@ def process_song(store: FileStore, row: dict[str, str]) -> dict[str, str] | None
     song_id = extract_id_from_title(title)
 
     object_key = f"songs/{public_id}.nbs"
-
-    try:
-        data = store.download_object(object_key)
-    except ObjectNotFoundError:
-        print(f"Could not download {object_key}: object not found in bucket")
-        return
+    filename = build_filename(song_id)
+    destination = SONGS_DIR / filename
+    ensure_file_download(store, object_key, destination)
 
     region_id = detect_region(description)
     if region_id is None:
         print(f"Warning: No region found in description for {title!r} ({public_id})")
-
-    filename = build_filename(song_id)
-    destination = SONGS_DIR / filename
-    destination.write_bytes(data)
-    print(f"Saved {filename}")
 
     song_data = {
         "id": song_id,
