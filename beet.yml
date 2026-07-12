@@ -14,6 +14,7 @@ resource_pack:
 
 pipeline:
   - src.modules.dialogs
+  - src.modules.globes
   - src.modules.models
   - src.modules.paintings
   - src.modules.textures

@@ -12,8 +12,8 @@ function ~/paintings:
 function ~/thumbnails:
     open_dialog("credits/thumbnails")
 
-function ~/patched_plataeus:
-    open_dialog("credits/patched_plataeus")
+function ~/patched_plateaus:
+    open_dialog("credits/patched_plateaus")
 
 function ~/textured_tropics:
     open_dialog("credits/textured_tropics")

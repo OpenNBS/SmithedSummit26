@@ -30,13 +30,19 @@ class Resource:
         self.__delimiter__ = delimiter
         self.__paths__ = paths
 
-        self.value = f"{self.__base__}{self.__delimiter__.join(self.__paths__)}"
+        self.value = f"{self.__base__}{self.__merge__()}"
 
-    def __str__(self):
+    def __merge__(self) -> str:
+        return self.__delimiter__.join(self.__paths__)
+
+    def __str__(self) -> str:
         return self.value
 
     def append(self, *paths: str):
         return Resource(self.__base__, self.__delimiter__, *[*self.__paths__, *paths])
+
+    def path(self) -> str:
+        return self.__merge__()
 
 
 def get_translation(translation_type: TranslationType, *paths: str) -> Resource:
