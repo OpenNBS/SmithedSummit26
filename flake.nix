@@ -81,12 +81,11 @@
             packages =
               (with pkgs; [
                 uv
+                ruff
 
                 cargo
                 rustc
                 gcc
-
-                black
               ])
               ++ (with python.pkgs; [
                 venvShellHook
