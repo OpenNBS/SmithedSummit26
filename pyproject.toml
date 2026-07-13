@@ -1,27 +1,29 @@
-[tool.poetry]
+[project]
 name = "nbs-smithed-summit-26"
 version = "0.1.0"
 description = "Note Block Studio data pack + resource pack for Smithed Summit 2026"
-authors = ["Bentroen <bemcdc@gmail.com>"]
+authors = [{ name = "Bentroen", email = "bemcdc@gmail.com" }]
+requires-python = ">=3.14,<4"
 readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "beet>=0.115.0,<0.116",
+    "pynbs>=1.1.0,<2",
+    "bolt>=0.50.1,<0.51",
+    "numpy==2.3.2",
+    "boto3>=1.38.0,<2",
+    "python-dotenv>=1.1.0,<2",
+    "pyoxipng>=9.1.1,<10",
+]
 
-[tool.poetry.dependencies]
-python = "^3.14"
-beet = "^0.115.0"
-pynbs = "^1.1.0"
-bolt = "^0.50.1"
-numpy = "2.3.2"
-boto3 = "^1.38.0"
-python-dotenv = "^1.1.0"
-pyoxipng = "^9.1.1"
+[dependency-groups]
+dev = [
+    "snakeviz>=2.2.0,<3",
+    "tuna>=0.5.11,<0.6",
+]
 
-[tool.poetry.group.dev.dependencies]
-snakeviz = "^2.2.0"
-tuna = "^0.5.11"
-
-[[tool.poetry.packages]]
-include = "src"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.uv]
+default-groups = "all"

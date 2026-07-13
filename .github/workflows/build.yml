@@ -16,7 +16,7 @@ jobs:
 
       - name: Build data and resource packs
         run: |
-          poetry install
+          uv sync
 
           beet build
 

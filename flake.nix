@@ -80,7 +80,7 @@
 
             packages =
               (with pkgs; [
-                poetry
+                uv
 
                 cargo
                 rustc
