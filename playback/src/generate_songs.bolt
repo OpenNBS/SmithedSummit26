@@ -4,17 +4,17 @@ from beet import Sound, SoundConfig
 import pynbs
 
 from src.utilities.note_block import get_notes
+from src.songs import SONGS_PATH
 
 SOURCE = "record"
 
 SOUNDS = Path("sounds")
-SONGS = Path("src") / "resources" / "songs"
 
 # memo:
 ctx.meta["instruments"] = set()
 
 # Define regions
-regions = list(SONGS.glob('*/'))
+regions = list(SONGS_PATH.glob('*/'))
 ctx.meta["regions"] = []
 for region in regions:
     region_name = normalize_string(region.stem)
@@ -23,7 +23,7 @@ for region in regions:
 append function ~/../playback/load:
     data modify storage nbs:main songs set value []
 
-for song_stuff in enumerate(SONGS.glob("**/*.nbs")):
+for song_stuff in enumerate(SONGS_PATH.glob("**/*.nbs")):
     song_index = song_stuff[0]
     path = song_stuff[1]
     song = pynbs.read(path)

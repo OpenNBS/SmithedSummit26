@@ -1,0 +1,26 @@
+id: nbs
+
+data_pack:
+  name: nbs-summit26-playback-dp
+  description: "Data pack for NBS playback on the Smithed Summit 2026"
+  load:
+  - data/nbs/module: src
+  zipped: true
+
+resource_pack:
+  name: nbs-summit26-playback-rp
+  description: "Resource pack for NBS playback on the Smithed Summit 2026"
+  zipped: true
+
+require:
+  - bolt
+
+pipeline:
+  - mecha
+  #- src.sounds
+
+meta:
+  bolt:
+    entrypoint: "nbs:main"
+
+output: dist

@@ -12,17 +12,26 @@ from io import BytesIO
 
 import pynbs
 from PIL import Image
-
-from src.resources.scripts.util.file_store import (
+from project import DATA_DIRECTORY
+from util.file_store import (
     FileStore,
     ObjectNotFoundError,
-    PROJECT_ROOT,
-    SCRIPT_DIR,
 )
 
-THUMBNAILS_JSON = PROJECT_ROOT / "resources" / "data" / "thumbnails.json"
+THUMBNAILS_JSON = DATA_DIRECTORY / "thumbnails.json"
+
+# TODO: pull from actual pack instead of pushing from here
+
+PROJECT_ROOT = DATA_DIRECTORY.parent.parent
 OUTPUT_DIR = (
-    PROJECT_ROOT / "src" / "assets" / "nbs" / "textures" / "block" / "thumbnails"
+    PROJECT_ROOT
+    / "booth"
+    / "src"
+    / "assets"
+    / "nbs"
+    / "textures"
+    / "block"
+    / "thumbnails"
 )
 
 DEFAULT_ZOOM_LEVEL = 3
@@ -126,7 +135,7 @@ def process_thumbnail(store: FileStore, entry: dict) -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     destination = OUTPUT_DIR / f"{name}.png"
     img.save(destination)
-    print(f"Saved {destination.relative_to(SCRIPT_DIR.parent.parent)}")
+    print(f"Saved {destination.relative_to(PROJECT_ROOT)}")
 
 
 def main() -> None:

@@ -64,5 +64,5 @@ def serialize_path(path: str) -> str:
 
 
 def read_resource(ctx: Context, file_name: str) -> Any:
-    with open(ctx.directory / "src" / "resources" / "data" / file_name, "r") as file:
+    with open(ctx.directory.parent / "shared" / "data" / file_name, "r") as file:
         return json.load(file)

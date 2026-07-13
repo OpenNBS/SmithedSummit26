@@ -6,9 +6,6 @@ import boto3
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 
-SCRIPT_DIR = Path(__file__).resolve().parent.parent.parent
-PROJECT_ROOT = SCRIPT_DIR.parent
-
 NOT_FOUND_ERROR_CODES = frozenset({"404", "NoSuchKey", "NotFound"})
 
 

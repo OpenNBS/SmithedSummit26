@@ -15,17 +15,13 @@ import sys
 import unicodedata
 from pathlib import Path
 
-from src.resources.scripts.util.file_store import (
-    SCRIPT_DIR,
-    FileStore,
-    ObjectNotFoundError,
-)
+from project import DATA_DIRECTORY
+from util.file_store import FileStore, ObjectNotFoundError
 
-SONGS_DIR = SCRIPT_DIR / "songs"
-DATA_DIR = SCRIPT_DIR / "data"
+SONGS_DIR = DATA_DIRECTORY / "songs"
 
-CSV_PATH = SONGS_DIR / "songs.csv"
-MANIFEST_PATH = DATA_DIR / "songs.json"
+CSV_PATH = SONGS_DIR / "input_songs.csv"
+MANIFEST_PATH = DATA_DIRECTORY / "songs.json"
 
 # When False, keep existing songs.json fields for songs already present (manual edits).
 OVERWRITE_METADATA = False
