@@ -1,0 +1,23 @@
+data_pack:
+  name: nbs-summit26-dp
+  description: "OpenNBS at Smithed Summit 2026"
+
+  zipped: true
+
+resource_pack:
+  name: nbs-summit26-rp
+  description: "OpenNBS at Smithed Summit 2026"
+
+  zipped: true
+
+pipeline:
+  - directory: "booth"
+    extend: ["beet.yml"]
+
+  - directory: "playback"
+    extend: ["beet.yml"]
+
+  - "shared.src.modules.image"
+  - "beet.contrib.minify_json"
+
+output: dist

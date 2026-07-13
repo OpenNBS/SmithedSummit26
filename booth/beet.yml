@@ -2,25 +2,23 @@ id: nbs
 
 data_pack:
   name: nbs-summit26-booth-dp
-  description: "Data pack for NBS booth on the Smithed Summit 2026"
+  description: "Smithed Summit 2026 OpenNBS booth"
+
   load: [src]
-  zipped: true
 
 resource_pack:
   name: nbs-summit26-booth-rp
-  description: "Resource pack for NBS booth on the Smithed Summit 2026"
+  description: "Smithed Summit 2026 OpenNBS booth"
+
   load: [src]
-  zipped: true
 
 pipeline:
   - src.modules.dialogs
+  - src.modules.functions
   - src.modules.globes
   - src.modules.models
   - src.modules.paintings
   - src.modules.textures
   - src.modules.thumbnails
-  - src.main
-  - src.utilities.image.optimize_textures
-  - beet.contrib.minify_json
 
 output: dist

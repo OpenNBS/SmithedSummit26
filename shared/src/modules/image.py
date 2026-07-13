@@ -5,7 +5,7 @@ from beet import Context
 from oxipng import StripChunks, optimize_from_memory
 from PIL import Image
 
-from src.utilities.resource import NAMESPACE
+from booth.src.utilities.resource import NAMESPACE
 
 logger = logging.getLogger(__name__)
 
@@ -30,3 +30,7 @@ def optimize_textures(ctx: Context):
         optimized_texture_image = Image.open(io.BytesIO(optimized_texture_bytes))
 
         ctx.assets.textures[texture].image = optimized_texture_image
+
+
+def beet_default(ctx: Context) -> None:
+    optimize_textures(ctx)
