@@ -28,63 +28,63 @@ Note Block Studio hosted a two-week event called _Reach the Summit_ on our Disco
 
 The pack is programmed to start playback as soon as it's loaded, but its rich set of playback control functions lets you control it as tightly as you need:
 
--   **Play:** start or resume playback.
+- **Play:** start or resume playback.
 
-    ```mcfunction
-    /function nbs:global/play
-    ```
+  ```mcfunction
+  /function nbs:global/play
+  ```
 
--   **Pause:** pauses playback, retaining the same position in the current song.
+- **Pause:** pauses playback, retaining the same position in the current song.
 
-    ```mcfunction
-    /function nbs:global/pause
-    ```
+  ```mcfunction
+  /function nbs:global/pause
+  ```
 
--   **Stop:** stops playback and seeks the current song back to the start.
+- **Stop:** stops playback and seeks the current song back to the start.
 
-    ```mcfunction
-    /function nbs:global/stop
-    ```
+  ```mcfunction
+  /function nbs:global/stop
+  ```
 
--   **Seek song:** move the song ahead or behind by a given amount of ticks.
+- **Seek song:** move the song ahead or behind by a given amount of ticks.
 
-    ```mcfunction
-    /scoreboard players add songtime nbs 10    # seek the song 0.5s ahead
-    /scoreboard players remove songtime nbs 10 # seek the song 0.5s back
-    ```
+  ```mcfunction
+  /scoreboard players add songtime nbs 10    # seek the song 0.5s ahead
+  /scoreboard players remove songtime nbs 10 # seek the song 0.5s back
+  ```
 
-    > NOTE: due to the way macros work, songs shift at the precise tick at which they end rather than at any tick greater than the song's length. If you advance past the end of the current song, it will not be skipped automatically. Advance the song manually to fix this (see below), and seek in small increments to avoid it.
+  > NOTE: due to the way macros work, songs shift at the precise tick at which they end rather than at any tick greater than the song's length. If you advance past the end of the current song, it will not be skipped automatically. Advance the song manually to fix this (see below), and seek in small increments to avoid it.
 
--   **Next song:** advance to the next song in sequential order.
+- **Next song:** advance to the next song in sequential order.
 
-    ```mcfunction
-    /function nbs:global/next
-    ```
+  ```mcfunction
+  /function nbs:global/next
+  ```
 
--   **Previous song:** go back to the previous song in sequential order.
+- **Previous song:** go back to the previous song in sequential order.
 
-    ```mcfunction
-    /function nbs:global/prev
-    ```
+  ```mcfunction
+  /function nbs:global/prev
+  ```
 
--   **Shuffle song:** change to a random song. If the randomizer picks the same song that's currently playing, it will advance to the next song in sequential order.
+- **Shuffle song:** change to a random song. If the randomizer picks the same song that's currently playing, it will advance to the next song in sequential order.
 
-    ```mcfunction
-    /function nbs:global/shuffle
-    ```
+  ```mcfunction
+  /function nbs:global/shuffle
+  ```
 
--   **Toggle shuffle/sequential playback:** if enabled, a random song will play after the current one is finished. Otherwise, songs will play sequentially in alphabetical order.
+- **Toggle shuffle/sequential playback:** if enabled, a random song will play after the current one is finished. Otherwise, songs will play sequentially in alphabetical order.
 
-    ```mcfunction
-    /scoreboard players set shuffle nbs 1 # enable
-    /scoreboard players set shuffle nbs 0 # disable
-    ```
+  ```mcfunction
+  /scoreboard players set shuffle nbs 1 # enable
+  /scoreboard players set shuffle nbs 0 # disable
+  ```
 
 There are three different audio sources that play the same song simultaneously at different locations, to different targets:
 
--   **Speakers:** can be heard fully inside an 8-block range, with the sound completely fading away at a 12-block range.
--   **Loudpeakers:** can be heard fully inside a 32-block range, with the sound completely fading away at a 48-block range.
--   **Headphones:** when equipped by a player, can be heard globally everywhere they go.
+- **Speakers:** can be heard fully inside an 8-block range, with the sound completely fading away at a 12-block range.
+- **Loudpeakers:** can be heard fully inside a 32-block range, with the sound completely fading away at a 48-block range.
+- **Headphones:** when equipped by a player, can be heard globally everywhere they go.
 
 Each of the three mechanics manipulate the target selectors' `distance` condition and `/playsound`'s `volume` and `minVolume` arguments to create three entirely different playback auditory experiences. To learn more about the implementation, take a look at the [`note.py`](src/note.py) module to see how each of the commands are generated.
 
@@ -117,54 +117,54 @@ Along with the songs, participants of the Reach the Summit event could submit al
 
 [encode42](https://github.com/encode42)
 
--   Monitor model
--   Album art and song submission compilation
+- Monitor model
+- Album art and song submission compilation
 
 [Kyrius](https://github.com/Kyrkis)
 
--   Speakers model and animation (boombox)
+- Speakers model and animation (boombox)
 
 [rx](https://github.com/RitikShah)
 
--   Refactoring and development of the playback system
+- Refactoring and development of the playback system
 
 Participants listed in [`credits.md`](/assets/credits.md):
 
--   Album art and songs played during the event
+- Album art and songs played during the event
 
-## Special thanks
+### Special thanks
 
 Our participation in the Smithed Summit wouldn't have been possible without the help of these amazing folks:
 
--   [**encode42**](https://github.com/encode42)
+- [**encode42**](https://github.com/encode42)
 
-    for conceptualizing and building our entire booth, recruiting build assistance, helping with modelling, planning, writing, art direction, general feedback and a lot more – because "every build tells as a story"!
+  for conceptualizing and building our entire booth, recruiting build assistance, helping with modelling, planning, writing, art direction, general feedback and a lot more – because "every build tells as a story"!
 
--   [**Vizeon**](https://www.youtube.com/@overlordvizeon)
+- [**Vizeon**](https://www.youtube.com/@overlordvizeon)
 
-    for being an awesome community manager, providing a lot of great feedback, making the song that got me through this entire month, being generally so enthusiastic about this project, and working in our marvelous panel!
+  for being an awesome community manager, providing a lot of great feedback, making the song that got me through this entire month, being generally so enthusiastic about this project, and working in our marvelous panel!
 
--   [**Fizzy**](https://github.com/vberlier)
+- [**Fizzy**](https://github.com/vberlier)
 
-    for making [pynbs](https://github.com/OpenNBS/pynbs/), my first ever contact with programmatic note blocks (and now part of our organization!); beet/mecha/bolt which power this entire repository; and pigstep, which let me learn the power of combining beet with nbs, and served as the base for our refined playback system!
+  for making [pynbs](https://github.com/OpenNBS/pynbs/), my first ever contact with programmatic note blocks (and now part of our organization!); beet/mecha/bolt which power this entire repository; and pigstep, which let me learn the power of combining beet with nbs, and served as the base for our refined playback system!
 
--   [**rx**](https://github.com/ritikshah)
+- [**rx**](https://github.com/ritikshah)
 
-    for tearing down, refactoring and upgrading the entire playback code of pigstep which I was using before, and for providing great guidance with beet and data pack knowledge (and for making the very announcement which let me know about the Summit!);
+  for tearing down, refactoring and upgrading the entire playback code of pigstep which I was using before, and for providing great guidance with beet and data pack knowledge (and for making the very announcement which let me know about the Summit!);
 
--   [**Kyrius**](https://github.com/Kyrkis)
+- [**Kyrius**](https://github.com/Kyrkis)
 
-    for contributing amazing models to our booth and providing a lot of resource pack and style assistance;
+  for contributing amazing models to our booth and providing a lot of resource pack and style assistance;
 
 And also:
 
--   Everyone else from the [Smithed](https://smithed.net/) team for promoting such an awesome event!
+- Everyone else from the [Smithed](https://smithed.net/) team for promoting such an awesome event!
 
--   [Bloom Host](https://bloom.host/) for generously sponsoring Smithed;
+- [Bloom Host](https://bloom.host/) for generously sponsoring Smithed;
 
--   The entire NBS community, especially our financial contributors and those who submitted songs to play during the event. You make all of this possible!
+- The entire NBS community, especially our financial contributors and those who submitted songs to play during the event. You make all of this possible!
 
-###### Supporters
+### Supporters
 
 <img src="https://opencollective.com/opennbs/backers.svg" height="48px"/>
 

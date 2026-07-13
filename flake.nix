@@ -82,6 +82,7 @@
               (with pkgs; [
                 uv
                 ruff
+                rumdl
 
                 cargo
                 rustc

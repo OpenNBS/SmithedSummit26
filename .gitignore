@@ -169,6 +169,7 @@ cython_debug/
 .zed/
 .vscode/
 .ruff_cache/
+.rumdl_cache/
 
 # Project
 .beet_cache/
