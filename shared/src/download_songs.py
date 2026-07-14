@@ -21,7 +21,7 @@ from util.file_store import FileStore, ObjectNotFoundError
 SONGS_DIR = DATA_DIRECTORY / "songs"
 
 CSV_PATH = SONGS_DIR / "input_songs.csv"
-MANIFEST_PATH = DATA_DIRECTORY / "songs.json"
+MANIFEST_PATH = DATA_DIRECTORY / "submissions.json"
 
 # When False, keep existing songs.json fields for songs already present (manual edits).
 OVERWRITE_METADATA = False

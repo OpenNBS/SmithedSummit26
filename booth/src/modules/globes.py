@@ -21,7 +21,7 @@ REGIONS: list[Region] = [
 def generate_globes(ctx: Context) -> None:
     dialog_base_asset = resource.get_asset("credits")
 
-    songs_data = resource.read_resource(ctx, "songs.json")
+    songs_data = resource.read_resource(ctx, "submissions.json")
 
     for region in REGIONS:
         dialog_asset = dialog_base_asset.append(region["id"])
