@@ -4,7 +4,6 @@ from typing import Tuple, TypedDict
 from beet import Context, Model
 from beet.library.resource_pack import ItemModel
 from pydantic.config import JsonDict
-
 from src.utilities.resource import Resource
 
 NO_SHADE_TINT = {
@@ -30,7 +29,7 @@ def apply_model_tints(model: Model) -> ItemModelTints | None:
         file_name: str = str(model.original.ensure_source_path).split("/")[-1]
 
         warnings.warn(
-            f'"parent" is not allowed when applying model tints in "{file_name}"'
+            f'"parent" will not be modified when applying model tints in "{file_name}"'
         )
 
         return
