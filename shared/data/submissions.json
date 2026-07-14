@@ -1,345 +1,345 @@
 [
-    {
-        "id": "norwegian_woods",
-        "title": "Norwegian Woods",
-        "region": "welded_woodlands",
-        "author": "raphaelbertges",
-        "url": "https://noteblock.world/song/eeDEu7KsZI"
-    },
-    {
-        "id": "wintry_woods",
-        "title": "Wintry Woods",
-        "region": "welded_woodlands",
-        "author": "Tzunamy",
-        "url": "https://noteblock.world/song/ZhqmXKLrlf"
-    },
-    {
-        "id": "world_shattering_providence",
-        "title": "World Shattering Providence (Smithed Mix)",
-        "region": "welded_woodlands",
-        "author": "PlayfulPotato",
-        "url": "https://noteblock.world/song/PeXxdefOtw"
-    },
-    {
-        "id": "with_hands_raised_to_the_sky",
-        "title": "With Hands Raised To The Sky",
-        "region": "welded_woodlands",
-        "author": "reydotcast",
-        "url": "https://noteblock.world/song/cJmP72kUj4"
-    },
-    {
-        "id": "bamboo_bossa",
-        "title": "Bamboo Bossa",
-        "region": "textured_tropics",
-        "author": "reydotcast",
-        "url": "https://noteblock.world/song/Vom8RJneOC"
-    },
-    {
-        "id": "a_place_to_be_alive",
-        "title": "A Place To Be Alive (Among The Sunflowers)",
-        "region": "patched_plateaus",
-        "author": "reydotcast",
-        "url": "https://noteblock.world/song/T6ULFE1tM0"
-    },
-    {
-        "id": "nighttime_on_the_island",
-        "title": "Nighttime on the Island (Tomodachi Life: Living the Dream)",
-        "region": "patched_plateaus",
-        "author": "PScout",
-        "url": "https://noteblock.world/song/lLgyRPgo8D"
-    },
-    {
-        "id": "wheatley_science",
-        "title": "Wheatley Science (Portal 2)",
-        "region": "welded_woodlands",
-        "author": "PScout",
-        "url": "https://noteblock.world/song/RPmSebjDG2"
-    },
-    {
-        "id": "there_she_is",
-        "title": "There She Is (Portal 2)",
-        "region": "welded_woodlands",
-        "author": "PScout",
-        "url": "https://noteblock.world/song/zUBMrE4nAS"
-    },
-    {
-        "id": "steam_gardens",
-        "title": "Steam Gardens (Super Mario Odyssey)",
-        "region": "textured_tropics",
-        "author": "PScout",
-        "url": "https://noteblock.world/song/qOYdt8NUue"
-    },
-    {
-        "id": "gravel_dirt_and_cobblestones",
-        "title": "Gravel, Dirt and Cobblestones",
-        "region": "textured_tropics",
-        "author": "MissxSniper",
-        "url": "https://noteblock.world/song/iRVUOIN2fn"
-    },
-    {
-        "id": "fairy_fox_festival",
-        "title": "Fairy Fox Festival",
-        "region": "textured_tropics",
-        "author": "PlayfulPotato",
-        "url": "https://noteblock.world/song/8dqzthf7zm"
-    },
-    {
-        "id": "where_the_fun_guys_go",
-        "title": "Where The Fun Guys Go",
-        "region": "textured_tropics",
-        "author": "PlayfulPotato",
-        "url": "https://noteblock.world/song/MyNlAfauHY"
-    },
-    {
-        "id": "builder_man_builder_jam",
-        "title": "Builder Man, Builder Jam",
-        "region": "patched_plateaus",
-        "author": "PlayfulPotato",
-        "url": "https://noteblock.world/song/XN2H7Qfrsm"
-    },
-    {
-        "id": "do_mechanical_bees_dream_of_skis",
-        "title": "Do Mechanical Bees Dream of Skis",
-        "region": "welded_woodlands",
-        "author": "PlayfulPotato",
-        "url": "https://noteblock.world/song/rSMsgR8NQH"
-    },
-    {
-        "id": "summer_dew",
-        "title": "Summer Dew",
-        "region": "patched_plateaus",
-        "author": "PlayfulPotato",
-        "url": "https://noteblock.world/song/PWIiyzai8B"
-    },
-    {
-        "id": "bedraggled",
-        "title": "Bedraggled",
-        "region": "patched_plateaus",
-        "author": "techity",
-        "url": "https://noteblock.world/song/KOsyMsYF3M"
-    },
-    {
-        "id": "scrumptiously_rustic_valves",
-        "title": "scrumptiously rustic valves",
-        "region": "welded_woodlands",
-        "author": "superbaconbro",
-        "url": "https://noteblock.world/song/IN5LlK1xOI"
-    },
-    {
-        "id": "johnny_core_conga",
-        "title": "Johnny Core Conga",
-        "region": "textured_tropics",
-        "author": "superbaconbro",
-        "url": "https://noteblock.world/song/EuY0qMDoDJ"
-    },
-    {
-        "id": "pipe_rock_plateau",
-        "title": "Pipe Rock Plateau (Super Mario Bros. Wonder)",
-        "region": "patched_plateaus",
-        "author": "superbaconbro",
-        "url": "https://noteblock.world/song/UHIpXKhVVQ"
-    },
-    {
-        "id": "clocktower",
-        "title": "Super Mario 3D Land - Clocktower",
-        "region": "welded_woodlands",
-        "author": "stunningwheel94",
-        "url": "https://noteblock.world/song/gBYTGbfqfK"
-    },
-    {
-        "id": "nintendo_land_main_theme",
-        "title": "Nintendo Land Main Theme",
-        "region": "patched_plateaus",
-        "author": "stunningwheel94",
-        "url": "https://noteblock.world/song/9fEtvgfUpe"
-    },
-    {
-        "id": "youve_got_to_be_modernistic",
-        "title": "You've Got to be Modernistic (James P. Johnson)",
-        "region": "textured_tropics",
-        "author": "stunningwheel94",
-        "url": "https://noteblock.world/song/xFfrpXc7X5"
-    },
-    {
-        "id": "the_flowers_forestation_station",
-        "title": "The Flowers & Forestation Station",
-        "region": "patched_plateaus",
-        "author": "suluntulu",
-        "url": "https://noteblock.world/song/geym05hfr7"
-    },
-    {
-        "id": "the_obsolescent_industrial_remains",
-        "title": "The Obsolescent Industrial Remains",
-        "region": "welded_woodlands",
-        "author": "L0ndRzZz",
-        "url": "https://noteblock.world/song/kppVwbwQiv"
-    },
-    {
-        "id": "amarillo",
-        "title": "amarillo",
-        "region": "patched_plateaus",
-        "author": "PianoPersona",
-        "url": "https://noteblock.world/song/3gvpWPJp1S"
-    },
-    {
-        "id": "machines_root_for_the_undergrowth",
-        "title": "Machines Root for the Undergrowth",
-        "region": "welded_woodlands",
-        "author": "QueasyQuery",
-        "url": "https://noteblock.world/song/tFDamSfzGO"
-    },
-    {
-        "id": "in_the_deep_woods",
-        "title": "In The Deep Woods (Stardew Valley)",
-        "region": "welded_woodlands",
-        "author": "minesculptor",
-        "url": "https://noteblock.world/song/f9e5Lb0YcJ"
-    },
-    {
-        "id": "illusory_science_dolls_phantom",
-        "title": "Illusory Science ~ Doll's Phantom (Shuusou Gyoku)",
-        "region": "welded_woodlands",
-        "author": "L0ndRzZz",
-        "url": "https://noteblock.world/song/IPW4RKVBKM"
-    },
-    {
-        "id": "fall_of_fall_autumnal_waterfall",
-        "title": "Fall of Fall ~ Autumnal Waterfall (Touhou 10: Mountain of Faith)",
-        "region": "textured_tropics",
-        "author": "L0ndRzZz",
-        "url": "https://noteblock.world/song/zv7U78vyPa"
-    },
-    {
-        "id": "the_cliff_hidden_in_deep_green",
-        "title": "The Cliff Hidden in Deep Green (Touhou 18: Unconnected Marketeers)",
-        "region": "textured_tropics",
-        "author": "L0ndRzZz",
-        "url": "https://noteblock.world/song/Paab2vqJtu"
-    },
-    {
-        "id": "gensokyo_past_and_present_flower_land",
-        "title": "Gensokyo, Past and Present ~ Flower Land (Touhou 9: Phantasmagoria of Flower View)",
-        "region": "patched_plateaus",
-        "author": "L0ndRzZz",
-        "url": "https://noteblock.world/song/C36c5Rfexy"
-    },
-    {
-        "id": "the_primal_scene_of_japan_the_girl_saw",
-        "title": "The Primal Scene of Japan the Girl Saw (Touhou 10: Mountain of Faith)",
-        "region": "patched_plateaus",
-        "author": "L0ndRzZz",
-        "url": "https://noteblock.world/song/rf2ZcZUXiE"
-    },
-    {
-        "id": "apex_tropicorum",
-        "title": "Apex Tropicorum",
-        "region": "textured_tropics",
-        "author": "Frougfrog",
-        "url": "https://noteblock.world/song/4wz5LXxSvh"
-    },
-    {
-        "id": "run_bongy_run",
-        "title": "Run Bongy, Run (Limbus Company)",
-        "region": "patched_plateaus",
-        "author": "kaliumi",
-        "url": "https://noteblock.world/song/v75IJ5vx4c"
-    },
-    {
-        "id": "through_the_field",
-        "title": "Through the Field",
-        "region": "patched_plateaus",
-        "author": "kaliumi",
-        "url": "https://noteblock.world/song/CHydZWXQZw"
-    },
-    {
-        "id": "in_flighty_steps",
-        "title": "In Flighty Steps",
-        "region": "textured_tropics",
-        "author": "kaliumi",
-        "url": "https://noteblock.world/song/twZvNGQd4Z"
-    },
-    {
-        "id": "like_broken_clockwork",
-        "title": "Like Broken Clockwork",
-        "region": "welded_woodlands",
-        "author": "kaliumi",
-        "url": "https://noteblock.world/song/Qw4h70EKw7"
-    },
-    {
-        "id": "theres_a_great_big_beautiful_tomorrow",
-        "title": "There's a Great Big Beautiful Tomorrow (Walt Disney World)",
-        "region": "patched_plateaus",
-        "author": "T_ufy",
-        "url": "https://noteblock.world/song/Tav7Yeipdb"
-    },
-    {
-        "id": "permafrost",
-        "title": "Permafrost",
-        "region": "welded_woodlands",
-        "author": "BuilderAltWCF1",
-        "url": "https://noteblock.world/song/2ESweEbBiP"
-    },
-    {
-        "id": "fun_fun_fun_dayo_lucky_star",
-        "title": "Fun Fun Fun dayo, Lucky Star (Lucky Star)",
-        "region": "patched_plateaus",
-        "author": "itikgamemix6908",
-        "url": "https://noteblock.world/song/o8OfLrGOop"
-    },
-    {
-        "id": "meltdown",
-        "title": "Meltdown ft. Kagamine Rin (iroha (sasaki))",
-        "region": "patched_plateaus",
-        "author": "alexzes",
-        "url": "https://noteblock.world/song/CMnbfau5sn"
-    },
-    {
-        "id": "canyon_layer",
-        "title": "Canyon Layer (Donkey Kong Bananza)",
-        "region": "welded_woodlands",
-        "author": "CreeperJuice",
-        "url": "https://noteblock.world/song/MiYEEv4kU7"
-    },
-    {
-        "id": "forest_layer_eggshell_hotel",
-        "title": "Eggshell Hotel - Forest Layer (Donkey Kong Bananza)",
-        "region": "textured_tropics",
-        "author": "CreeperJuice",
-        "url": "https://noteblock.world/song/xk2zkPLVbz"
-    },
-    {
-        "id": "welcome_to_the_city",
-        "title": "WELCOME TO THE CITY (DELTARUNE)",
-        "region": "patched_plateaus",
-        "author": "CreeperJuice",
-        "url": "https://noteblock.world/song/XRppo6N96A"
-    },
-    {
-        "id": "splitting_edges_of_the_universe",
-        "title": "Splitting Edges of the Universe",
-        "region": null,
-        "author": "GamingTriz",
-        "url": "https://noteblock.world/song/wDwXIqsHYp"
-    },
-    {
-        "id": "the_stardrop_saloon",
-        "title": "The Stardrop Saloon (Stardew Valley)",
-        "region": "patched_plateaus",
-        "author": "EternalD6",
-        "url": "https://noteblock.world/song/nXU6wKWqJq"
-    },
-    {
-        "id": "rainie_love",
-        "title": "Rainie Love (Rainie Yang)",
-        "region": "welded_woodlands",
-        "author": "AnAn",
-        "url": "https://noteblock.world/song/XaFt2fa4FB"
-    },
-    {
-        "id": "to_te_ti",
-        "title": "T\u00f2 Te T\u00ed (Wrens Evans ft. itsnk)",
-        "region": "patched_plateaus",
-        "author": "AnAn",
-        "url": "https://noteblock.world/song/aI3WWwk3A0"
-    }
+	{
+		"id": "norwegian_woods",
+		"title": "Norwegian Woods",
+		"region": "welded_woodlands",
+		"author": "raphaelbertges",
+		"url": "eeDEu7KsZI"
+	},
+	{
+		"id": "wintry_woods",
+		"title": "Wintry Woods",
+		"region": "welded_woodlands",
+		"author": "Tzunamy",
+		"url": "ZhqmXKLrlf"
+	},
+	{
+		"id": "world_shattering_providence",
+		"title": "World Shattering Providence (Smithed Mix)",
+		"region": "welded_woodlands",
+		"author": "PlayfulPotato",
+		"url": "PeXxdefOtw"
+	},
+	{
+		"id": "with_hands_raised_to_the_sky",
+		"title": "With Hands Raised To The Sky",
+		"region": "welded_woodlands",
+		"author": "reydotcast",
+		"url": "cJmP72kUj4"
+	},
+	{
+		"id": "bamboo_bossa",
+		"title": "Bamboo Bossa",
+		"region": "textured_tropics",
+		"author": "reydotcast",
+		"url": "Vom8RJneOC"
+	},
+	{
+		"id": "a_place_to_be_alive",
+		"title": "A Place To Be Alive (Among The Sunflowers)",
+		"region": "patched_plateaus",
+		"author": "reydotcast",
+		"url": "T6ULFE1tM0"
+	},
+	{
+		"id": "nighttime_on_the_island",
+		"title": "Nighttime on the Island (Tomodachi Life: Living the Dream)",
+		"region": "patched_plateaus",
+		"author": "PScout",
+		"url": "lLgyRPgo8D"
+	},
+	{
+		"id": "wheatley_science",
+		"title": "Wheatley Science (Portal 2)",
+		"region": "welded_woodlands",
+		"author": "PScout",
+		"url": "RPmSebjDG2"
+	},
+	{
+		"id": "there_she_is",
+		"title": "There She Is (Portal 2)",
+		"region": "welded_woodlands",
+		"author": "PScout",
+		"url": "zUBMrE4nAS"
+	},
+	{
+		"id": "steam_gardens",
+		"title": "Steam Gardens (Super Mario Odyssey)",
+		"region": "textured_tropics",
+		"author": "PScout",
+		"url": "qOYdt8NUue"
+	},
+	{
+		"id": "gravel_dirt_and_cobblestones",
+		"title": "Gravel, Dirt and Cobblestones",
+		"region": "textured_tropics",
+		"author": "MissxSniper",
+		"url": "iRVUOIN2fn"
+	},
+	{
+		"id": "fairy_fox_festival",
+		"title": "Fairy Fox Festival",
+		"region": "textured_tropics",
+		"author": "PlayfulPotato",
+		"url": "8dqzthf7zm"
+	},
+	{
+		"id": "where_the_fun_guys_go",
+		"title": "Where The Fun Guys Go",
+		"region": "textured_tropics",
+		"author": "PlayfulPotato",
+		"url": "MyNlAfauHY"
+	},
+	{
+		"id": "builder_man_builder_jam",
+		"title": "Builder Man, Builder Jam",
+		"region": "patched_plateaus",
+		"author": "PlayfulPotato",
+		"url": "XN2H7Qfrsm"
+	},
+	{
+		"id": "do_mechanical_bees_dream_of_skis",
+		"title": "Do Mechanical Bees Dream of Skis",
+		"region": "welded_woodlands",
+		"author": "PlayfulPotato",
+		"url": "rSMsgR8NQH"
+	},
+	{
+		"id": "summer_dew",
+		"title": "Summer Dew",
+		"region": "patched_plateaus",
+		"author": "PlayfulPotato",
+		"url": "PWIiyzai8B"
+	},
+	{
+		"id": "bedraggled",
+		"title": "Bedraggled",
+		"region": "patched_plateaus",
+		"author": "techity",
+		"url": "KOsyMsYF3M"
+	},
+	{
+		"id": "scrumptiously_rustic_valves",
+		"title": "scrumptiously rustic valves",
+		"region": "welded_woodlands",
+		"author": "superbaconbro",
+		"url": "IN5LlK1xOI"
+	},
+	{
+		"id": "johnny_core_conga",
+		"title": "Johnny Core Conga",
+		"region": "textured_tropics",
+		"author": "superbaconbro",
+		"url": "EuY0qMDoDJ"
+	},
+	{
+		"id": "pipe_rock_plateau",
+		"title": "Pipe Rock Plateau (Super Mario Bros. Wonder)",
+		"region": "patched_plateaus",
+		"author": "superbaconbro",
+		"url": "UHIpXKhVVQ"
+	},
+	{
+		"id": "clocktower",
+		"title": "Super Mario 3D Land - Clocktower",
+		"region": "welded_woodlands",
+		"author": "stunningwheel94",
+		"url": "gBYTGbfqfK"
+	},
+	{
+		"id": "nintendo_land_main_theme",
+		"title": "Nintendo Land Main Theme",
+		"region": "patched_plateaus",
+		"author": "stunningwheel94",
+		"url": "9fEtvgfUpe"
+	},
+	{
+		"id": "youve_got_to_be_modernistic",
+		"title": "You've Got to be Modernistic (James P. Johnson)",
+		"region": "textured_tropics",
+		"author": "stunningwheel94",
+		"url": "xFfrpXc7X5"
+	},
+	{
+		"id": "the_flowers_forestation_station",
+		"title": "The Flowers & Forestation Station",
+		"region": "patched_plateaus",
+		"author": "suluntulu",
+		"url": "geym05hfr7"
+	},
+	{
+		"id": "the_obsolescent_industrial_remains",
+		"title": "The Obsolescent Industrial Remains",
+		"region": "welded_woodlands",
+		"author": "L0ndRzZz",
+		"url": "kppVwbwQiv"
+	},
+	{
+		"id": "amarillo",
+		"title": "amarillo",
+		"region": "patched_plateaus",
+		"author": "PianoPersona",
+		"url": "3gvpWPJp1S"
+	},
+	{
+		"id": "machines_root_for_the_undergrowth",
+		"title": "Machines Root for the Undergrowth",
+		"region": "welded_woodlands",
+		"author": "QueasyQuery",
+		"url": "tFDamSfzGO"
+	},
+	{
+		"id": "in_the_deep_woods",
+		"title": "In The Deep Woods (Stardew Valley)",
+		"region": "welded_woodlands",
+		"author": "minesculptor",
+		"url": "f9e5Lb0YcJ"
+	},
+	{
+		"id": "illusory_science_dolls_phantom",
+		"title": "Illusory Science ~ Doll's Phantom (Shuusou Gyoku)",
+		"region": "welded_woodlands",
+		"author": "L0ndRzZz",
+		"url": "IPW4RKVBKM"
+	},
+	{
+		"id": "fall_of_fall_autumnal_waterfall",
+		"title": "Fall of Fall ~ Autumnal Waterfall (Touhou 10: Mountain of Faith)",
+		"region": "textured_tropics",
+		"author": "L0ndRzZz",
+		"url": "zv7U78vyPa"
+	},
+	{
+		"id": "the_cliff_hidden_in_deep_green",
+		"title": "The Cliff Hidden in Deep Green (Touhou 18: Unconnected Marketeers)",
+		"region": "textured_tropics",
+		"author": "L0ndRzZz",
+		"url": "Paab2vqJtu"
+	},
+	{
+		"id": "gensokyo_past_and_present_flower_land",
+		"title": "Gensokyo, Past and Present ~ Flower Land (Touhou 9: Phantasmagoria of Flower View)",
+		"region": "patched_plateaus",
+		"author": "L0ndRzZz",
+		"url": "C36c5Rfexy"
+	},
+	{
+		"id": "the_primal_scene_of_japan_the_girl_saw",
+		"title": "The Primal Scene of Japan the Girl Saw (Touhou 10: Mountain of Faith)",
+		"region": "patched_plateaus",
+		"author": "L0ndRzZz",
+		"url": "rf2ZcZUXiE"
+	},
+	{
+		"id": "apex_tropicorum",
+		"title": "Apex Tropicorum",
+		"region": "textured_tropics",
+		"author": "Frougfrog",
+		"url": "4wz5LXxSvh"
+	},
+	{
+		"id": "run_bongy_run",
+		"title": "Run Bongy, Run (Limbus Company)",
+		"region": "patched_plateaus",
+		"author": "kaliumi",
+		"url": "v75IJ5vx4c"
+	},
+	{
+		"id": "through_the_field",
+		"title": "Through the Field",
+		"region": "patched_plateaus",
+		"author": "kaliumi",
+		"url": "CHydZWXQZw"
+	},
+	{
+		"id": "in_flighty_steps",
+		"title": "In Flighty Steps",
+		"region": "textured_tropics",
+		"author": "kaliumi",
+		"url": "twZvNGQd4Z"
+	},
+	{
+		"id": "like_broken_clockwork",
+		"title": "Like Broken Clockwork",
+		"region": "welded_woodlands",
+		"author": "kaliumi",
+		"url": "Qw4h70EKw7"
+	},
+	{
+		"id": "theres_a_great_big_beautiful_tomorrow",
+		"title": "There's a Great Big Beautiful Tomorrow (Walt Disney World)",
+		"region": "patched_plateaus",
+		"author": "T_ufy",
+		"url": "Tav7Yeipdb"
+	},
+	{
+		"id": "permafrost",
+		"title": "Permafrost",
+		"region": "welded_woodlands",
+		"author": "BuilderAltWCF1",
+		"url": "2ESweEbBiP"
+	},
+	{
+		"id": "fun_fun_fun_dayo_lucky_star",
+		"title": "Fun Fun Fun dayo, Lucky Star (Lucky Star)",
+		"region": "patched_plateaus",
+		"author": "itikgamemix6908",
+		"url": "o8OfLrGOop"
+	},
+	{
+		"id": "meltdown",
+		"title": "Meltdown ft. Kagamine Rin (iroha (sasaki))",
+		"region": "patched_plateaus",
+		"author": "alexzes",
+		"url": "CMnbfau5sn"
+	},
+	{
+		"id": "canyon_layer",
+		"title": "Canyon Layer (Donkey Kong Bananza)",
+		"region": "welded_woodlands",
+		"author": "CreeperJuice",
+		"url": "MiYEEv4kU7"
+	},
+	{
+		"id": "forest_layer_eggshell_hotel",
+		"title": "Eggshell Hotel - Forest Layer (Donkey Kong Bananza)",
+		"region": "textured_tropics",
+		"author": "CreeperJuice",
+		"url": "xk2zkPLVbz"
+	},
+	{
+		"id": "welcome_to_the_city",
+		"title": "WELCOME TO THE CITY (DELTARUNE)",
+		"region": "patched_plateaus",
+		"author": "CreeperJuice",
+		"url": "XRppo6N96A"
+	},
+	{
+		"id": "splitting_edges_of_the_universe",
+		"title": "Splitting Edges of the Universe",
+		"region": null,
+		"author": "GamingTriz",
+		"url": "wDwXIqsHYp"
+	},
+	{
+		"id": "the_stardrop_saloon",
+		"title": "The Stardrop Saloon (Stardew Valley)",
+		"region": "patched_plateaus",
+		"author": "EternalD6",
+		"url": "nXU6wKWqJq"
+	},
+	{
+		"id": "rainie_love",
+		"title": "Rainie Love (Rainie Yang)",
+		"region": "welded_woodlands",
+		"author": "AnAn",
+		"url": "XaFt2fa4FB"
+	},
+	{
+		"id": "to_te_ti",
+		"title": "T\u00f2 Te T\u00ed (Wrens Evans ft. itsnk)",
+		"region": "patched_plateaus",
+		"author": "AnAn",
+		"url": "aI3WWwk3A0"
+	}
 ]

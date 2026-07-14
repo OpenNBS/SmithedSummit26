@@ -1,5 +1,4 @@
 from beet import Context
-
 from src.utilities import resource
 from src.utilities.dialog import DialogHelper
 from src.utilities.resource import read_resource
@@ -20,7 +19,7 @@ def generate_thumbnails(ctx: Context) -> None:
     for thumbnail in thumbnail_data:
         author = thumbnail["author"]
         title = thumbnail["title"]
-        song_id = thumbnail["id"]
+        url = thumbnail["url"]
 
         action_asset_id = resource.serialize_path(author)
 
@@ -31,7 +30,7 @@ def generate_thumbnails(ctx: Context) -> None:
             label,
             action={
                 "type": "open_url",
-                "url": f"https://noteblock.world/song/{song_id}",
+                "url": f"https://noteblock.world/song/{url}",
             },
             other={"width": 200},
         )

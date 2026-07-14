@@ -152,7 +152,7 @@ def process_song(
         "title": title,
         "region": region_id,
         "author": author,
-        "url": f"https://noteblock.world/song/{public_id}",
+        "url": public_id,
     }
 
     return resolve_song_data(song_data, existing_meta)
@@ -185,7 +185,7 @@ def main() -> None:
             manifest_data.append(song_data)
 
     with open(MANIFEST_PATH, "w", encoding="utf-8") as f:
-        json.dump(manifest_data, f, indent=4, separators=(",", ": "))
+        json.dump(manifest_data, f, indent="\t", separators=(",", ": "))
 
 
 if __name__ == "__main__":

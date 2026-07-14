@@ -1,7 +1,6 @@
 from typing import TypedDict
 
 from beet import Context
-
 from src.utilities import resource
 from src.utilities.dialog import DialogHelper
 
@@ -52,7 +51,7 @@ def generate_globes(ctx: Context) -> None:
                 label,
                 action={
                     "type": "open_url",
-                    "url": url,
+                    "url": f"https://noteblock.world/song/{url}",
                 },
                 other={"width": 200},
             )
