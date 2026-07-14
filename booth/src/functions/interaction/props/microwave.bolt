@@ -1,4 +1,5 @@
 microwave_position = (-194.5, 65.5, 54.5)
+selector = @a[tag=summit.in_booth.nbs,distance=..8]
 
 merge function_tag minecraft:load {
     "values": [(~/load)]
@@ -16,38 +17,43 @@ function ~/root:
         scoreboard players set microwave_active nbs.props 1
 
         item modify entity @s weapon.mainhand nbs:remove_one
-        function ~/../1
+        function ~/../play
 
-function ~/1:
-    positioned microwave_position run playsound minecraft:block.decorated_pot.insert block @a[distance=..8] ~ ~ ~ 1 1.6
+function ~/play:
+    function ~/../step/1
+    schedule function ~/../step/2 8t
+    schedule function ~/../step/3 12t
+    schedule function ~/../step/4 16t
+    schedule function ~/../step/5 48t
 
-    schedule function ~/../2 8t
 
-function ~/2:
-    positioned microwave_position run playsound minecraft:block.decorated_pot.insert block @a[distance=..8] ~ ~ ~ 1 1.82
+function ~/step/1:
+    positioned microwave_position:
+        playsound minecraft:block.decorated_pot.insert block selector ~ ~ ~ 1 1.6
 
-    schedule function ~/../3 4t
+function ~/step/2:
+    positioned microwave_position:
+        playsound minecraft:block.decorated_pot.insert block selector ~ ~ ~ 1 1.82
 
-function ~/3:
-    positioned microwave_position run playsound minecraft:block.decorated_pot.insert block @a[distance=..8] ~ ~ ~ 1 1.95
+function ~/step/3:
+    positioned microwave_position:
+        playsound minecraft:block.decorated_pot.insert block selector ~ ~ ~ 1 1.95
 
-    schedule function ~/../4 4t
+function ~/step/4:
+    positioned microwave_position:
+        # TODO: out-of-range note
+        playsound minecraft:block.note_block.bit block selector ~ ~ ~ 0.3 0
+        playsound minecraft:block.brewing_stand.brew block selector ~ ~ ~ 0.05 0.07
 
-function ~/4:
-    # TODO: out-of-range note
-    positioned microwave_position run playsound minecraft:block.note_block.bit block @a[distance=..8] ~ ~ ~ 0.3 0
-    positioned microwave_position run playsound minecraft:block.brewing_stand.brew block @a[distance=..8] ~ ~ ~ 0.05 0.07
+function ~/step/5:
+    positioned microwave_position:
+        playsound minecraft:block.mud.break block selector ~ ~ ~ 0.8 0.12
+        playsound minecraft:block.mud.break block selector ~ ~ ~ 1 0.35
 
-    schedule function ~/../5 32t
+        playsound minecraft:entity.sulfur_cube.squish block selector -195 65.5 54 0.3 0.35
 
-function ~/5:
-    positioned microwave_position run playsound minecraft:block.mud.break block @a[distance=..8] ~ ~ ~ 0.8 0.12
-    positioned microwave_position run playsound minecraft:block.mud.break block @a[distance=..8] ~ ~ ~ 1 0.35
+        playsound minecraft:entity.firework_rocket.large_blast block selector -195 65.5 54 0.35 1.5
 
-    positioned microwave_position run playsound minecraft:entity.sulfur_cube.squish block @a[distance=..8] -195 65.5 54 0.3 0.35
+        particle minecraft:campfire_cosy_smoke ~0.1 ~0.1 ~0.3 0 0.02 0 1 0 normal selector
 
-    positioned microwave_position run playsound minecraft:entity.firework_rocket.large_blast block @a[distance=..8] -195 65.5 54 0.35 1.5
-
-    positioned microwave_position run particle minecraft:campfire_cosy_smoke ~0.1 ~0.1 ~0.3 0 0.02 0 1 0
-
-    scoreboard players set microwave_active nbs.props 0
+        scoreboard players set microwave_active nbs.props 0

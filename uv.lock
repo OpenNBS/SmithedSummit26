@@ -45,6 +45,20 @@ wheels = [
 ]
 
 [[package]]
+name = "bolt-selectors"
+version = "0.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "beet" },
+    { name = "bolt" },
+    { name = "mecha" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a5/f8/9b5c0274fe30f3f7acaa56fa74f2ac581ce2f1fa75e5bcd502d6823ecd91/bolt_selectors-0.4.0.tar.gz", hash = "sha256:9ba5223cc5d84217917215c11a54cd8a2f06aea3068333ee14c4a4a61efe1ccf", size = 6253, upload-time = "2026-01-18T03:21:45.771Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/57/66/082c8e2871ce212edf6432bb4578c2e4df3f969609bc01dcf3854186c7cb/bolt_selectors-0.4.0-py3-none-any.whl", hash = "sha256:52521049f5b3daeea18bf9dcbb6980179b7b0e3b4c0ce74c162ac1a36192583d", size = 7628, upload-time = "2026-01-18T03:21:44.307Z" },
+]
+
+[[package]]
 name = "boto3"
 version = "1.43.40"
 source = { registry = "https://pypi.org/simple" }
@@ -176,6 +190,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "beet" },
     { name = "bolt" },
+    { name = "bolt-selectors" },
     { name = "boto3" },
     { name = "numpy" },
     { name = "pynbs" },
@@ -193,6 +208,7 @@ dev = [
 requires-dist = [
     { name = "beet", specifier = ">=0.115.0,<0.116" },
     { name = "bolt", specifier = ">=0.50.1,<0.51" },
+    { name = "bolt-selectors", specifier = ">=0.4.0" },
     { name = "boto3", specifier = ">=1.38.0,<2" },
     { name = "numpy", specifier = "==2.3.2" },
     { name = "pynbs", specifier = ">=1.1.0,<2" },

@@ -1,6 +1,7 @@
 from typing import TypedDict
 
 piano_position = (-194.0, 88.0, 58.5)
+selector = @a[tag=summit.in_booth.nbs,distance=..12]
 
 class Note(TypedDict):
     key: float
@@ -38,36 +39,37 @@ note_b_2: Note = {
 }
 
 def play_note(note: Note) -> None:
-    playsound minecraft:block.note_block.pling block @a[distance=..12] ~note["position"] ~ ~ 1 note["key"]
-    particle minecraft:note f"~{note["position"] * 3}" ~0.5 ~.25 note["particle"] 0 0 1 0
+    playsound minecraft:block.note_block.pling block selector ~note["position"] ~ ~ 1 note["key"]
+    particle minecraft:note f"~{note["position"] * 3}" ~0.5 ~.25 note["particle"] 0 0 1 0 normal selector
 
 function ~/root:
     swing @s
 
     execute store result storage nbs:main piano.key int 1 run random value 1..5
-    execute positioned piano_position function ~/../play with storage nbs:main piano
+    positioned piano_position run function ~/../play with storage nbs:main piano
 
 function ~/play:
-    $function nbs:interaction/props/piano/$(key)
+    $function nbs:interaction/props/piano/note/$(key)
 
-function ~/1:
+function ~/note/1:
     play_note(note_g_1)
 
-function ~/2:
+function ~/note/2:
     play_note(note_c_1)
 
-function ~/3:
+function ~/note/3:
     play_note(note_e_1)
 
-function ~/4:
+function ~/note/4:
     play_note(note_g_2)
 
-function ~/5:
+function ~/note/5:
     play_note(note_b_2)
 
 function ~/hit:
-    execute positioned piano_position function ~/../1
-    execute positioned piano_position function ~/../2
-    execute positioned piano_position function ~/../3
-    execute positioned piano_position function ~/../4
-    execute positioned piano_position function ~/../5
+    positioned piano_position:
+        function ~/../note/1
+        function ~/../note/2
+        function ~/../note/3
+        function ~/../note/4
+        function ~/../note/5
