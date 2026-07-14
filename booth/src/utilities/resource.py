@@ -4,6 +4,8 @@ from typing import Any
 
 from beet import Context
 
+from shared.src.utilities.project import DATA_DIRECTORY
+
 NAMESPACE = "nbs"
 
 
@@ -64,5 +66,5 @@ def serialize_path(path: str) -> str:
 
 
 def read_resource(ctx: Context, file_name: str) -> Any:
-    with open(ctx.directory.parent / "shared" / "data" / file_name, "r") as file:
+    with open(DATA_DIRECTORY / file_name, "r") as file:
         return json.load(file)
