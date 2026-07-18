@@ -55,7 +55,6 @@ EDIBLE_IDS = [
     "pumpkin_latte"
 ]
 
-
 def give_edible(
     namespace: str, path: str, edible_type: EdibleType, translation_component={}
 ) -> None:
