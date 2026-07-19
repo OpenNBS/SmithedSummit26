@@ -6,6 +6,98 @@ This repository holds the data pack and resource pack created for [Note Block St
 
 We've decided to make this project public so everyone can learn from what we've made for our participation in the event!
 
+## Development
+
+The repository is a [uv](https://docs.astral.sh/uv/) workspace. Commands are
+defined with [Poe the Poet](https://poethepoet.natn.io/) and are intended to be
+run from the repository root.
+
+### Setup
+
+Install uv, clone the repository, and synchronize the workspace:
+
+```console
+uv sync
+```
+
+This installs the root toolchain, the dependencies of every workspace member,
+and the editable `nbs_shared` package. You don't need to activate the virtual
+environment; `uv run` selects it automatically.
+
+Run `uv run poe` at any time to list the available tasks.
+
+### Commands
+
+- `uv run poe build` builds the combined data pack and resource pack using the
+  root [`beet.yml`](beet.yml). Build artifacts are written to `dist/`.
+- `uv run poe link` links the combined packs to a Minecraft installation using
+  beet's link configuration.
+- `uv run poe booth` builds only the booth package.
+- `uv run poe booth-watch` watches the booth package and rebuilds it on changes.
+- `uv run poe playback` builds only the playback package.
+- `uv run poe playback-watch` watches the playback package and rebuilds it on
+  changes.
+- `uv run poe download-songs` downloads source song files from Backblaze B2 and
+  updates `data/generated/songs/manifest.json`.
+- `uv run poe create-thumbnails` downloads the configured songs and generates
+  thumbnails in `data/generated/thumbnails/`.
+
+The repository scripts read B2 credentials from a root `.env` file:
+
+```dotenv
+B2_APPLICATION_KEY_ID=...
+B2_APPLICATION_KEY=...
+B2_BUCKET_NAME=...
+B2_ENDPOINT=https://s3.<region>.backblazeb2.com
+```
+
+Their dependencies are declared as inline PEP 723 metadata and are resolved by
+uv only when the scripts run. They are not installed into the project
+environment.
+
+### Repository structure
+
+```text
+.
+├── beet.yml                 # Combined beet project
+├── pyproject.toml           # uv workspace and Poe tasks
+├── data/
+│   ├── source/              # Maintained inputs
+│   │   ├── songs.csv
+│   │   ├── paintings.json
+│   │   └── thumbnails.json
+│   └── generated/           # Tool-produced build inputs
+│       ├── songs/
+│       │   ├── manifest.json
+│       │   └── files/       # Downloaded .nbs files
+│       └── thumbnails/      # Generated thumbnail textures
+├── packages/
+│   ├── booth/               # Booth data/resource pack project
+│   ├── playback/            # Song playback data/resource pack project
+│   └── shared/              # Installable nbs_shared Python package
+└── scripts/                 # Repository-only maintenance tools
+```
+
+The root beet project composes `packages/booth` and `packages/playback`.
+`packages/shared` contains Python code imported by both projects, including the
+shared image optimization plugin and repository data-path helpers.
+
+Booth and playback are virtual uv workspace members because they are beet
+projects rather than distributable Python packages. Shared has a build backend
+so uv can install it in editable mode and make `nbs_shared` importable.
+
+### Data lifecycle
+
+`data/source/` contains maintained inputs. Repository scripts transform or
+download those inputs into `data/generated/`, and the package builds consume the
+generated results. The booth's copy-files pipeline, for example, incorporates
+generated thumbnails into the resource pack.
+
+Generated does not necessarily mean uncommitted. The manifest and thumbnails
+are required for CI builds that don't have B2 credentials, so they remain
+tracked. Downloaded `*.nbs` files are reproducible or restricted and remain
+ignored.
+
 ## About
 
 The pack generation is powered by [beet](https://github.com/mcbeet/beet), a powerful toolkit that serves as an authoring tool for data packs using the Python programming language. [mecha](https://github.com/mcbeet/mecha) and [bolt](https://github.com/mcbeet/bolt) are used to unlock some special syntax that makes working with multiple function files a breeze.
