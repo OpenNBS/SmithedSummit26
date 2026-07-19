@@ -218,12 +218,6 @@ dev = [{ name = "poethepoet", specifier = ">=0.37.0" }]
 name = "nbs-summit26-booth"
 version = "0.1.0"
 source = { virtual = "booth" }
-dependencies = [
-    { name = "pyoxipng" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "pyoxipng", specifier = ">=9.1.1,<10" }]
 
 [[package]]
 name = "nbs-summit26-playback"
@@ -246,12 +240,14 @@ version = "0.1.0"
 source = { virtual = "shared" }
 dependencies = [
     { name = "boto3" },
+    { name = "pyoxipng" },
     { name = "python-dotenv" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "boto3", specifier = ">=1.38.0,<2" },
+    { name = "pyoxipng", specifier = ">=9.1.1,<10" },
     { name = "python-dotenv", specifier = ">=1.1.0,<2" },
 ]
 

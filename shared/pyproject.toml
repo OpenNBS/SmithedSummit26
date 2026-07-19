@@ -11,5 +11,6 @@ classifiers = [
 ]
 dependencies = [
     "boto3>=1.38.0,<2",
+    "pyoxipng>=9.1.1,<10",
     "python-dotenv>=1.1.0,<2",
 ]

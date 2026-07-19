@@ -9,6 +9,3 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.14",
 ]
-dependencies = [
-    "pyoxipng>=9.1.1,<10",
-]
