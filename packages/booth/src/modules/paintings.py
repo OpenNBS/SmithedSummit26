@@ -20,7 +20,7 @@ def generate_paintings(ctx: Context) -> None:
         extra={"columns": 1},
     )
 
-    painting_data = read_resource(ctx, "paintings.json")
+    painting_data = read_resource(ctx, "source/paintings.json")
 
     for painting in painting_data:
         author = painting["author"]

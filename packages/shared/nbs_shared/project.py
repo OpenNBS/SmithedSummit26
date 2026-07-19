@@ -10,3 +10,9 @@ def find_repository_root() -> Path:
 
 REPOSITORY_ROOT = find_repository_root()
 DATA_DIRECTORY = REPOSITORY_ROOT / "data"
+SOURCE_DIRECTORY = DATA_DIRECTORY / "source"
+GENERATED_DIRECTORY = DATA_DIRECTORY / "generated"
+
+SONGS_MANIFEST_PATH = GENERATED_DIRECTORY / "songs" / "manifest.json"
+SONGS_FILES_DIRECTORY = GENERATED_DIRECTORY / "songs" / "files"
+THUMBNAILS_DIRECTORY = GENERATED_DIRECTORY / "thumbnails"

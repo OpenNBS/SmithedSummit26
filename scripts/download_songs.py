@@ -27,10 +27,12 @@ from _lib.file_store import FileStore, ObjectNotFoundError
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIRECTORY = REPOSITORY_ROOT / "data"
-SONGS_DIR = DATA_DIRECTORY / "songs"
+SOURCE_DIRECTORY = DATA_DIRECTORY / "source"
+GENERATED_DIRECTORY = DATA_DIRECTORY / "generated"
 
-CSV_PATH = SONGS_DIR / "input_songs.csv"
-MANIFEST_PATH = DATA_DIRECTORY / "submissions.json"
+CSV_PATH = SOURCE_DIRECTORY / "songs.csv"
+MANIFEST_PATH = GENERATED_DIRECTORY / "songs" / "manifest.json"
+SONGS_DIR = GENERATED_DIRECTORY / "songs" / "files"
 
 # When False, keep existing songs.json fields for songs already present (manual edits).
 OVERWRITE_METADATA = False
@@ -127,7 +129,7 @@ def resolve_song_data(
 ) -> dict:
     """Return the metadata to write for a song.
 
-    When OVERWRITE_METADATA is False and the song already exists in songs.json,
+    When OVERWRITE_METADATA is False and the song already exists in the manifest,
     existing fields win so manual edits are preserved. New fields from the CSV
     pass are still filled in when missing from the existing entry.
     """
@@ -172,6 +174,9 @@ def main() -> None:
 
     if not CSV_PATH.is_file():
         raise SystemExit(f"CSV not found: {CSV_PATH}")
+
+    SONGS_DIR.mkdir(parents=True, exist_ok=True)
+    MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
 
     with CSV_PATH.open(newline="", encoding="utf-8") as csv_file:
         reader = csv.DictReader(csv_file)

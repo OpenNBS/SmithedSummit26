@@ -10,8 +10,8 @@
 
 """Generate note-block pixel-art thumbnails from summit songs stored in Backblaze B2.
 
-Reads thumbnail metadata from data/thumbnails.json, downloads each song, and saves a
-PNG to data/generated/thumbnails/{author}.png.
+Reads thumbnail metadata from data/source/thumbnails.json, downloads each song, and
+saves a PNG to data/generated/thumbnails/{author}.png.
 
 Expects a .env file (see scripts/download_songs.py) with B2 credentials.
 """
@@ -30,7 +30,7 @@ from _lib.file_store import (
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIRECTORY = REPOSITORY_ROOT / "data"
-THUMBNAILS_JSON = DATA_DIRECTORY / "thumbnails.json"
+THUMBNAILS_JSON = DATA_DIRECTORY / "source" / "thumbnails.json"
 OUTPUT_DIR = DATA_DIRECTORY / "generated" / "thumbnails"
 
 DEFAULT_ZOOM_LEVEL = 3

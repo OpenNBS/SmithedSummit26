@@ -73,6 +73,6 @@ def serialize_path(path: str) -> str:
     return path.lower().replace(".", "")
 
 
-def read_resource(ctx: Context, file_name: str) -> Any:
-    with open(DATA_DIRECTORY / file_name, "r") as file:
+def read_resource(ctx: Context, relative_path: str) -> Any:
+    with open(DATA_DIRECTORY / relative_path, "r", encoding="utf-8") as file:
         return json.load(file)

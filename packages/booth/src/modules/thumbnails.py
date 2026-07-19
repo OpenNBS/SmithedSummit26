@@ -14,7 +14,7 @@ def generate_thumbnails(ctx: Context) -> None:
         extra={"columns": 1},
     )
 
-    thumbnail_data = read_resource(ctx, "thumbnails.json")
+    thumbnail_data = read_resource(ctx, "source/thumbnails.json")
 
     for thumbnail in thumbnail_data:
         author = thumbnail["author"]
