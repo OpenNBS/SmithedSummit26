@@ -175,9 +175,9 @@ dev = [
 requires-dist = [
     { name = "beet", specifier = ">=0.115.0,<0.116" },
     { name = "bolt", specifier = ">=0.50.1,<0.51" },
-    { name = "nbs-summit26-booth", virtual = "booth" },
-    { name = "nbs-summit26-playback", virtual = "playback" },
-    { name = "nbs-summit26-shared", editable = "shared" },
+    { name = "nbs-summit26-booth", virtual = "packages/booth" },
+    { name = "nbs-summit26-playback", virtual = "packages/playback" },
+    { name = "nbs-summit26-shared", editable = "packages/shared" },
 ]
 
 [package.metadata.requires-dev]
@@ -186,18 +186,18 @@ dev = [{ name = "poethepoet", specifier = ">=0.37.0" }]
 [[package]]
 name = "nbs-summit26-booth"
 version = "0.1.0"
-source = { virtual = "booth" }
+source = { virtual = "packages/booth" }
 dependencies = [
     { name = "nbs-summit26-shared" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "nbs-summit26-shared", editable = "shared" }]
+requires-dist = [{ name = "nbs-summit26-shared", editable = "packages/shared" }]
 
 [[package]]
 name = "nbs-summit26-playback"
 version = "0.1.0"
-source = { virtual = "playback" }
+source = { virtual = "packages/playback" }
 dependencies = [
     { name = "bolt-selectors" },
     { name = "nbs-summit26-shared" },
@@ -207,14 +207,14 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "bolt-selectors", specifier = ">=0.4.0" },
-    { name = "nbs-summit26-shared", editable = "shared" },
+    { name = "nbs-summit26-shared", editable = "packages/shared" },
     { name = "pynbs", specifier = ">=1.1.0,<2" },
 ]
 
 [[package]]
 name = "nbs-summit26-shared"
 version = "0.1.0"
-source = { editable = "shared" }
+source = { editable = "packages/shared" }
 dependencies = [
     { name = "pillow" },
     { name = "pyoxipng" },

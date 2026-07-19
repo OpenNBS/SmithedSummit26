@@ -36,6 +36,7 @@ THUMBNAILS_JSON = DATA_DIRECTORY / "thumbnails.json"
 
 OUTPUT_DIR = (
     REPOSITORY_ROOT
+    / "packages"
     / "booth"
     / "src"
     / "assets"

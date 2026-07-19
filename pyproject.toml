@@ -32,7 +32,7 @@ nbs-summit26-playback = { workspace = true }
 nbs-summit26-shared = { workspace = true }
 
 [tool.uv.workspace]
-members = ["booth", "playback", "shared"]
+members = ["packages/*"]
 
 [tool.poe.tasks.build]
 help = "Build the full project (root beet.yml)"
@@ -45,22 +45,22 @@ cmd = "beet link"
 [tool.poe.tasks.booth]
 help = "Build the booth package"
 cmd = "beet"
-cwd = "booth"
+cwd = "packages/booth"
 
 [tool.poe.tasks.booth-watch]
 help = "Watch and rebuild the booth package"
 cmd = "beet watch --reload"
-cwd = "booth"
+cwd = "packages/booth"
 
 [tool.poe.tasks.playback]
 help = "Build the playback package"
 cmd = "beet"
-cwd = "playback"
+cwd = "packages/playback"
 
 [tool.poe.tasks.playback-watch]
 help = "Watch and rebuild the playback package"
 cmd = "beet watch --reload"
-cwd = "playback"
+cwd = "packages/playback"
 
 [tool.poe.tasks.download-songs]
 help = "Download song files and update the submissions manifest"

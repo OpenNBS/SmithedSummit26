@@ -11,10 +11,10 @@ resource_pack:
   zipped: true
 
 pipeline:
-  - directory: "booth"
+  - directory: "packages/booth"
     extend: ["beet.yml"]
 
-  - directory: "playback"
+  - directory: "packages/playback"
     extend: ["beet.yml"]
 
   - "nbs_shared.plugins.image"
