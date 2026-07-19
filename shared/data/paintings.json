@@ -2,31 +2,47 @@
 	{
 		"author": "KaliumI",
 		"title": "Abyss",
+		"url": "https://www.youtube.com/@kaliumi",
 		"size": 1
 	},
 	{
 		"author": "BuilderAltWCF1",
 		"title": "Creature",
+		"url": "https://builderdraws.carrd.co/",
 		"size": 2
 	},
 	{
 		"author": "rey.cast",
 		"title": "Harvest",
+		"url": "https://www.youtube.com/@rey.casttt",
 		"size": 2
 	},
 	{
 		"author": "superbaconbro",
 		"title": "Irrupt",
+		"url": "https://www.youtube.com/@superbaconbro",
 		"size": 2
 	},
 	{
 		"author": "playfulpotato",
 		"title": "Stable",
+		"url": "https://www.youtube.com/@PlayfulPotatwo",
 		"size": 1
 	},
 	{
 		"author": "StunningWheel94",
 		"title": "Overview",
+		"url": "https://www.youtube.com/@StunningWheel94",
 		"size": 2
+	},
+	{
+		"author": "rmfandyplayz",
+		"title": "Exterior collage",
+		"url": "https://rmfandyplayz.com"
+	},
+	{
+		"author": "BuilderAltWCF1",
+		"title": "Exterior billboard",
+		"url": "https://builderdraws.carrd.co/"
 	}
 ]

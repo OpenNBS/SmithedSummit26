@@ -1,5 +1,4 @@
 from beet import Context
-
 from src.utilities import resource
 from src.utilities.dialog import DialogHelper
 from src.utilities.painting import get_painting_variant
@@ -26,9 +25,28 @@ def generate_paintings(ctx: Context) -> None:
     for painting in painting_data:
         author = painting["author"]
         title = painting["title"]
-        size = painting["size"]
+        url = painting["url"]
+        size = None
+
+        if "size" in painting:
+            size = painting["size"]
+
+        label = f"{title} by {author}"
 
         painting_asset_id = serialize_path(author)
+
+        dialog_helper.create_action(
+            painting_asset_id,
+            label,
+            action={
+                "type": "open_url",
+                "url": url,
+            },
+            other={"width": 200},
+        )
+
+        if size is None:
+            continue
 
         translation_resource = resource.get_translation(
             TranslationType.PAINTING, painting_asset_id
@@ -51,15 +69,6 @@ def generate_paintings(ctx: Context) -> None:
             "height": size,
             "width": size,
         }
-
-        label = f"{title} by {author}"
-
-        dialog_helper.create_action(
-            painting_asset_id,
-            label,
-            action={"type": "copy_to_clipboard", "value": label},
-            other={"width": 200},
-        )
 
 
 def beet_default(ctx: Context):
