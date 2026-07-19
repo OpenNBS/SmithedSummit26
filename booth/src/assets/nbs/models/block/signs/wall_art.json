@@ -1,8 +1,6 @@
 {
-	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "nbs:item/wall_art",
-		"particle": "nbs:item/wall_art"
+		"0": "nbs:block/signs/wall_art"
 	},
 	"elements": [
 		{

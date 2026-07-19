@@ -25,14 +25,10 @@ BLOCK_MODELS = [
     "signs/world/text_variant_world",
     "signs/world/text_variant_world_shadow",
     "signs/world/wordmark",
+    "signs/wall_art",
 ]
 
-ITEM_MODELS = [
-    "props/headphones",
-    "props/starreact",
-    "signs/billboard",
-    "wall_art",
-]
+ITEM_MODELS = ["props/headphones", "props/starreact", "signs/billboard"]
 
 UNUSED_NOTE_VARIANTS = [
     "blue",
