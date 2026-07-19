@@ -43,6 +43,16 @@ class Resource:
     def append(self, *paths: str):
         return Resource(self.__base__, self.__delimiter__, *[*self.__paths__, *paths])
 
+    def suffix(self, value: str):
+        last_path = self.__paths__[-1]
+        rest_paths = self.__paths__[:-1]
+
+        suffixed_last_path = f"{last_path}_{value}"
+
+        return Resource(
+            self.__base__, self.__delimiter__, *[*rest_paths, suffixed_last_path]
+        )
+
     def path(self) -> str:
         return self.__merge__()
 
