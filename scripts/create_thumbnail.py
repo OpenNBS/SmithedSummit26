@@ -11,7 +11,7 @@
 """Generate note-block pixel-art thumbnails from summit songs stored in Backblaze B2.
 
 Reads thumbnail metadata from data/thumbnails.json, downloads each song, and saves a
-PNG to src/assets/nbs/textures/block/thumbnails/{author}.png.
+PNG to data/generated/thumbnails/{author}.png.
 
 Expects a .env file (see scripts/download_songs.py) with B2 credentials.
 """
@@ -31,20 +31,7 @@ from _lib.file_store import (
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIRECTORY = REPOSITORY_ROOT / "data"
 THUMBNAILS_JSON = DATA_DIRECTORY / "thumbnails.json"
-
-# TODO: pull from actual pack instead of pushing from here
-
-OUTPUT_DIR = (
-    REPOSITORY_ROOT
-    / "packages"
-    / "booth"
-    / "src"
-    / "assets"
-    / "nbs"
-    / "textures"
-    / "block"
-    / "thumbnails"
-)
+OUTPUT_DIR = DATA_DIRECTORY / "generated" / "thumbnails"
 
 DEFAULT_ZOOM_LEVEL = 3
 MIN_ZOOM_LEVEL = 1

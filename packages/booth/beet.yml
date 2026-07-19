@@ -20,5 +20,11 @@ pipeline:
   - src.modules.paintings
   - src.modules.textures
   - src.modules.thumbnails
+  - beet.contrib.copy_files
+
+meta:
+  copy_files:
+    resource_pack:
+      assets/nbs/textures/block/thumbnails: "../../data/generated/thumbnails/*.png"
 
 output: dist
