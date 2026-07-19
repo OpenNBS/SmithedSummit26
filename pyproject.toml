@@ -61,3 +61,11 @@ cwd = "playback"
 help = "Watch and rebuild the playback package"
 cmd = "beet watch --reload"
 cwd = "playback"
+
+[tool.poe.tasks.download-songs]
+help = "Download song files and update the submissions manifest"
+cmd = "uv run scripts/download_songs.py"
+
+[tool.poe.tasks.create-thumbnails]
+help = "Generate booth thumbnails from remote song files"
+cmd = "uv run scripts/create_thumbnail.py"

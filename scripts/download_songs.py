@@ -1,6 +1,14 @@
-"""Download summit songs from Backblaze B2 and sort them into region folders.
+# /// script
+# requires-python = ">=3.14,<4"
+# dependencies = [
+#     "boto3>=1.38.0,<2",
+#     "python-dotenv>=1.1.0,<2",
+# ]
+# ///
 
-Expects a .env file in the project root (or songs/) with:
+"""Download summit songs from Backblaze B2.
+
+Expects a .env file in the repository root with:
 
     B2_APPLICATION_KEY_ID=...
     B2_APPLICATION_KEY=...
@@ -15,9 +23,10 @@ import sys
 import unicodedata
 from pathlib import Path
 
-from nbs_shared.file_store import FileStore, ObjectNotFoundError
-from nbs_shared.project import DATA_DIRECTORY
+from _lib.file_store import FileStore, ObjectNotFoundError
 
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+DATA_DIRECTORY = REPOSITORY_ROOT / "data"
 SONGS_DIR = DATA_DIRECTORY / "songs"
 
 CSV_PATH = SONGS_DIR / "input_songs.csv"

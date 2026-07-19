@@ -1,30 +1,41 @@
+# /// script
+# requires-python = ">=3.14,<4"
+# dependencies = [
+#     "boto3>=1.38.0,<2",
+#     "pillow>=12.0.0,<13",
+#     "pynbs>=1.1.0,<2",
+#     "python-dotenv>=1.1.0,<2",
+# ]
+# ///
+
 """Generate note-block pixel-art thumbnails from summit songs stored in Backblaze B2.
 
 Reads thumbnail metadata from data/thumbnails.json, downloads each song, and saves a
 PNG to src/assets/nbs/textures/block/thumbnails/{author}.png.
 
-Expects a .env file (see songs/download_songs.py) with B2 credentials.
+Expects a .env file (see scripts/download_songs.py) with B2 credentials.
 """
 
 import json
 import sys
 from io import BytesIO
+from pathlib import Path
 
 import pynbs
 from PIL import Image
-from nbs_shared.file_store import (
+from _lib.file_store import (
     FileStore,
     ObjectNotFoundError,
 )
-from nbs_shared.project import DATA_DIRECTORY
 
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+DATA_DIRECTORY = REPOSITORY_ROOT / "data"
 THUMBNAILS_JSON = DATA_DIRECTORY / "thumbnails.json"
 
 # TODO: pull from actual pack instead of pushing from here
 
-PROJECT_ROOT = DATA_DIRECTORY.parent.parent
 OUTPUT_DIR = (
-    PROJECT_ROOT
+    REPOSITORY_ROOT
     / "booth"
     / "src"
     / "assets"
@@ -135,7 +146,7 @@ def process_thumbnail(store: FileStore, entry: dict) -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     destination = OUTPUT_DIR / f"{name}.png"
     img.save(destination)
-    print(f"Saved {destination.relative_to(PROJECT_ROOT)}")
+    print(f"Saved {destination.relative_to(REPOSITORY_ROOT)}")
 
 
 def main() -> None:
