@@ -20,3 +20,31 @@ default-groups = ["dev"]
 
 [tool.uv.workspace]
 members = ["booth", "playback", "shared"]
+
+[tool.poe.tasks.build]
+help = "Build the full project (root beet.yml)"
+cmd = "beet"
+
+[tool.poe.tasks.link]
+help = "Link built packs to a Minecraft installation"
+cmd = "beet link"
+
+[tool.poe.tasks.booth]
+help = "Build the booth package"
+cmd = "beet"
+cwd = "booth"
+
+[tool.poe.tasks.booth-watch]
+help = "Watch and rebuild the booth package"
+cmd = "beet watch --reload"
+cwd = "booth"
+
+[tool.poe.tasks.playback]
+help = "Build the playback package"
+cmd = "beet"
+cwd = "playback"
+
+[tool.poe.tasks.playback-watch]
+help = "Watch and rebuild the playback package"
+cmd = "beet watch --reload"
+cwd = "playback"
