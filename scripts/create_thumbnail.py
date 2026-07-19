@@ -117,7 +117,7 @@ def generate_thumbnail(song: pynbs.File, thumbnail_data: dict) -> Image.Image:
 
 
 def process_thumbnail(store: FileStore, entry: dict) -> None:
-    song_id = entry["id"]
+    song_id = entry["url"]
     thumbnail_data = entry["thumbnailData"]
     object_key = f"songs/{song_id}.nbs"
 
