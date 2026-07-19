@@ -15,8 +15,8 @@ import sys
 import unicodedata
 from pathlib import Path
 
-from utilities.file_store import FileStore, ObjectNotFoundError
-from utilities.project import DATA_DIRECTORY
+from nbs_shared.file_store import FileStore, ObjectNotFoundError
+from nbs_shared.project import DATA_DIRECTORY
 
 SONGS_DIR = DATA_DIRECTORY / "songs"
 

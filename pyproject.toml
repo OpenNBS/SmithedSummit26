@@ -13,6 +13,9 @@ classifiers = [
 dependencies = [
     "beet>=0.115.0,<0.116",
     "bolt>=0.50.1,<0.51",
+    "nbs-summit26-booth",
+    "nbs-summit26-playback",
+    "nbs-summit26-shared",
 ]
 
 [dependency-groups]
@@ -22,6 +25,11 @@ dev = [
 
 [tool.uv]
 default-groups = ["dev"]
+
+[tool.uv.sources]
+nbs-summit26-booth = { workspace = true }
+nbs-summit26-playback = { workspace = true }
+nbs-summit26-shared = { workspace = true }
 
 [tool.uv.workspace]
 members = ["booth", "playback", "shared"]

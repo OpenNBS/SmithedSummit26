@@ -17,7 +17,7 @@ pipeline:
   - directory: "playback"
     extend: ["beet.yml"]
 
-  - "shared.src.modules.image"
+  - "nbs_shared.plugins.image"
   - "beet.contrib.minify_json"
 
 output: dist

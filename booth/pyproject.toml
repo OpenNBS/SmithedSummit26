@@ -9,3 +9,12 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.14",
 ]
+dependencies = [
+    "nbs-summit26-shared",
+]
+
+[tool.uv.sources]
+nbs-summit26-shared = { workspace = true }
+
+[tool.uv]
+package = false

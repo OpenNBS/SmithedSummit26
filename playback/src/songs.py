@@ -1,3 +1,3 @@
-from pathlib import Path
+from nbs_shared.project import DATA_DIRECTORY
 
-SONGS_PATH = Path(__file__).parent.resolve().parent.parent / "shared" / "data" / "songs"
+SONGS_PATH = DATA_DIRECTORY / "songs"

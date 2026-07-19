@@ -12,11 +12,11 @@ from io import BytesIO
 
 import pynbs
 from PIL import Image
-from utilities.file_store import (
+from nbs_shared.file_store import (
     FileStore,
     ObjectNotFoundError,
 )
-from utilities.project import DATA_DIRECTORY
+from nbs_shared.project import DATA_DIRECTORY
 
 THUMBNAILS_JSON = DATA_DIRECTORY / "thumbnails.json"
 

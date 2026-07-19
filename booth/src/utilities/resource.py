@@ -3,10 +3,8 @@ from enum import Enum
 from typing import Any
 
 from beet import Context
-
-from shared.src.utilities.project import DATA_DIRECTORY
-
-NAMESPACE = "nbs"
+from nbs_shared.constants import NAMESPACE
+from nbs_shared.project import DATA_DIRECTORY
 
 
 class TranslationType(Enum):

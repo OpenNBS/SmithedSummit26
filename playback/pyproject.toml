@@ -10,6 +10,13 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "pynbs>=1.1.0,<2",
     "bolt-selectors>=0.4.0",
+    "nbs-summit26-shared",
+    "pynbs>=1.1.0,<2",
 ]
+
+[tool.uv.sources]
+nbs-summit26-shared = { workspace = true }
+
+[tool.uv]
+package = false

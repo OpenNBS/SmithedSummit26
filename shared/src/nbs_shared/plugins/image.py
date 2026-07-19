@@ -5,7 +5,7 @@ from beet import Context
 from oxipng import StripChunks, optimize_from_memory
 from PIL import Image
 
-from booth.src.utilities.resource import NAMESPACE
+from nbs_shared.constants import NAMESPACE
 
 logger = logging.getLogger(__name__)
 
