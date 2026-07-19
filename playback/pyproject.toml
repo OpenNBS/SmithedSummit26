@@ -10,8 +10,6 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "beet>=0.115.0,<0.116",
     "pynbs>=1.1.0,<2",
-    "bolt>=0.50.1,<0.51",
     "bolt-selectors>=0.4.0",
 ]
