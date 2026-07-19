@@ -1,0 +1,17 @@
+[project]
+name = "nbs-summit26-playback"
+version = "0.1.0"
+description = "Note Block Studio playback project for Smithed Summit 2026"
+authors = [{ name = "Bentroen" }]
+requires-python = ">=3.14,<4"
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "beet>=0.115.0,<0.116",
+    "pynbs>=1.1.0,<2",
+    "bolt>=0.50.1,<0.51",
+    "bolt-selectors>=0.4.0",
+]

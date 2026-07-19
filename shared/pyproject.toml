@@ -1,7 +1,7 @@
 [project]
-name = "nbs-summit26"
+name = "nbs-summit26-shared"
 version = "0.1.0"
-description = "Note Block Studio data pack + resource pack for Smithed Summit 2026"
+description = "Shared utilities for Note Block Studio data packs"
 authors = [{ name = "Bentroen" }]
 requires-python = ">=3.14,<4"
 readme = "README.md"
@@ -9,6 +9,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.14",
 ]
-
-[tool.uv.workspace]
-members = ["booth", "playback", "shared"]
+dependencies = [
+    "boto3>=1.38.0,<2",
+    "python-dotenv>=1.1.0,<2",
+]

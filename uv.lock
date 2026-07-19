@@ -2,6 +2,14 @@ version = 1
 revision = 3
 requires-python = ">=3.14, <4"
 
+[manifest]
+members = [
+    "nbs-summit26",
+    "nbs-summit26-booth",
+    "nbs-summit26-playback",
+    "nbs-summit26-shared",
+]
+
 [[package]]
 name = "annotated-types"
 version = "0.7.0"
@@ -184,7 +192,7 @@ wheels = [
 ]
 
 [[package]]
-name = "nbs-smithed-summit-26"
+name = "nbs-summit26"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
@@ -220,6 +228,57 @@ requires-dist = [
 dev = [
     { name = "snakeviz", specifier = ">=2.2.0,<3" },
     { name = "tuna", specifier = ">=0.5.11,<0.6" },
+]
+
+[[package]]
+name = "nbs-summit26-booth"
+version = "0.1.0"
+source = { virtual = "booth" }
+dependencies = [
+    { name = "beet" },
+    { name = "bolt" },
+    { name = "pyoxipng" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "beet", specifier = ">=0.115.0,<0.116" },
+    { name = "bolt", specifier = ">=0.50.1,<0.51" },
+    { name = "pyoxipng", specifier = ">=9.1.1,<10" },
+]
+
+[[package]]
+name = "nbs-summit26-playback"
+version = "0.1.0"
+source = { virtual = "playback" }
+dependencies = [
+    { name = "beet" },
+    { name = "bolt" },
+    { name = "bolt-selectors" },
+    { name = "pynbs" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "beet", specifier = ">=0.115.0,<0.116" },
+    { name = "bolt", specifier = ">=0.50.1,<0.51" },
+    { name = "bolt-selectors", specifier = ">=0.4.0" },
+    { name = "pynbs", specifier = ">=1.1.0,<2" },
+]
+
+[[package]]
+name = "nbs-summit26-shared"
+version = "0.1.0"
+source = { virtual = "shared" }
+dependencies = [
+    { name = "boto3" },
+    { name = "python-dotenv" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "boto3", specifier = ">=1.38.0,<2" },
+    { name = "python-dotenv", specifier = ">=1.1.0,<2" },
 ]
 
 [[package]]
