@@ -10,6 +10,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
+    "bolt-selectors>=0.4.0",
     "nbs-summit26-shared",
 ]
 

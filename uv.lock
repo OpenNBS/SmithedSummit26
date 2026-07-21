@@ -188,25 +188,27 @@ name = "nbs-summit26-booth"
 version = "0.1.0"
 source = { virtual = "packages/booth" }
 dependencies = [
+    { name = "bolt-selectors" },
     { name = "nbs-summit26-shared" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "nbs-summit26-shared", editable = "packages/shared" }]
+requires-dist = [
+    { name = "bolt-selectors", specifier = ">=0.4.0" },
+    { name = "nbs-summit26-shared", editable = "packages/shared" },
+]
 
 [[package]]
 name = "nbs-summit26-playback"
 version = "0.1.0"
 source = { virtual = "packages/playback" }
 dependencies = [
-    { name = "bolt-selectors" },
     { name = "nbs-summit26-shared" },
     { name = "pynbs" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "bolt-selectors", specifier = ">=0.4.0" },
     { name = "nbs-summit26-shared", editable = "packages/shared" },
     { name = "pynbs", specifier = ">=1.1.0,<2" },
 ]
