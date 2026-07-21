@@ -4,12 +4,22 @@ from src.utilities import resource
 from src.utilities.resource import TranslationType
 
 
+class Description(TypedDict):
+    lore: Any
+    tagline: Any
+    tooltip: Any
+
+class Extra(TypedDict, total=False):
+    description: NotRequired[Description]
+
+
 OPENNBS_TOOLTIP = {
     "translate": f"nbs.tooltip",
     "font": "nbs:tooltip",
     "color": "#ec8c0c",
     "italic": False
 }
+
 
 def give_item(item: str) -> None:
     swing @s
@@ -18,13 +28,6 @@ def give_item(item: str) -> None:
         give @s item
     unless items entity @s weapon.mainhand *:
         item replace entity @s weapon.mainhand with item
-
-class Description(TypedDict):
-    lore: Any
-    tagline: Any
-
-class Extra(TypedDict, total=False):
-    description: NotRequired[Description]
 
 def dump_component(component: dict[str, Any]) -> str:
     parts: list[str] = []
@@ -53,8 +56,16 @@ def give_persistent_item(asset_resource_id: str, item_model_component: str, extr
         }
     }
 
+    if "minecraft:custom_data" in extra:
+        custom_data_component = {
+            **custom_data_component,
+            **extra["minecraft:custom_data"]
+        }
+
+        del extra["minecraft:custom_data"]
+
     description: Description = {
-        "lore":  {
+        "lore": {
             "translate": lore_translation_resource.value,
             "color": "#20CFF0",
             "italic": False
@@ -66,19 +77,35 @@ def give_persistent_item(asset_resource_id: str, item_model_component: str, extr
         }
     }
 
+    # Absolutely cursed way to modify item lore
+    # Needs refactor
+    lore_component: list[Any] = []
+
     if "description" in extra:
         description = {
             **description,
             **extra["description"]
         }
 
+        if "tooltip" in extra["description"]:
+            lore_component.extend([
+                extra["description"]["tooltip"]
+            ])
+
         del extra["description"]
 
-    lore_component = [
+    description_order = [
         description["lore"],
         description["tagline"],
+        "",
         OPENNBS_TOOLTIP
     ]
+
+    description_order.reverse()
+
+    lore_component.extend(description_order)
+
+    lore_component.reverse()
 
     components: dict[str, Any] = {
         "minecraft:item_name": item_name_component,

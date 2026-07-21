@@ -35,6 +35,29 @@ function ~/root:
                     },
                     '"',
                 ],
+            },
+            "tooltip": {
+                "text": "ѕʜᴏᴡ ᴛᴏ ",
+                "color": "dark_gray",
+                "italic": false,
+                "extra": [
+                    {
+                        "text": "\ua001 Beetrice",
+                        "font": "beet:pack_mark",
+                        "color": "white"
+                    }
+                ],
+            }
+        },
+        "minecraft:custom_data": {
+            "beet": {
+                "beetrice": {
+                    "dialogue": {
+                        "text": "I... I don't care! I don't care if you have Starreact... I have my own!",
+                        "padding": 0,
+                        "width": 150
+                    }
+                }
             }
         }
     })
