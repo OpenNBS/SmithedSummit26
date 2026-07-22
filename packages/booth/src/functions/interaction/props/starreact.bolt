@@ -55,7 +55,7 @@ function ~/root:
                     "dialogue": {
                         "text": "I... I don't care! I don't care if you have Starreact... I have my own!",
                         "padding": 0,
-                        "width": 150
+                        "width": 90
                     }
                 }
             }
