@@ -87,17 +87,17 @@ def apply_item_model_tints(
 
 def create_tinted_item_model(
     ctx: Context,
-    model_path: Resource,
-    texture_path: Resource,
-    model_tints: ItemModelTints | None,
+    model_resource: Resource,
+    texture_resource: Resource,
+    model_tints: ItemModelTints | None = None,
 ) -> None:
     item_model = ItemModel(
-        {"model": {"type": "minecraft:model", "model": texture_path.value}}
+        {"model": {"type": "minecraft:model", "model": texture_resource.value}}
     )
 
     apply_item_model_tints(item_model, model_tints)
 
-    ctx.assets.item_models[model_path.value] = item_model
+    ctx.assets.item_models[model_resource.value] = item_model
 
 
 def create_item_model(
