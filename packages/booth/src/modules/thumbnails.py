@@ -1,7 +1,8 @@
 from beet import Context
 from src.utilities import resource
 from src.utilities.dialog import DialogHelper
-from src.utilities.resource import read_resource
+from src.utilities.model import create_model, create_tinted_item_model
+from src.utilities.resource import TextureType, read_resource
 
 
 def generate_thumbnails(ctx: Context) -> None:
@@ -14,12 +15,25 @@ def generate_thumbnails(ctx: Context) -> None:
         extra={"columns": 1},
     )
 
-    thumbnail_data = read_resource(ctx, "source/thumbnails.json")
+    thumbnail_data = read_resource("source/thumbnails.json")
+
+    thumbnail_texture_resource = resource.get_texture(TextureType.BLOCK, "thumbnails")
+    thumbnail_asset_resource = resource.get_asset("thumbnails")
+
+    base_model_resource = thumbnail_texture_resource.append("base")
 
     for thumbnail in thumbnail_data:
         author = thumbnail["author"]
         title = thumbnail["title"]
         url = thumbnail["url"]
+
+        id = author.lower()
+
+        variant_texture_resource = thumbnail_texture_resource.append(id)
+        variant_asset_resource = thumbnail_asset_resource.append(id)
+
+        create_model(ctx, base_model_resource, variant_texture_resource)
+        create_tinted_item_model(ctx, variant_asset_resource, variant_texture_resource)
 
         action_asset_id = resource.serialize_path(author)
 

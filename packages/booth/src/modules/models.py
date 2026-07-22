@@ -1,5 +1,4 @@
 from beet import Context
-
 from src.utilities import resource
 from src.utilities.model import (
     create_item_model,
@@ -39,8 +38,6 @@ UNUSED_NOTE_VARIANTS = [
     "pink",
     "purple",
 ]
-
-UNUSED_THUMBNAIL_VARIANTS = []
 
 UNUSED_BALLOON_VARIANTS = ["blue"]
 
@@ -109,14 +106,6 @@ def generate_item_models(ctx: Context) -> None:
 
 def generate_dynamic_models(ctx: Context) -> None:
     create_dynamic_pair(ctx, TextureType.BLOCK, "notes", UNUSED_NOTE_VARIANTS)
-
-    create_dynamic_pair(
-        ctx,
-        TextureType.BLOCK,
-        "thumbnails",
-        UNUSED_THUMBNAIL_VARIANTS,
-        ["frame"],
-    )
 
     create_dynamic_models(
         ctx, TextureType.ITEM, "balloons", UNUSED_BALLOON_VARIANTS, ["string"]

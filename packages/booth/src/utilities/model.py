@@ -128,24 +128,30 @@ def get_variants(
     return list(filter(lambda variant: variant[0] not in unused_variants, variants))
 
 
+def create_model(
+    ctx: Context, base_model_resource: Resource, variant_texture_resource: Resource
+) -> None:
+    model = Model(
+        {
+            "parent": base_model_resource.value,
+            "textures": {"variant": variant_texture_resource.value},
+        }
+    )
+
+    ctx.assets.models[variant_texture_resource.value] = model
+
+
 def create_models_from_base(
     ctx: Context, texture_resource: Resource, unused_variants: list[str] = []
 ) -> None:
-    base_texture_resource = texture_resource.append("base")
+    base_model_resource = texture_resource.append("base")
 
     texture_variants = get_variants(ctx, texture_resource, unused_variants)
 
     for variant_name, variant_texture_resource in texture_variants:
         variant_texture_resource = texture_resource.append(variant_name)
 
-        model = Model(
-            {
-                "parent": base_texture_resource.value,
-                "textures": {"variant": variant_texture_resource.value},
-            }
-        )
-
-        ctx.assets.models[variant_texture_resource.value] = model
+        create_model(ctx, base_model_resource, variant_texture_resource)
 
 
 def create_item_models_from_base(
