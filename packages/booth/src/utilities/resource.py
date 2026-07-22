@@ -2,7 +2,6 @@ import json
 from enum import Enum
 from typing import Any
 
-from beet import Context
 from nbs_shared.constants import NAMESPACE
 from nbs_shared.project import DATA_DIRECTORY
 
@@ -73,6 +72,6 @@ def serialize_path(path: str) -> str:
     return path.lower().replace(".", "")
 
 
-def read_resource(ctx: Context, relative_path: str) -> Any:
+def read_resource(relative_path: str) -> Any:
     with open(DATA_DIRECTORY / relative_path, "r", encoding="utf-8") as file:
         return json.load(file)
