@@ -62,8 +62,6 @@ for song_stuff in enumerate(SONGS_PATH.glob("**/*.nbs")):
 
                 function nbs:global/speaker_iter with storage nbs:temp input
 
-            as @a[tag=nbs_headphones] at @s function ~/../headphones
-
             scoreboard players add notes_played nbs_stats f"{len(notes)}"
             scoreboard players add ticks_played nbs_stats 1
 
@@ -90,9 +88,6 @@ for song_stuff in enumerate(SONGS_PATH.glob("**/*.nbs")):
 
                 append function ~/../loudspeaker:
                     playsound f"{note.play_loudspeakers()}"
-
-                append function ~/../headphones:
-                    playsound f"{note.play_headphones()}"
 
 
     function f"nbs:song/{song_name}/{tick + 40}/root":
