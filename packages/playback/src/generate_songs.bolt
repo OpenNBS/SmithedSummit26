@@ -1,6 +1,7 @@
 from pathlib import Path
 from beet.core.utils import normalize_string
 from beet import Sound, SoundConfig
+import json
 import pynbs
 
 from src.utilities.note_block import get_notes
@@ -9,51 +10,67 @@ from src.songs import SONGS_PATH
 SOURCE = "record"
 
 SOUNDS = Path("sounds")
+SONG_DATA = SONGS_PATH.parent / "manifest.json"
 
 # memo:
 ctx.meta["instruments"] = set()
 
-# Define regions
-regions = list(SONGS_PATH.glob('*/'))
-ctx.meta["regions"] = []
-for region in regions:
-    region_name = normalize_string(region.stem)
-    ctx.meta["regions"].append(region_name)
+# Load song manifest
+with open(SONG_DATA, "r", encoding="utf-8") as f:
+    song_manifest = json.load(f)
+
+# Load regions
+regions = set()
+for song in song_manifest:
+    region = song["region"]
+    if region is not None:
+        regions.add(region)
+ctx.meta["regions"] = regions
 
 append function ~/../playback/load:
     data modify storage nbs:main songs set value []
 
-for song_stuff in enumerate(SONGS_PATH.glob("**/*.nbs")):
+for song_stuff in enumerate(song_manifest):
     song_index = song_stuff[0]
-    path = song_stuff[1]
+    song_data = song_stuff[1]
+
+    song_id = song_data["id"]
+    title = song_data["title"]
+    author = song_data["author"]
+    region = song_data["region"]
+
+    if region is None:
+        continue
+
+    formatted_string = f"{title} - {author}"
+
+    path = SONGS_PATH / f"{song_id}.nbs"
+
+    if not path.exists():
+        print(f"Song file not found: {path}")
+        continue
+
     song = pynbs.read(path)
 
-    song_name = normalize_string(path.stem.split(" - ")[0].split("(")[0])
-    formatted_string = path.stem
-    title = song.header.song_name
-    author = song.header.song_author
-    original_author = song.header.original_author
+    print("Processing:", song_id)
 
-    print("processing", song_name)
-
-    append function ~/../global/load:
-        data modify storage nbs:main songs append value {
-            "name": song_name,
+    append function ~/../playback/load:
+        data modify storage nbs:playback songs append value {
+            "name": title,
             "index": song_index,
             "formatted_string": formatted_string,
             "title": title,
             "author": author,
-            "original_author": original_author,
         }
 
     for chord in get_notes(song):
         tick = chord[0]
         notes = chord[1]
             #data modify storage nbs:main playing set from storage nbs:main songs[0]
-        function f"nbs:song/{song_name}/{tick}/root":
+        function f"nbs:song/{song_id}/{tick}/root":
             # iterate through speaker UUIDs
             data modify storage nbs:temp input set value {}
-            data modify storage nbs:temp input.song set value (song_name)
+            data modify storage nbs:temp input.song set value (song_id)
             data modify storage nbs:temp input.tick set value (tick)
             for entity in ["speaker", "loudspeaker"]:
                 store result score #len nbs if data storage nbs:main f"locations.{entity}[]"
@@ -89,9 +106,9 @@ for song_stuff in enumerate(SONGS_PATH.glob("**/*.nbs")):
                 append function ~/../loudspeaker:
                     playsound f"{note.play_loudspeakers()}"
 
+    function f"nbs:song/{song_id}/{tick + 40}/root":
+        function f"nbs:playback/{region}/advance"
 
-    function f"nbs:song/{song_name}/{tick + 40}/root":
-        function nbs:global/advance
 
 
 print("🎉 LGTM")
