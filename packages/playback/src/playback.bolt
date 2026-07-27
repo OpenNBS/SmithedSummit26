@@ -1,4 +1,7 @@
 import glob
+import logging
+
+logging.info("Generating playback functions")
 
 #> setup
 merge function_tag minecraft:load {

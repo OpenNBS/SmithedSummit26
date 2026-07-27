@@ -3,6 +3,7 @@ from beet.core.utils import normalize_string
 from beet import Sound, SoundConfig
 import json
 import pynbs
+import logging
 
 from src.utilities.note_block import get_notes
 from src.songs import SONGS_PATH
@@ -11,6 +12,8 @@ SOURCE = "record"
 
 SOUNDS = Path("sounds")
 SONG_DATA = SONGS_PATH.parent / "manifest.json"
+
+logging.info("Generating songs")
 
 # memo:
 ctx.meta["instruments"] = set()

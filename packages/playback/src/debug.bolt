@@ -1,6 +1,9 @@
 from src.utilities.sphere import sphere
+import logging
 
 DELAY_TICKS = 10
+
+logging.info("Generating debug functions")
 
 #> setup
 merge function_tag minecraft:load {
