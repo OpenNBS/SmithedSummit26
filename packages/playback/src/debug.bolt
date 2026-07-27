@@ -1,0 +1,37 @@
+from src.utilities.sphere import sphere
+
+DELAY_TICKS = 10
+
+#> setup
+merge function_tag minecraft:load {
+    "values": [(~/load)]
+}
+
+append function ~/load:
+    schedule function ~/tick f'{DELAY_TICKS}t' replace
+
+append function ~/tick:
+    function ~/show_debug_particles
+    execute if score debug nbs matches 1 run schedule function ~/tick f'{DELAY_TICKS}t' replace
+
+append function ~/toggle:
+    scoreboard players add debug nbs 1
+    execute if score debug nbs matches 2.. run scoreboard players set debug nbs 0
+
+    execute if score debug nbs matches 1 run function ~/tick
+
+
+for data in [('speaker', 12), ('loudspeaker', 48)]:
+    speaker_type = data[0]
+    radius = data[1] 
+
+    append function ~/show_debug_particles:
+        execute as f"@e[type=item_display,tag=nbs_{speaker_type}]" run function ~/spawn_particles_{radius}
+
+    for point in sphere(radius=radius, density=0.25):
+        x = point[0]
+        y = point[1]
+        z = point[2]
+
+        append function ~/spawn_particles_{radius}:
+            particle minecraft:block_marker{block_state:{Name:"minecraft:barrier"}} f"~{x}" f"~{y}" f"~{z}" 0 0 0 0 1 normal
