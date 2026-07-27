@@ -1,13 +1,13 @@
 from src.utilities import resource
 
-from ../../utilities/item import give_persistent_item
+from ../../utilities/item import create_persistent_item, give_item
 
 asset_resource_id = "starreact"
 
 function ~/root:
-    item_model_component = resource.get_asset(f"props/{asset_resource_id}")
+    item_model_component = resource.get_asset("props", asset_resource_id)
 
-    give_persistent_item(asset_resource_id, item_model_component.value, {
+    loot_resource = create_persistent_item(asset_resource_id, item_model_component.value, {
         "description": {
             "tagline": {
                 "italic": True,
@@ -39,7 +39,7 @@ function ~/root:
             "tooltip": {
                 "text": "ѕʜᴏᴡ ᴛᴏ ",
                 "color": "dark_gray",
-                "italic": false,
+                "italic": False,
                 "extra": [
                     {
                         "text": "\ua001 Beetrice",
@@ -61,3 +61,5 @@ function ~/root:
             }
         }
     })
+
+    give_item(loot_resource, 1)

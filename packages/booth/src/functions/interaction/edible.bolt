@@ -1,7 +1,10 @@
 from enum import Enum
 from typing import TypedDict
 
-from ../../utilities/item import give_item
+from src.utilities import resource
+from src.utilities.resource import Resource
+
+from ../../utilities/item import create_loot, give_item, Components
 
 
 class EdibleType(Enum):
@@ -67,13 +70,29 @@ def give_edible(
         **translation_component,
     }
 
+    components: Components = {
+        "minecraft:food": dict(SHARED_FOOD_COMPONENT),
+        "minecraft:consumable": edible_component['consumable'],
+        "minecraft:max_stack_size": edible_component['max_stack_size'],
+        "minecraft:item_model": item_model_component,
+        "minecraft:item_name": translation_component,
+        "minecraft:lore": lore_component,
+        "minecraft:custom_data": dict(SHARED_CUSTOM_DATA_COMPONENT)
+    }
+
+    loot_resource = resource.get_asset("edible", path)
+
+    create_loot(loot_resource, components)
+
+    return loot_resource
+
+def give_edible_item(path: str, loot_resource: Resource, max_count: int | None = None) -> None:
+    give_item(loot_resource, max_count)
+
     scoreboard players add @s f"nbs.edibles.obtained_{path}" 1
 
     function ~/../refresh_sticker_progress
 
-    give_item(
-        f"minecraft:note_block[minecraft:food={SHARED_FOOD_COMPONENT}, minecraft:consumable={edible_component['consumable']}, minecraft:max_stack_size={edible_component['max_stack_size']}, minecraft:item_model='{item_model_component}', minecraft:item_name={translation_component}, minecraft:lore={lore_component}, minecraft:custom_data={SHARED_CUSTOM_DATA_COMPONENT}]"
-    )
 
 merge function_tag minecraft:load {
     "values": [(~/load)]
@@ -94,18 +113,38 @@ function ~/refresh_sticker_progress:
             function nbs:stickers/collected_all_foods
 
 function ~/pink_donut:
-    give_edible("cnk", "pink_donut", EdibleType.FOOD)
+    path = "pink_donut"
+
+    loot_resource = create_edible_item("cnk", path, EdibleType.FOOD)
+
+    give_edible_item(path, loot_resource, 5)
 
 function ~/cinnamon_roll:
-    give_edible("cnk", "cinnamon_roll", EdibleType.FOOD)
+    path = "cinnamon_roll"
+
+    loot_resource = create_edible_item("cnk", path, EdibleType.FOOD)
+
+    give_edible_item(path, loot_resource, 5)
 
 function ~/pizza:
-    give_edible("cnk", "pizza", EdibleType.FOOD)
+    path = "pizza"
+
+    loot_resource = create_edible_item("cnk", path, EdibleType.FOOD)
+
+    give_edible_item(path, loot_resource, 5)
 
 function ~/cake_slice:
-    give_edible("foodstuffs", "cake_slice", EdibleType.FOOD, translation_component={
+    path = "cake_slice"
+
+    loot_resource = create_edible_item("foodstuffs", path, EdibleType.FOOD, translation_component={
         "fallback": "Cake Slice"
     })
 
+    give_edible_item(path, loot_resource, 5)
+
 function ~/pumpkin_latte:
-    give_edible("cnk", "pumpkin_latte", EdibleType.DRINK)
+    path = "pumpkin_latte"
+
+    loot_resource = create_edible_item("cnk", path, EdibleType.DRINK)
+
+    give_edible_item(path, loot_resource, 5)

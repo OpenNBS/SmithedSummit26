@@ -1,7 +1,10 @@
-import json
 from typing import Any, NotRequired, TypedDict
+
+from beet import Context, LootTable
 from src.utilities import resource
-from src.utilities.resource import TranslationType
+from src.utilities.resource import Resource, TranslationType, NAMESPACE
+
+Components = dict[str, Any]
 
 
 class Description(TypedDict):
@@ -17,28 +20,63 @@ OPENNBS_TOOLTIP = {
     "translate": f"nbs.tooltip",
     "font": "nbs:tooltip",
     "color": "#ec8c0c",
-    "italic": False
+    "italic": False,
 }
 
 
-def give_item(item: str) -> None:
+def give_item(loot_resource: Resource, max_count: int | None = None) -> None:
+    if max_count is not None:
+        custom_data: Components = {}
+
+        custom_data[NAMESPACE] = {
+            "type": loot_resource.path()
+        }
+
+        function summit.items:api/count_items {"custom_data": str(custom_data), "max": max_count}
+
+        execute if score $below_max summit.temp matches 0 return fail
+
     swing @s
 
-    if items entity @s weapon.mainhand *:
-        give @s item
-    unless items entity @s weapon.mainhand *:
-        item replace entity @s weapon.mainhand with item
+    loot give @s loot loot_resource.value
 
-def dump_component(component: dict[str, Any]) -> str:
-    parts: list[str] = []
 
-    for key, value in component.items():
-        parts.append(f"{key}={json.dumps(value)}")
+def create_loot(asset_resource: Resource, components: Components) -> None:
+    if "minecraft:custom_data" not in components:
+        components["minecraft:custom_data"] = {}
 
-    return ", ".join(parts)
+    if NAMESPACE not in components["minecraft:custom_data"]:
+        components["minecraft:custom_data"][NAMESPACE] = {}
 
-def give_persistent_item(asset_resource_id: str, item_model_component: str, extra: Extra = {}) -> None:
-    translation_resource = resource.get_translation(TranslationType.ITEM, asset_resource_id)
+    components["minecraft:custom_data"][NAMESPACE]["type"] = asset_resource.path()
+
+    ctx.data.loot_tables[asset_resource.value] = LootTable(
+        {
+            "pools": [
+                {
+                    "rolls": 1,
+                    "entries": [
+                        {
+                            "type": "minecraft:item",
+                            "name": "minecraft:note_block",
+                            "functions": [
+                                {
+                                    "function": "minecraft:set_components",
+                                    "components": components,
+                                }
+                            ],
+                        }
+                    ],
+                }
+            ]
+        }
+    )
+
+
+def create_persistent_item(
+    asset_id: str, item_model_component: str, extra: Extra = {}
+) -> Resource:
+    translation_resource = resource.get_translation(TranslationType.ITEM, asset_id)
 
     lore_translation_resource = translation_resource.append("lore")
     tagline_translation_resource = translation_resource.append("tagline")
@@ -46,9 +84,7 @@ def give_persistent_item(asset_resource_id: str, item_model_component: str, extr
     rarity_component = "rare"
     max_stack_size_component = 1
 
-    item_name_component = {
-        "translate": translation_resource.value
-    }
+    item_name_component = {"translate": translation_resource.value}
 
     custom_data_component = {
         "summit": {
@@ -59,7 +95,7 @@ def give_persistent_item(asset_resource_id: str, item_model_component: str, extr
     if "minecraft:custom_data" in extra:
         custom_data_component = {
             **custom_data_component,
-            **extra["minecraft:custom_data"]
+            **extra["minecraft:custom_data"],
         }
 
         del extra["minecraft:custom_data"]
@@ -68,13 +104,14 @@ def give_persistent_item(asset_resource_id: str, item_model_component: str, extr
         "lore": {
             "translate": lore_translation_resource.value,
             "color": "#20CFF0",
-            "italic": False
+            "italic": False,
         },
         "tagline": {
             "translate": tagline_translation_resource.value,
             "color": "dark_gray",
-            "italic": True
-        }
+            "italic": True,
+        },
+        "tooltip": {},
     }
 
     # Absolutely cursed way to modify item lore
@@ -82,15 +119,10 @@ def give_persistent_item(asset_resource_id: str, item_model_component: str, extr
     lore_component: list[Any] = []
 
     if "description" in extra:
-        description = {
-            **description,
-            **extra["description"]
-        }
+        description = {**description, **extra["description"]}
 
         if "tooltip" in extra["description"]:
-            lore_component.extend([
-                extra["description"]["tooltip"]
-            ])
+            lore_component.extend([extra["description"]["tooltip"]])
 
         del extra["description"]
 
@@ -98,7 +130,7 @@ def give_persistent_item(asset_resource_id: str, item_model_component: str, extr
         description["lore"],
         description["tagline"],
         "",
-        OPENNBS_TOOLTIP
+        OPENNBS_TOOLTIP,
     ]
 
     description_order.reverse()
@@ -107,16 +139,18 @@ def give_persistent_item(asset_resource_id: str, item_model_component: str, extr
 
     lore_component.reverse()
 
-    components: dict[str, Any] = {
+    components = {
         "minecraft:item_name": item_name_component,
         "minecraft:item_model": item_model_component,
         "minecraft:lore": lore_component,
         "minecraft:rarity": rarity_component,
         "minecraft:max_stack_size": max_stack_size_component,
         "minecraft:custom_data": custom_data_component,
-        **extra
+        **extra,
     }
 
-    components_dumped = dump_component(components)
+    loot_resource = resource.get_asset(asset_id)
 
-    give_item(f"minecraft:note_block[{components_dumped}]")
+    create_loot(loot_resource, components)
+
+    return loot_resource
