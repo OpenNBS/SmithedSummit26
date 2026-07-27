@@ -17,18 +17,18 @@ append function ~/load:
     schedule function ~/../tick 1t replace
     
     execute function ~/save_speaker_positions:
-        data modify storage nbs:main locations set value {speaker: [], loudspeaker: []}
+        data modify storage nbs:playback locations set value {speaker: [], loudspeaker: []}
         data modify storage nbs:temp input set value {}
         for entity in ["speaker", "loudspeaker"]:
             as @e[type=item_display, tag=f"nbs_{entity}"]:
                 data modify storage nbs:temp input.UUID set from entity @s UUID
                 function animated_java:global/internal/gu/convert_uuid_array_to_string with storage nbs:temp input
-                data modify storage nbs:main f"locations.{entity}" append from storage aj:uuid main.out
+                data modify storage nbs:playback f"locations.{entity}" append from storage aj:uuid main.out
 
 # Helper function that iterates through all speaker and loudspeaker in the world
 # Takes {speaker_type: "speaker", i: 0, song: "song", tick: 0}
 function ~/speaker_iter:
-    $data modify storage nbs:temp input.uuid set from storage nbs:main locations.$(speaker_type)[$(i)]
+    $data modify storage nbs:temp input.uuid set from storage nbs:playback locations.$(speaker_type)[$(i)]
     execute function ~/uuid with storage nbs:temp input:
         $execute as $(uuid) at @s run function nbs:song/$(song)/$(tick)/$(speaker_type)
     store result storage nbs:temp input.i int 1 scoreboard players add #iter nbs 1
@@ -40,21 +40,21 @@ for region in ctx.meta["regions"]:
     function ~/{region}/tick:
         schedule function (~/) 1t replace
         execute if score f"{region}_playing" nbs matches 1 run scoreboard players add f"{region}_songtime" nbs 1
-        execute store result storage nbs:main f"playing.{region}.tick" int 1 run scoreboard players get f"{region}_songtime" nbs
-        function nbs:global/playback with storage nbs:main f"playing.{region}" # TODO: this command works in a command block, but not here :c
+        execute store result storage nbs:playback f"playing.{region}.tick" int 1 run scoreboard players get f"{region}_songtime" nbs
+        function nbs:playback with storage nbs:playback f"playing.{region}" # TODO: this command works in a command block, but not here :c
 
     function ~/{region}/playback:
         $function nbs:song/$(name)/$(tick)/root
 
     function ~/{region}/change_song:
         scoreboard players add songs_played nbs_stats 1
-        scoreboard players set f"{region}_songtime" nbs -1
-        execute store result storage nbs:main f"playing.{region}.index" int 1 run scoreboard players get f"{region}_songindex" nbs
-        function ~/{region}/zzz_change_song with storage nbs:main f"playing.{region}"   
+        scoreboard players set f"{region}.songtime" nbs -1
+        execute store result storage nbs:playback f"playing.{region}.index" int 1 run scoreboard players get f"{region}.songindex" nbs
+        function ~/{region}/zzz_change_song with storage nbs:playback f"playing.{region}"   
 
     function ~/{region}/zzz_change_song:
-        $data modify storage nbs:main f"playing.{region}" set from storage nbs:main f"songs.{region}[$(index)]"
-        function ~/{region}/title with storage nbs:main f"playing.{region}"
+        $data modify storage nbs:playback f"playing.{region}" set from storage nbs:playback f"songs.{region}[$(index)]"
+        function ~/{region}/title with storage nbs:playback f"playing.{region}"
 
 
     #> Effects
@@ -71,26 +71,26 @@ for region in ctx.meta["regions"]:
 
     function ~/{region}/place_speaker:
         function animated_java:music_speaker/summon/default
-        tag @e[type=item_display,limit=1,distance=..1,tag=nbs_speaker_new] add nbs_speaker
-        tag @e[type=item_display,limit=1,distance=..1,tag=nbs_speaker_new] remove nbs_speaker_new
+        tag @n[type=item_display,distance=..1,tag=nbs_speaker_new] add nbs.speaker
+        tag @n[type=item_display,distance=..1,tag=nbs_speaker_new] remove nbs.speaker_new
 
     function ~/{region}/place_loudspeaker:
         function animated_java:music_speaker/summon/default
-        tag @e[type=item_display,limit=1,distance=..1,tag=nbs_speaker_new] add nbs_loudspeaker
-        tag @e[type=item_display,limit=1,distance=..1,tag=nbs_speaker_new] remove nbs_speaker_new
+        tag @n[type=item_display,distance=..1,tag=nbs_speaker_new] add nbs.loudspeaker
+        tag @n[type=item_display,distance=..1,tag=nbs_speaker_new] remove nbs.speaker_new
 
     #> Song Controls
 
     song_count = len(glob.glob(f"songs/{region}/*.nbs")) + 1 #> TODO: REMOVE
 
     function ~/{region}/next:
-        scoreboard players add f"{region}_songindex" nbs 1
-        execute if score f"{region}_songindex" nbs matches f"{song_count}.." run scoreboard players set f"{region}_songindex" nbs 0
+        scoreboard players add f"{region}.songindex" nbs 1
+        execute if score f"{region}.songindex" nbs matches f"{song_count}.." run scoreboard players set f"{region}.songindex" nbs 0
         function ~/../change_song
 
     function ~/{region}/prev:
-        scoreboard players remove f"{region}_songindex" nbs 1
-        execute if score f"{region}_songindex" nbs matches ..-1 run scoreboard players set f"{region}_songindex" nbs (song_count - 1)
+        scoreboard players remove f"{region}.songindex" nbs 1
+        execute if score f"{region}.songindex" nbs matches ..-1 run scoreboard players set f"{region}.songindex" nbs (song_count - 1)
         function ~/../change_song
 
     function ~/{region}/pause:
@@ -104,9 +104,9 @@ for region in ctx.meta["regions"]:
         scoreboard players set f"{region}_songtime" nbs -1
 
     function ~/{region}/shuffle:
-        scoreboard players operation f"{region}_prevsong" nbs = songindex nbs
-        execute store result score f"{region}_songindex" nbs run random value (0, song_count - 1)
-        execute if score f"{region}_songindex" nbs = f"{region}_prevsong" nbs run function ~/{region}/next
+        scoreboard players operation f"{region}.prevsong" nbs = songindex nbs
+        execute store result score f"{region}.songindex" nbs run random value (0, song_count - 1)
+        execute if score f"{region}.songindex" nbs = f"{region}.prevsong" nbs run function ~/{region}/next
         function ~/{region}/change_song
 
     function ~/{region}/advance:
@@ -117,11 +117,10 @@ for region in ctx.meta["regions"]:
     #> Global Controls
 
     append function ~/pause:
-        scoreboard players set f"{region}_playing" nbs 0
+        scoreboard players set f"{region}.playing" nbs 0
 
     append function ~/play:
-        scoreboard players set f"{region}_playing" nbs 1
-
+        scoreboard players set f"{region}.playing" nbs 1
     append function ~/tick:
         function ~/{region}/tick
 

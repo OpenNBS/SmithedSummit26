@@ -31,7 +31,7 @@ for song in song_manifest:
 ctx.meta["regions"] = regions
 
 append function ~/../playback/load:
-    data modify storage nbs:main songs set value []
+    data modify storage nbs:playback songs set value []
 
 for song_stuff in enumerate(song_manifest):
     song_index = song_stuff[0]
@@ -69,18 +69,18 @@ for song_stuff in enumerate(song_manifest):
     for chord in get_notes(song):
         tick = chord[0]
         notes = chord[1]
-            #data modify storage nbs:main playing set from storage nbs:main songs[0]
+            #data modify storage nbs:playback playing set from storage nbs:playback songs[0]
         function f"nbs:song/{song_id}/{tick}/root":
             # iterate through speaker UUIDs
             data modify storage nbs:temp input set value {}
             data modify storage nbs:temp input.song set value (song_id)
             data modify storage nbs:temp input.tick set value (tick)
             for entity in ["speaker", "loudspeaker"]:
-                store result score #len nbs if data storage nbs:main f"locations.{entity}[]"
+                store result score #len nbs if data storage nbs:playback f"locations.{entity}[]"
                 store result storage nbs:temp input.i int 1 scoreboard players set #iter nbs 0
                 data modify storage nbs:temp input.speaker_type set value (entity)
 
-                function nbs:global/speaker_iter with storage nbs:temp input
+                function nbs:playback/speaker_iter with storage nbs:temp input
 
             scoreboard players add notes_played nbs_stats f"{len(notes)}"
             scoreboard players add ticks_played nbs_stats 1
