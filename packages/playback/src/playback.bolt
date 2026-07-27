@@ -70,12 +70,14 @@ for region in ctx.meta["regions"]:
     #> Spawn Speakers
 
     function ~/{region}/place_speaker:
-        function animated_java:music_speaker/summon/default
+        # function animated_java:music_speaker/summon/default
+        execute positioned as @s rotated as @s run summon minecraft:item_display ~ ~ ~ {item:{count:1b,id:"minecraft:note_block"},Tags:["nbs.speaker_new"]}
         tag @n[type=item_display,distance=..1,tag=nbs_speaker_new] add nbs.speaker
         tag @n[type=item_display,distance=..1,tag=nbs_speaker_new] remove nbs.speaker_new
 
     function ~/{region}/place_loudspeaker:
-        function animated_java:music_speaker/summon/default
+        # function animated_java:music_speaker/summon/default
+        execute positioned as @s rotated as @s run summon minecraft:item_display ~ ~ ~ {item:{count:1b,id:"minecraft:note_block"},Tags:["nbs.speaker_new"]}
         tag @n[type=item_display,distance=..1,tag=nbs_speaker_new] add nbs.loudspeaker
         tag @n[type=item_display,distance=..1,tag=nbs_speaker_new] remove nbs.speaker_new
 
