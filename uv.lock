@@ -161,7 +161,6 @@ source = { virtual = "." }
 dependencies = [
     { name = "beet" },
     { name = "bolt" },
-    { name = "bolt-selectors" },
     { name = "nbs-summit26-booth" },
     { name = "nbs-summit26-playback" },
     { name = "nbs-summit26-shared" },
@@ -176,7 +175,6 @@ dev = [
 requires-dist = [
     { name = "beet", specifier = ">=0.115.0,<0.116" },
     { name = "bolt", specifier = ">=0.50.1,<0.51" },
-    { name = "bolt-selectors", specifier = ">=0.4.0" },
     { name = "nbs-summit26-booth", virtual = "packages/booth" },
     { name = "nbs-summit26-playback", virtual = "packages/playback" },
     { name = "nbs-summit26-shared", editable = "packages/shared" },
