@@ -58,9 +58,12 @@ EDIBLE_IDS = [
     "pumpkin_latte"
 ]
 
-def give_edible(
-    namespace: str, path: str, edible_type: EdibleType, translation_component={}
-) -> None:
+def create_edible_item(
+    namespace: str,
+    path: str,
+    edible_type: EdibleType,
+    translation_component: Components = {}
+) -> Resource:
     item_model_component = f"{namespace}:{path}"
     edible_component = EDIBLE_COMPONENTS[edible_type]
     lore_component = [PROJECT_TOOLTIP_COMPONENTS[Project[namespace.upper()]]]

@@ -8,16 +8,17 @@ Components = dict[str, Any]
 
 
 class Description(TypedDict):
-    lore: Any
-    tagline: Any
-    tooltip: Any
+    lore: Components
+    tagline: Components
+    tooltip: Components
+
 
 class Extra(TypedDict, total=False):
     description: NotRequired[Description]
 
 
 OPENNBS_TOOLTIP = {
-    "translate": f"nbs.tooltip",
+    "translate": "nbs.tooltip",
     "font": "nbs:tooltip",
     "color": "#ec8c0c",
     "italic": False,
