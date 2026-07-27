@@ -16,6 +16,7 @@ resource_pack:
 
 require:
   - bolt
+  - bolt_selectors
 
 pipeline:
   - mecha
