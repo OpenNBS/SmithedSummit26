@@ -92,7 +92,7 @@ for song_stuff in enumerate(song_manifest):
 
                     for entity, dist in [("speaker", 12), ("loudspeaker", 48)]:
                         append function ~/../{entity}:
-                            store result score #random nbs random value 1..4
+                            store result score #random nbs random value 1..6
                             for i in range(4):
                                 execute
                                     if score #random nbs matches (i+1)
