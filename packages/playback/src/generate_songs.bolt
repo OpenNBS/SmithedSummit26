@@ -97,7 +97,7 @@ for song_stuff in enumerate(song_manifest):
                                 execute
                                     if score #random nbs matches (i+1)
                                     if entity @a[distance=(0, dist)]
-                                    function f"animated_java:music_speaker/animations/animation_speaker_beat_{(i+1)}/play"
+                                    function f"animated_java:speaker_{region}/animations/beat_{(i+1)}/play"
 
                     continue
 
