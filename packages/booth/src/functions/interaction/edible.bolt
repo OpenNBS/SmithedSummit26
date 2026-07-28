@@ -18,9 +18,8 @@ class EdibleComponents(TypedDict):
 
 
 class Project(Enum):
-    NBS = 1
-    CNK = 2
-    FOODSTUFFS = 3
+    CNK = "cnk"
+    FOODSTUFFS = "booth.apd"
 
 
 SHARED_FOOD_COMPONENT = {"nutrition": 0, "saturation": 0, "can_always_eat": True}
@@ -59,17 +58,17 @@ EDIBLE_IDS = [
 ]
 
 def create_edible_item(
-    namespace: str,
+    project: Project,
     path: str,
     edible_type: EdibleType,
     translation_component: Components = {}
 ) -> Resource:
-    item_model_component = f"{namespace}:{path}"
+    item_model_component = f"{project.value}:{path}"
     edible_component = EDIBLE_COMPONENTS[edible_type]
-    lore_component = [PROJECT_TOOLTIP_COMPONENTS[Project[namespace.upper()]]]
+    lore_component = [PROJECT_TOOLTIP_COMPONENTS[project]]
 
     translation_component = {
-        "translate": f"item.{namespace}.{path}",
+        "translate": f"item.{project.value}.{path}",
         **translation_component,
     }
 
@@ -118,28 +117,28 @@ function ~/refresh_sticker_progress:
 function ~/pink_donut:
     path = "pink_donut"
 
-    loot_resource = create_edible_item("cnk", path, EdibleType.FOOD)
+    loot_resource = create_edible_item(Project.CNK, path, EdibleType.FOOD)
 
     give_edible_item(path, loot_resource, 5)
 
 function ~/cinnamon_roll:
     path = "cinnamon_roll"
 
-    loot_resource = create_edible_item("cnk", path, EdibleType.FOOD)
+    loot_resource = create_edible_item(Project.CNK, path, EdibleType.FOOD)
 
     give_edible_item(path, loot_resource, 5)
 
 function ~/pizza:
     path = "pizza"
 
-    loot_resource = create_edible_item("cnk", path, EdibleType.FOOD)
+    loot_resource = create_edible_item(Project.CNK, path, EdibleType.FOOD)
 
     give_edible_item(path, loot_resource, 5)
 
 function ~/cake_slice:
     path = "cake_slice"
 
-    loot_resource = create_edible_item("foodstuffs", path, EdibleType.FOOD, translation_component={
+    loot_resource = create_edible_item(Project.FOODSTUFFS, path, EdibleType.FOOD, translation_component={
         "fallback": "Cake Slice"
     })
 
@@ -148,6 +147,6 @@ function ~/cake_slice:
 function ~/pumpkin_latte:
     path = "pumpkin_latte"
 
-    loot_resource = create_edible_item("cnk", path, EdibleType.DRINK)
+    loot_resource = create_edible_item(Project.CNK, path, EdibleType.DRINK)
 
     give_edible_item(path, loot_resource, 5)
