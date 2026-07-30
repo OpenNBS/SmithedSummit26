@@ -1,7 +1,6 @@
+import src.utilities.resource as resource
 from beet import Context, Dialog
 from beet.core.utils import JsonDict
-
-import src.utilities.resource as resource
 from src.utilities.resource import Resource, TranslationType
 from src.utilities.translation import create_translation
 
@@ -43,15 +42,20 @@ class DialogHelper:
         title_translation_resource = self.__translation_resource__.append("title")
         body_translation_resource = self.__translation_resource__.append("body")
 
-        create_translation(self.__ctx__, title_translation_resource, title)
-        create_translation(self.__ctx__, body_translation_resource, body)
+        title_translation_string = create_translation(
+            self.__ctx__, title_translation_resource, title
+        )
+
+        body_translation_string = create_translation(
+            self.__ctx__, body_translation_resource, body
+        )
 
         self.__dialog__.data = {
             "type": "minecraft:notice",
-            "title": {"translate": title_translation_resource.value},
+            "title": {"translate": title_translation_string},
             "body": {
                 "type": "minecraft:plain_message",
-                "contents": {"translate": body_translation_resource.value},
+                "contents": {"translate": body_translation_string},
             },
             **extra,
         }
@@ -74,9 +78,11 @@ class DialogHelper:
             "action", action_asset_id
         )
 
-        create_translation(self.__ctx__, translation_resource, label)
+        translation_string = create_translation(
+            self.__ctx__, translation_resource, label
+        )
 
-        label_component = {"translate": translation_resource.value}
+        label_component = {"translate": translation_string}
 
         if icon is not None:
             label_component["font"] = "minecraft:default"

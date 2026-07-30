@@ -57,8 +57,8 @@ def generate_paintings(ctx: Context) -> None:
 
         painting_variant_resource = resource.get_asset(painting_asset_id)
 
-        create_translation(ctx, author_translation_resource, author)
-        create_translation(ctx, title_translation_resource, title)
+        create_translation(ctx, author_translation_resource, author, True)
+        create_translation(ctx, title_translation_resource, title, True)
 
         painting_variant = get_painting_variant(ctx, painting_variant_resource)
 
