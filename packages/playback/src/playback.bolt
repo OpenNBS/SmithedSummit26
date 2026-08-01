@@ -130,4 +130,4 @@ for region in config.REGIONS:
 function ~/remove_speaker:
     for speaker in config.SPEAKER_RANGES:
         speaker_type = speaker["name"]
-        kill @n[tag=nbs_$(speaker_type),distance=..1]
+        kill @n[tag=f"nbs_{speaker_type}",distance=..1]
