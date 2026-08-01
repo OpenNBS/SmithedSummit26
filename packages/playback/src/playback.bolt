@@ -67,7 +67,7 @@ for region in config.REGIONS:
         for speaker in config.SPEAKER_RANGES:
             speaker_type = speaker["name"]
             speaker_range = speaker["range"]
-            $execute at @e[type=item_display,tag=f"nbs.speaker.{region}",tag=f"nbs.speaker.{speaker_type}"] run title @a[distance=..$(speaker_range)] actionbar {"text":"","extra":[{"text":"🎵 Now Playing: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}
+            raw f'$execute at @e[type=item_display,tag=nbs.speaker.{region},tag=nbs.speaker.{speaker_type}] run title @a[distance=..$(speaker_range)] actionbar {"text":"","extra":[{"text":"🎵 Now Playing: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}'
         $execute as @e[tag=aj.music_speaker.root] on passengers if entity @s[tag=aj.music_speaker.bone.text_display] run data modify entity @s text set value '{"text":"🎵 $(formatted_string)","color":"green"}'
         $execute as @e[type=item_display,tag=aj.music_speaker.root] on passengers if entity @s[tag=aj.music_speaker.bone.text_display] run data modify entity @s text set value {"text":"","extra":[{"text":"🎵 Now Playing: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}
 
