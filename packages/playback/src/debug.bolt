@@ -1,5 +1,7 @@
 from src.utilities.sphere import sphere
 import logging
+import ./config as config
+
 
 DELAY_TICKS = 10
 
@@ -24,7 +26,7 @@ append function ~/toggle:
     execute if score debug nbs matches 1 run function ~/tick
 
 
-for data in ctx.meta["speaker_ranges"]:
+for data in config.SPEAKER_RANGES:
     speaker_type = data["name"]
     radius = data["range"]
 

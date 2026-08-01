@@ -7,6 +7,7 @@ import logging
 
 from src.utilities.note_block import get_notes
 from src.songs import SONGS_PATH
+import ./config as config
 
 SOURCE = "record"
 
@@ -80,7 +81,7 @@ for song_stuff in enumerate(song_manifest):
             data modify storage nbs:temp input set value {}
             data modify storage nbs:temp input.song set value (song_id)
             data modify storage nbs:temp input.tick set value (tick)
-            for speaker in ctx.meta["speaker_ranges"]:
+            for speaker in config.SPEAKER_RANGES:
                 speaker_type = speaker["name"]
                 speaker_range = speaker["range"]
                 store result score #len nbs if data storage nbs:playback f"locations.{speaker_type}[]"
@@ -97,7 +98,7 @@ for song_stuff in enumerate(song_manifest):
                     append function ~/../headphones:
                         particle ("note") ~ ~2.25 ~ 0 0 0 1 1
 
-                    for speaker in ctx.meta["speaker_ranges"]:
+                    for speaker in config.SPEAKER_RANGES:
                         speaker_type = speaker["name"]
                         speaker_range = speaker["range"]
                         append function ~/../{speaker_type}:

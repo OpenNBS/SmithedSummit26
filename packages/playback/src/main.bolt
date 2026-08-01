@@ -1,4 +1,3 @@
-import ./config as config
 import ./generate_songs as generate_songs
 import ./playback as playback
 import ./debug as debug
