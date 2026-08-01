@@ -111,12 +111,12 @@ for region in config.REGIONS:
     function ~/{region}/shuffle:
         scoreboard players operation f"{region}.prevsong" nbs = songindex nbs
         execute store result score f"{region}.songindex" nbs run random value (0, song_count - 1)
-        execute if score f"{region}.songindex" nbs = f"{region}.prevsong" nbs run function ~/{region}/next
-        function ~/{region}/change_song
+        execute if score f"{region}.songindex" nbs = f"{region}.prevsong" nbs run function ~/../next
+        function ~/../change_song
 
     function ~/{region}/advance:
-        execute if score shuffle nbs matches 0 run function ~/{region}/next
-        execute if score shuffle nbs matches 1 run function ~/{region}/shuffle
+        execute if score shuffle nbs matches 0 run function ~/../next
+        execute if score shuffle nbs matches 1 run function ~/../shuffle
 
 
     #> Global Controls
