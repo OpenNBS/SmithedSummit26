@@ -28,6 +28,10 @@ NBS_DEFAULT_INSTRUMENTS = [
     "block.note_block.bit",
     "block.note_block.banjo",
     "block.note_block.pling",
+    "block.note_block.trumpet",
+    "block.note_block.trumpet_exposed",
+    "block.note_block.trumpet_weathered",
+    "block.note_block.trumpet_oxidized",
 ]
 
 octaves = {
@@ -47,6 +51,10 @@ octaves = {
     "bit": 0,
     "banjo": 0,
     "pling": 0,
+    "trumpet": 0,
+    "trumpet_exposed": 0,
+    "trumpet_weathered": -1,
+    "trumpet_oxidized": -1,
 }
 
 
@@ -60,7 +68,7 @@ class Note:
     pitch: float = 1
     panning: float = 0
 
-    def play_speakers(self, stereo_separation: float = 4) -> str:
+    def play_short_range(self, stereo_separation: float = 4) -> str:
         """
         Play a sound that can be heard in a small radius by all players in range.
         """
@@ -102,7 +110,7 @@ class Note:
 
         return self.play(radius=radius, position=position, volume=self.volume)
 
-    def play_loudspeakers(self, stereo_separation: float = 8) -> str:
+    def play_long_range(self, stereo_separation: float = 8) -> str:
         """
         Play a sound that can be heard in a large radius by all players in range.
         """
@@ -134,25 +142,6 @@ class Note:
             radius=radius,
             volume=volume,
             position=position,
-        )
-
-    def play_headphones(self):
-        """
-        Play a sound that can be globally heard by players with headphones.
-        """
-
-        # This is achieved by setting the `volume` to 0 (actual value is irrelevant) and,
-        # instead, using `min_volume` as the desired volume. This way it doesn't matter if
-        # the player is within the `volume`'s range - they will always hear it at `min_volume`.
-        # No custom rolloff is present here.
-
-        volume = self.volume
-        position = f"^{-self.panning} ^ ^"
-
-        return self.play(
-            volume=volume,
-            position=position,
-            selector="@s",
         )
 
     def play(
@@ -256,7 +245,7 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["Note"]]]:
 
         layer = song.layers[note.layer]
 
-        sound = sounds[note.instrument] if note.instrument >= 0 else "BEAT"
+        sound = sounds[note.instrument % 15] if note.instrument >= 0 else "BEAT"
         pitch = note.key + (note.pitch / 100)
         octave_suffix = "_-1" if pitch < 33 else "_1" if pitch > 57 else ""
         source = f"{sound}{octave_suffix}"

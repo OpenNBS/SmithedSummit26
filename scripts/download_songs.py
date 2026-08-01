@@ -38,9 +38,9 @@ SONGS_DIR = GENERATED_DIRECTORY / "songs" / "files"
 OVERWRITE_METADATA = False
 
 REGIONS = {
-    "Patched Plateau": "patched_plateaus",
-    "Textured Tropic": "textured_tropics",
-    "Welded Woodland": "welded_woodlands",
+    "Patched Plateau": "plateaus",
+    "Textured Tropic": "tropics",
+    "Welded Woodland": "woodlands",
 }
 
 INVALID_FILENAME_CHARS = re.compile(r'[<>:"/\\|?*]')

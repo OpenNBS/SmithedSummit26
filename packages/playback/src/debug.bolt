@@ -1,0 +1,43 @@
+from src.utilities.sphere import sphere
+import logging
+import src.config as config
+
+
+DELAY_TICKS = 80
+
+logging.info("Generating debug functions")
+
+#> setup
+
+append function ~/tick:
+    function ~/../show_debug_particles
+    execute if score debug nbs matches 1 run schedule function (~/) f'{DELAY_TICKS}t' replace
+
+append function ~/toggle:
+    scoreboard players add debug nbs 1
+    execute if score debug nbs matches 2.. run scoreboard players set debug nbs 0
+
+    execute if score debug nbs matches 1 run function ~/../tick
+
+#> display
+
+for data in config.SPEAKER_RANGES:
+    speaker_type = data["name"]
+    radius = data["range"]
+
+    append function ~/show_debug_particles:
+        execute as @e[type=item_display,tag=f"nbs.speaker.{speaker_type}"] at @s run function ~/../spawn_particles/{speaker_type}
+
+    function ~/spawn_particles/{speaker_type}:
+        for pos in range(-radius, radius + 1):
+            if pos % 2 == 0:
+                particle minecraft:block_marker{block_state:{Name:"minecraft:red_concrete"}} f"~{pos}" ~ ~ 0 0 0 0 1 force
+                particle minecraft:block_marker{block_state:{Name:"minecraft:green_concrete"}} ~ f"~{pos}" ~ 0 0 0 0 1 force
+                particle minecraft:block_marker{block_state:{Name:"minecraft:blue_concrete"}} ~ ~ f"~{pos}" 0 0 0 0 1 force
+
+        for point in sphere(radius=radius, density=0.02):
+            x = point[0]
+            y = point[1]
+            z = point[2]
+
+            particle minecraft:block_marker{block_state:{Name:"minecraft:purple_stained_glass"}} f"~{x}" f"~{y}" f"~{z}" 0 0 0 0 1 force
