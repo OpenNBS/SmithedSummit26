@@ -11,7 +11,9 @@ import src.config as config
 logging.info("Generating songs")
 
 append function ~/../playback/load:
-    data modify storage nbs:playback songs set value []
+    data modify storage nbs:playback songs set value {}
+    for region in config.REGIONS:
+        data modify storage nbs:playback f"songs.{region}" set value []
 
 for song_stuff in enumerate(config.SONG_MANIFEST):
     song_index = song_stuff[0]
@@ -38,8 +40,8 @@ for song_stuff in enumerate(config.SONG_MANIFEST):
     print("Processing:", song_id)
 
     append function ~/../playback/load:
-        data modify storage nbs:playback songs append value {
-            "name": title,
+        data modify storage nbs:playback f"songs.{region}" append value {
+            "name": song_id,
             "index": song_index,
             "formatted_string": formatted_string,
             "title": title,
@@ -49,20 +51,14 @@ for song_stuff in enumerate(config.SONG_MANIFEST):
     for chord in get_notes(song):
         tick = chord[0]
         notes = chord[1]
-            #data modify storage nbs:playback playing set from storage nbs:playback songs[0]
         function f"nbs:song/{song_id}/{tick}/root":
-            # iterate through speaker UUIDs
+            # iterate through this region's speakers; each entry carries its own speaker_type
             data modify storage nbs:temp input set value {}
             data modify storage nbs:temp input.song set value (song_id)
             data modify storage nbs:temp input.tick set value (tick)
-            for speaker in config.SPEAKER_RANGES:
-                speaker_type = speaker["name"]
-                speaker_range = speaker["range"]
-                store result score #len nbs if data storage nbs:playback f"locations.{speaker_type}[]"
-                store result storage nbs:temp input.i int 1 scoreboard players set #iter nbs 0
-                data modify storage nbs:temp input.speaker_type set value (speaker_type)
-
-                function nbs:playback/speaker_iter with storage nbs:temp input
+            store result score f"{region}.#len" nbs if data storage nbs:playback f"locations.{region}[]"
+            store result storage nbs:temp input.i int 1 scoreboard players set f"{region}.#iter" nbs 0
+            function f"nbs:playback/{region}/speaker_iter" with storage nbs:temp input
 
             scoreboard players add notes_played nbs_stats f"{len(notes)}"
             scoreboard players add ticks_played nbs_stats 1
@@ -82,6 +78,7 @@ for song_stuff in enumerate(config.SONG_MANIFEST):
                                         function f"animated_java:speaker_{region}/animations/beat_{(i+1)}/play"
                         continue
                 
+                    # TODO: dynamically inject the correct function name based on the speaker type
                     append function ~/../{speaker_type}:
                         playsound f"{note.play_short_range()}"
 

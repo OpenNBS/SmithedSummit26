@@ -21,31 +21,33 @@ append function ~/load:
     execute function ~/save_speaker_positions:
         data modify storage nbs:playback locations set value {}
         data modify storage nbs:temp input set value {}
-        for variant in config.SPEAKER_RANGES:
-            speaker_type = variant["name"]
-            data modify storage nbs:temp f"locations.{speaker_type}" set value []
-            as @e[type=item_display, tag=f"nbs.speaker.{speaker_type}"]:
-                data modify storage nbs:temp input.UUID set from entity @s UUID
-                function animated_java:global/internal/gu/convert_uuid_array_to_string with storage nbs:temp input
-                data modify storage nbs:playback f"locations.{speaker_type}" append from storage aj:uuid main.out
-
-# Helper function that iterates through all speakers in the world
-# Takes {speaker_type: "short|mid|long", i: 0, song: "song_id", tick: 0}
-function ~/speaker_iter:
-    $data modify storage nbs:temp input.uuid set from storage nbs:playback locations.$(speaker_type)[$(i)]
-    execute function ~/uuid with storage nbs:temp input:
-        $execute as $(uuid) at @s run function nbs:song/$(song)/$(tick)/$(speaker_type)
-    store result storage nbs:temp input.i int 1 scoreboard players add #iter nbs 1
-    if score #iter nbs < #len nbs function (~/) with storage nbs:temp input
+        for region in config.REGIONS:
+            data modify storage nbs:playback f"locations.{region}" set value []
+            for speaker in config.SPEAKER_RANGES:
+                speaker_type = speaker["name"]
+                as @e[type=item_display, tag=f"nbs.speaker.{region}", tag=f"nbs.speaker.{speaker_type}"]:
+                    data modify storage nbs:temp input.UUID set from entity @s UUID
+                    function animated_java:global/internal/gu/convert_uuid_array_to_string with storage nbs:temp input
+                    data modify storage nbs:playback f"locations.{region}" append value {speaker_type: "$(speaker_type)"}
+                    data modify storage nbs:playback f"locations.{region}[-1].uuid" set from storage aj:uuid main.out
 
 
 for region in config.REGIONS:
+    # Iterates all speakers for this region.
+    # Takes {i: 0, song: "song_id", tick: 0}. Reads speaker_type from each location entry.
+    function ~/{region}/speaker_iter:
+        $data modify storage nbs:temp input.uuid set from storage nbs:playback locations.{region}[$(i)].uuid
+        $data modify storage nbs:temp input.speaker_type set from storage nbs:playback locations.{region}[$(i)].speaker_type
+        execute function ~/run with storage nbs:temp input:
+            $execute as $(uuid) at @s run function nbs:song/$(song)/$(tick)/$(speaker_type)
+        store result storage nbs:temp input.i int 1 scoreboard players add f"{region}.#iter" nbs 1
+        if score f"{region}.#iter" nbs < f"{region}.#len" nbs function (~/) with storage nbs:temp input
 
     function ~/{region}/tick:
         schedule function (~/) 1t replace
-        execute if score f"{region}_playing" nbs matches 1 run scoreboard players add f"{region}_songtime" nbs 1
-        execute store result storage nbs:playback f"playing.{region}.tick" int 1 run scoreboard players get f"{region}_songtime" nbs
-        function nbs:playback with storage nbs:playback f"playing.{region}" # TODO: this command works in a command block, but not here :c
+        execute if score f"{region}.playing" nbs matches 1 run scoreboard players add f"{region}.songtime" nbs 1
+        execute store result storage nbs:playback f"playing.{region}.tick" int 1 run scoreboard players get f"{region}.songtime" nbs
+        function ~/../playback with storage nbs:playback f"playing.{region}"
 
     function ~/{region}/playback:
         $function nbs:song/$(name)/$(tick)/root
@@ -54,11 +56,11 @@ for region in config.REGIONS:
         scoreboard players add songs_played nbs_stats 1
         scoreboard players set f"{region}.songtime" nbs -1
         execute store result storage nbs:playback f"playing.{region}.index" int 1 run scoreboard players get f"{region}.songindex" nbs
-        function ~/{region}/zzz_change_song with storage nbs:playback f"playing.{region}"   
+        function ~/../zzz_change_song with storage nbs:playback f"playing.{region}"   
 
     function ~/{region}/zzz_change_song:
         $data modify storage nbs:playback f"playing.{region}" set from storage nbs:playback f"songs.{region}[$(index)]"
-        function ~/{region}/title with storage nbs:playback f"playing.{region}"
+        function ~/../title with storage nbs:playback f"playing.{region}"
 
 
     #> Effects
@@ -67,7 +69,7 @@ for region in config.REGIONS:
         for speaker in config.SPEAKER_RANGES:
             speaker_type = speaker["name"]
             speaker_range = speaker["range"]
-            $execute at @e[type=item_display,tag=f"nbs.speaker.{speaker_type}"] run title @a[distance=..$(speaker_range)] actionbar {"text":"","extra":[{"text":"🎵 Now Playing: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}
+            $execute at @e[type=item_display,tag=f"nbs.speaker.{region}",tag=f"nbs.speaker.{speaker_type}"] run title @a[distance=..$(speaker_range)] actionbar {"text":"","extra":[{"text":"🎵 Now Playing: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}
         $execute as @e[tag=aj.music_speaker.root] on passengers if entity @s[tag=aj.music_speaker.bone.text_display] run data modify entity @s text set value '{"text":"🎵 $(formatted_string)","color":"green"}'
         $execute as @e[type=item_display,tag=aj.music_speaker.root] on passengers if entity @s[tag=aj.music_speaker.bone.text_display] run data modify entity @s text set value {"text":"","extra":[{"text":"🎵 Now Playing: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}
 
@@ -81,6 +83,7 @@ for region in config.REGIONS:
         function ~/{region}/speaker/place/{variant}:
             function f"animated_java:speaker_{region}/summon/default"
             execute positioned as @s rotated as @s run summon minecraft:item_display ~ ~ ~ {item:{count:1b,id:"minecraft:note_block"},Tags:["nbs.speaker_new", "nbs.speaker"]}
+            tag @n[type=item_display,distance=..1,tag=nbs.speaker_new] add f"nbs.speaker.{region}"
             tag @n[type=item_display,distance=..1,tag=nbs.speaker_new] add f"nbs.speaker.{variant}"
             tag @n[type=item_display,distance=..1,tag=nbs.speaker_new] remove nbs.speaker_new
 
@@ -130,5 +133,4 @@ for region in config.REGIONS:
         function ~/{region}/tick
 
 function ~/remove_speaker:
-    speaker_type = speaker["name"]
-    kill @n[tag=f"nbs.speaker",distance=..1]
+    kill @n[tag=nbs.speaker,distance=..1]
