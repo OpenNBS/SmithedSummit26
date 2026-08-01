@@ -65,24 +65,22 @@ for region in config.REGIONS:
         for speaker in config.SPEAKER_RANGES:
             speaker_type = speaker["name"]
             speaker_range = speaker["range"]
-            $execute at @e[type=item_display,tag=nbs_$(speaker_type)] run title @a[distance=..$(speaker_range)] actionbar {"text":"","extra":[{"text":"🎵 Now Playing: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}
+            $execute at @e[type=item_display,tag=f"nbs.speaker.{speaker_type}"] run title @a[distance=..$(speaker_range)] actionbar {"text":"","extra":[{"text":"🎵 Now Playing: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}
         $execute as @e[tag=aj.music_speaker.root] on passengers if entity @s[tag=aj.music_speaker.bone.text_display] run data modify entity @s text set value '{"text":"🎵 $(formatted_string)","color":"green"}'
         $execute as @e[type=item_display,tag=aj.music_speaker.root] on passengers if entity @s[tag=aj.music_speaker.bone.text_display] run data modify entity @s text set value {"text":"","extra":[{"text":"🎵 Now Playing: ","color":"green"},{"text":"$(formatted_string)","color":"white"}]}
 
 
     #> Spawn Speakers
 
-    function ~/{region}/place_speaker:
-        # function animated_java:music_speaker/summon/default
-        execute positioned as @s rotated as @s run summon minecraft:item_display ~ ~ ~ {item:{count:1b,id:"minecraft:note_block"},Tags:["nbs.speaker_new"]}
-        tag @n[type=item_display,distance=..1,tag=nbs_speaker_new] add nbs.speaker
-        tag @n[type=item_display,distance=..1,tag=nbs_speaker_new] remove nbs.speaker_new
+    for speaker in config.SPEAKER_RANGES:
+        variant = speaker["name"]
+        range = speaker["range"]
 
-    function ~/{region}/place_loudspeaker:
-        # function animated_java:music_speaker/summon/default
-        execute positioned as @s rotated as @s run summon minecraft:item_display ~ ~ ~ {item:{count:1b,id:"minecraft:note_block"},Tags:["nbs.speaker_new"]}
-        tag @n[type=item_display,distance=..1,tag=nbs_speaker_new] add nbs.loudspeaker
-        tag @n[type=item_display,distance=..1,tag=nbs_speaker_new] remove nbs.speaker_new
+        function ~/{region}/speaker/place/{variant}:
+            function f"animated_java:speaker_{region}/summon/default"
+            execute positioned as @s rotated as @s run summon minecraft:item_display ~ ~ ~ {item:{count:1b,id:"minecraft:note_block"},Tags:["nbs.speaker_new", "nbs.speaker"]}
+            tag @n[type=item_display,distance=..1,tag=nbs.speaker_new] add f"nbs.speaker.{variant}"
+            tag @n[type=item_display,distance=..1,tag=nbs.speaker_new] remove nbs.speaker_new
 
     #> Song Controls
 
@@ -130,6 +128,5 @@ for region in config.REGIONS:
         function ~/{region}/tick
 
 function ~/remove_speaker:
-    for speaker in config.SPEAKER_RANGES:
-        speaker_type = speaker["name"]
-        kill @n[tag=f"nbs_{speaker_type}",distance=..1]
+    speaker_type = speaker["name"]
+    kill @n[tag=f"nbs.speaker",distance=..1]

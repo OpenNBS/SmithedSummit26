@@ -31,7 +31,7 @@ for data in config.SPEAKER_RANGES:
     radius = data["range"]
 
     append function ~/show_debug_particles:
-        execute as @e[type=item_display,tag=f"nbs_{speaker_type}"] run function ~/spawn_particles_{radius}
+        execute as @e[type=item_display,tag=f"nbs.speaker.{speaker_type}"] run function ~/spawn_particles_{radius}
 
     for point in sphere(radius=radius, density=0.25):
         x = point[0]
