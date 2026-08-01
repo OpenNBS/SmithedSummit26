@@ -68,27 +68,26 @@ for song_stuff in enumerate(config.SONG_MANIFEST):
             scoreboard players add ticks_played nbs_stats 1
 
             for note in notes:
-                if note.instrument == "BEAT":
-                    for speaker in config.SPEAKER_RANGES:
-                        speaker_type = speaker["name"]
-                        speaker_range = speaker["range"]
-                        append function ~/../{speaker_type}:
-                            store result score #random nbs random value 1..6
-                            for i in range(4):
-                                execute
-                                    if score #random nbs matches (i+1)
-                                    if entity @a[distance=(0, speaker_range)]
-                                    function f"animated_java:speaker_{region}/animations/beat_{(i+1)}/play"
+                for speaker in config.SPEAKER_RANGES:
+                    speaker_type = speaker["name"]
+                    speaker_range = speaker["range"]
 
-                    continue
+                    if note.instrument == "BEAT":
+                            append function ~/../{speaker_type}:
+                                store result score #random nbs random value 1..6
+                                for i in range(6):
+                                    execute
+                                        if score #random nbs matches (i+1)
+                                        if entity @a[distance=(0, speaker_range)]
+                                        function f"animated_java:speaker_{region}/animations/beat_{(i+1)}/play"
+                        continue
+                
+                    append function ~/../{speaker_type}:
+                        playsound f"{note.play_short_range()}"
 
                 config.INSTRUMENTS.add(note.instrument)
 
-                append function ~/../speaker:
-                    playsound f"{note.play_short_range()}"
 
-                append function ~/../loudspeaker:
-                    playsound f"{note.play_long_range()}"
 
     function f"nbs:song/{song_id}/{tick + 40}/root":
         function f"nbs:playback/{region}/advance"
