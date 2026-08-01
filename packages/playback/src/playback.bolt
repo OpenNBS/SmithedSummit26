@@ -28,7 +28,7 @@ append function ~/load:
                 as @e[type=item_display, tag=f"nbs.speaker.{region}", tag=f"nbs.speaker.{speaker_type}"]:
                     data modify storage nbs:temp input.UUID set from entity @s UUID
                     function animated_java:global/internal/gu/convert_uuid_array_to_string with storage nbs:temp input
-                    data modify storage nbs:playback f"locations.{region}" append value {speaker_type: "$(speaker_type)"}
+                    data modify storage nbs:playback f"locations.{region}" append value {speaker_type: f"{speaker_type}"}
                     data modify storage nbs:playback f"locations.{region}[-1].uuid" set from storage aj:uuid main.out
 
 
