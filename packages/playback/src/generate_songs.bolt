@@ -77,7 +77,7 @@ for song_stuff in enumerate(config.SONG_MANIFEST):
                             for i in range(4):
                                 execute
                                     if score #random nbs matches (i+1)
-                                    if entity @a[distance=(0, range)]
+                                    if entity @a[distance=(0, speaker_range)]
                                     function f"animated_java:speaker_{region}/animations/beat_{(i+1)}/play"
 
                     continue
