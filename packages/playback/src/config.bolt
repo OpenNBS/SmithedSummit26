@@ -1,3 +1,8 @@
+from pathlib import Path
+import json
+
+from src.songs import SONGS_PATH
+
 SPEAKER_RANGES = [
     {
         "name": "short",
@@ -12,3 +17,27 @@ SPEAKER_RANGES = [
         "range": 48,
     },
 ]
+
+# memo:
+ctx.meta["instruments"] = set()
+
+SOUNDS = Path("sounds")
+
+SONG_DATA = SONGS_PATH.parent / "manifest.json"
+
+# Load song manifest
+with open(SONG_DATA, "r", encoding="utf-8") as f:
+    SONG_MANIFEST = json.load(f)
+
+# Load regions
+regions = set()
+region_counts = {}
+for song_data in SONG_MANIFEST:
+    region = song_data["region"]
+    if region is None:
+        continue
+    regions.add(region)
+    region_counts[region] = region_counts.get(region, 0) + 1
+
+ctx.meta["regions"] = regions
+ctx.meta["region_counts"] = region_counts
