@@ -35,7 +35,7 @@ function ~/speaker_iter:
     if score #iter nbs < #len nbs function (~/) with storage nbs:temp input
 
 
-for region in ctx.meta["regions"]:
+for region in config.REGIONS:
 
     function ~/{region}/tick:
         schedule function (~/) 1t replace
@@ -83,7 +83,7 @@ for region in ctx.meta["regions"]:
 
     #> Song Controls
 
-    song_count = ctx.meta["region_counts"][region] + 1
+    song_count = config.REGION_COUNTS[region] + 1
 
     function ~/{region}/next:
         scoreboard players add f"{region}.songindex" nbs 1

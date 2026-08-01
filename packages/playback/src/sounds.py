@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import src.config as config
 from beet import Context, Sound, SoundConfig
 
 EXTRA_NOTES = {
@@ -41,7 +42,7 @@ EXTRA_NOTES = {
 def beet_default(ctx: Context):
     sound_config = {}
 
-    for instrument in ctx.meta["instruments"]:
+    for instrument in config.INSTRUMENTS:
         sound_path = EXTRA_NOTES.get(instrument)
         if sound_path is not None:
             instrument_path = instrument.replace(".", "/")

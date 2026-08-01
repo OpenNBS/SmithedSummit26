@@ -1,12 +1,12 @@
-from pathlib import Path
 import json
+from pathlib import Path
 
 from src.songs import SONGS_PATH
 
 SPEAKER_RANGES = [
     {
         "name": "short",
-        "range": 16
+        "range": 16,
     },
     {
         "name": "mid",
@@ -19,7 +19,7 @@ SPEAKER_RANGES = [
 ]
 
 # memo:
-ctx.meta["instruments"] = set()
+INSTRUMENTS = set()
 
 SOUNDS = Path("sounds")
 
@@ -30,8 +30,8 @@ with open(SONG_DATA, "r", encoding="utf-8") as f:
     SONG_MANIFEST = json.load(f)
 
 # Load regions
-regions = set()
-region_counts = {}
+regions: set[str] = set()
+region_counts: dict[str, int] = {}
 for song_data in SONG_MANIFEST:
     region = song_data["region"]
     if region is None:
@@ -39,5 +39,5 @@ for song_data in SONG_MANIFEST:
     regions.add(region)
     region_counts[region] = region_counts.get(region, 0) + 1
 
-ctx.meta["regions"] = regions
-ctx.meta["region_counts"] = region_counts
+REGIONS = regions
+REGION_COUNTS = region_counts

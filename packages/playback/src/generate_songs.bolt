@@ -6,7 +6,7 @@ import pynbs
 import logging
 
 from src.utilities.note_block import get_notes
-import ./config as config
+import src.config as config
 
 logging.info("Generating songs")
 
@@ -85,7 +85,7 @@ for song_stuff in enumerate(config.SONG_MANIFEST):
 
                     continue
 
-                ctx.meta["instruments"].add(note.instrument)
+                config.INSTRUMENTS.add(note.instrument)
 
                 append function ~/../speaker:
                     playsound f"{note.play_speakers()}"
