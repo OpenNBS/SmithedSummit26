@@ -57,7 +57,7 @@ for region in config.REGIONS:
         function ~/../zzz_change_song with storage nbs:playback f"playing.{region}"   
 
     function ~/{region}/zzz_change_song:
-        $data modify storage nbs:playback f"playing.{region}" set from storage nbs:playback f"songs.{region}[$(index)]"
+        raw f"$data modify storage nbs:playback playing.{region} set from storage nbs:playback songs.{region}[$(index)]"
         function ~/../title with storage nbs:playback f"playing.{region}"
 
 
