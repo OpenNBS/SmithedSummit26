@@ -29,9 +29,14 @@ for data in config.SPEAKER_RANGES:
         execute as @e[type=item_display,tag=f"nbs.speaker.{speaker_type}"] at @s run function ~/../spawn_particles/{speaker_type}
 
     function ~/spawn_particles/{speaker_type}:
-        for point in sphere(radius=radius, density=0.05):
+        for pos in range(-radius, radius + 1):
+            particle minecraft:block_marker{block_state:{Name:"minecraft:red_concrete"}} f"~{pos}" ~ ~ 0 0 0 0 1 force
+            particle minecraft:block_marker{block_state:{Name:"minecraft:green_concrete"}} ~ f"~{pos}" ~ 0 0 0 0 1 force
+            particle minecraft:block_marker{block_state:{Name:"minecraft:blue_concrete"}} ~ ~ f"~{pos}" 0 0 0 0 1 force
+
+        for point in sphere(radius=radius, density=0.03):
             x = point[0]
             y = point[1]
             z = point[2]
 
-            particle minecraft:block_marker{block_state:{Name:"minecraft:note_block"}} f"~{x}" f"~{y}" f"~{z}" 0 0 0 0 1 force
+            particle minecraft:block_marker{block_state:{Name:"minecraft:purple_stained_glass"}} f"~{x}" f"~{y}" f"~{z}" 0 0 0 0 1 force
