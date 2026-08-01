@@ -68,7 +68,7 @@ class Note:
     pitch: float = 1
     panning: float = 0
 
-    def play_speakers(self, stereo_separation: float = 4) -> str:
+    def play_short_range(self, stereo_separation: float = 4) -> str:
         """
         Play a sound that can be heard in a small radius by all players in range.
         """
@@ -110,7 +110,7 @@ class Note:
 
         return self.play(radius=radius, position=position, volume=self.volume)
 
-    def play_loudspeakers(self, stereo_separation: float = 8) -> str:
+    def play_long_range(self, stereo_separation: float = 8) -> str:
         """
         Play a sound that can be heard in a large radius by all players in range.
         """

@@ -85,10 +85,10 @@ for song_stuff in enumerate(config.SONG_MANIFEST):
                 config.INSTRUMENTS.add(note.instrument)
 
                 append function ~/../speaker:
-                    playsound f"{note.play_speakers()}"
+                    playsound f"{note.play_short_range()}"
 
                 append function ~/../loudspeaker:
-                    playsound f"{note.play_loudspeakers()}"
+                    playsound f"{note.play_long_range()}"
 
     function f"nbs:song/{song_id}/{tick + 40}/root":
         function f"nbs:playback/{region}/advance"
