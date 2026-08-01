@@ -20,16 +20,14 @@ append function ~/load:
     
     execute function ~/save_speaker_positions:
         data modify storage nbs:playback locations set value {}
-        data modify storage nbs:temp input set value {}
         for region in config.REGIONS:
             data modify storage nbs:playback f"locations.{region}" set value []
             for speaker in config.SPEAKER_RANGES:
                 speaker_type = speaker["name"]
                 as @e[type=item_display, tag=f"nbs.speaker.{region}", tag=f"nbs.speaker.{speaker_type}"]:
-                    data modify storage nbs:temp input.UUID set from entity @s UUID
-                    function animated_java:global/internal/gu/convert_uuid_array_to_string with storage nbs:temp input
+                    function animated_java:global/gu/get_entity_uuid_string
                     data modify storage nbs:playback f"locations.{region}" append value {speaker_type: f"{speaker_type}"}
-                    data modify storage nbs:playback f"locations.{region}[-1].uuid" set from storage aj:uuid main.out
+                    data modify storage nbs:playback f"locations.{region}[-1].uuid" set from storage animated_java:gu out
 
 
 for region in config.REGIONS:
