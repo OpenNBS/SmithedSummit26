@@ -18,6 +18,9 @@ SPEAKER_RANGES = [
     },
 ]
 
+# Number of 'play' animation variants in the AJ speaker model
+ANIM_COUNT = 6
+
 # memo:
 INSTRUMENTS = set()
 

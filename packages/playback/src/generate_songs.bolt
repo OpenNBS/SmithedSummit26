@@ -74,8 +74,8 @@ for song_stuff in enumerate(config.SONG_MANIFEST):
 
                     if note.instrument == "BEAT":
                             append function ~/../{speaker_type}:
-                                store result score #random nbs random value 1..6
-                                for i in range(6):
+                                store result score #random nbs random value (1, config.ANIM_COUNT)
+                                for i in range(config.ANIM_COUNT):
                                     execute
                                         if score #random nbs matches (i+1)
                                         if entity @a[distance=(0, speaker_range)]
