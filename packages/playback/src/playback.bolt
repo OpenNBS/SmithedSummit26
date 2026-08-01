@@ -86,7 +86,7 @@ for region in config.REGIONS:
 
     #> Song Controls
 
-    song_count = config.REGION_COUNTS[region] + 1
+    song_count = config.REGION_COUNTS[region]
 
     function ~/{region}/next:
         scoreboard players add f"{region}.songindex" nbs 1
