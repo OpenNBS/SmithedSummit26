@@ -125,12 +125,16 @@ for region in config.REGIONS:
     #> Global Controls
 
     append function ~/pause:
-        scoreboard players set f"{region}.playing" nbs 0
+        function ~/../{region}/pause
 
     append function ~/play:
-        scoreboard players set f"{region}.playing" nbs 1
+        function ~/../{region}/play
+
+    append function ~/stop:
+        function ~/../{region}/stop
+
     append function ~/tick:
-        function ~/{region}/tick
+        function ~/../{region}/tick
 
 function ~/remove_speaker:
     kill @n[tag=nbs.speaker,distance=..1]
