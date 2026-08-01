@@ -34,8 +34,8 @@ for region in config.REGIONS:
     # Iterates all speakers for this region.
     # Takes {i: 0, song: "song_id", tick: 0}. Reads speaker_type from each location entry.
     function ~/{region}/speaker_iter:
-        $data modify storage nbs:temp input.uuid set from storage nbs:playback locations.{region}[$(i)].uuid
-        $data modify storage nbs:temp input.speaker_type set from storage nbs:playback locations.{region}[$(i)].speaker_type
+        raw f"$data modify storage nbs:temp input.uuid set from storage nbs:playback locations.{region}[$(i)].uuid"
+        raw f"$data modify storage nbs:temp input.speaker_type set from storage nbs:playback locations.{region}[$(i)].speaker_type"
         execute function ~/run with storage nbs:temp input:
             $execute as $(uuid) at @s run function nbs:song/$(song)/$(tick)/$(speaker_type)
         store result storage nbs:temp input.i int 1 scoreboard players add f"{region}.#iter" nbs 1
