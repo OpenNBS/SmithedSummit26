@@ -96,14 +96,14 @@ for region in ctx.meta["regions"]:
         function ~/../change_song
 
     function ~/{region}/pause:
-        scoreboard players set f"{region}_playing" nbs 0
+        scoreboard players set f"{region}.playing" nbs 0
 
     function ~/{region}/play:
-        scoreboard players set f"{region}_playing" nbs 1
+        scoreboard players set f"{region}.playing" nbs 1
 
     function ~/{region}/stop:
-        scoreboard players set f"{region}_playing" nbs 0
-        scoreboard players set f"{region}_songtime" nbs -1
+        scoreboard players set f"{region}.playing" nbs 0
+        scoreboard players set f"{region}.songtime" nbs -1
 
     function ~/{region}/shuffle:
         scoreboard players operation f"{region}.prevsong" nbs = songindex nbs
