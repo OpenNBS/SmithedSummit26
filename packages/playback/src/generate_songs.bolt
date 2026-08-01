@@ -69,9 +69,6 @@ for song_stuff in enumerate(config.SONG_MANIFEST):
 
             for note in notes:
                 if note.instrument == "BEAT":
-                    append function ~/../headphones:
-                        particle ("note") ~ ~2.25 ~ 0 0 0 1 1
-
                     for speaker in config.SPEAKER_RANGES:
                         speaker_type = speaker["name"]
                         speaker_range = speaker["range"]

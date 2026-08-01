@@ -144,25 +144,6 @@ class Note:
             position=position,
         )
 
-    def play_headphones(self):
-        """
-        Play a sound that can be globally heard by players with headphones.
-        """
-
-        # This is achieved by setting the `volume` to 0 (actual value is irrelevant) and,
-        # instead, using `min_volume` as the desired volume. This way it doesn't matter if
-        # the player is within the `volume`'s range - they will always hear it at `min_volume`.
-        # No custom rolloff is present here.
-
-        volume = self.volume
-        position = f"^{-self.panning} ^ ^"
-
-        return self.play(
-            volume=volume,
-            position=position,
-            selector="@s",
-        )
-
     def play(
         self,
         radius: float | None = None,
