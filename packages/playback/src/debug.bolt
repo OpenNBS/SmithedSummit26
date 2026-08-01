@@ -30,11 +30,12 @@ for data in config.SPEAKER_RANGES:
 
     function ~/spawn_particles/{speaker_type}:
         for pos in range(-radius, radius + 1):
-            particle minecraft:block_marker{block_state:{Name:"minecraft:red_concrete"}} f"~{pos}" ~ ~ 0 0 0 0 1 force
-            particle minecraft:block_marker{block_state:{Name:"minecraft:green_concrete"}} ~ f"~{pos}" ~ 0 0 0 0 1 force
-            particle minecraft:block_marker{block_state:{Name:"minecraft:blue_concrete"}} ~ ~ f"~{pos}" 0 0 0 0 1 force
+            if pos % 2 == 0:
+                particle minecraft:block_marker{block_state:{Name:"minecraft:red_concrete"}} f"~{pos}" ~ ~ 0 0 0 0 1 force
+                particle minecraft:block_marker{block_state:{Name:"minecraft:green_concrete"}} ~ f"~{pos}" ~ 0 0 0 0 1 force
+                particle minecraft:block_marker{block_state:{Name:"minecraft:blue_concrete"}} ~ ~ f"~{pos}" 0 0 0 0 1 force
 
-        for point in sphere(radius=radius, density=0.03):
+        for point in sphere(radius=radius, density=0.02):
             x = point[0]
             y = point[1]
             z = point[2]
