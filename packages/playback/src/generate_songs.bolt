@@ -80,10 +80,12 @@ for song_stuff in enumerate(song_manifest):
             data modify storage nbs:temp input set value {}
             data modify storage nbs:temp input.song set value (song_id)
             data modify storage nbs:temp input.tick set value (tick)
-            for entity in ["speaker", "loudspeaker"]:
-                store result score #len nbs if data storage nbs:playback f"locations.{entity}[]"
+            for speaker in ctx.meta["speaker_ranges"]:
+                speaker_type = speaker["name"]
+                speaker_range = speaker["range"]
+                store result score #len nbs if data storage nbs:playback f"locations.{speaker_type}[]"
                 store result storage nbs:temp input.i int 1 scoreboard players set #iter nbs 0
-                data modify storage nbs:temp input.speaker_type set value (entity)
+                data modify storage nbs:temp input.speaker_type set value (speaker_type)
 
                 function nbs:playback/speaker_iter with storage nbs:temp input
 
@@ -95,13 +97,15 @@ for song_stuff in enumerate(song_manifest):
                     append function ~/../headphones:
                         particle ("note") ~ ~2.25 ~ 0 0 0 1 1
 
-                    for entity, dist in [("speaker", 12), ("loudspeaker", 48)]:
-                        append function ~/../{entity}:
+                    for speaker in ctx.meta["speaker_ranges"]:
+                        speaker_type = speaker["name"]
+                        speaker_range = speaker["range"]
+                        append function ~/../{speaker_type}:
                             store result score #random nbs random value 1..6
                             for i in range(4):
                                 execute
                                     if score #random nbs matches (i+1)
-                                    if entity @a[distance=(0, dist)]
+                                    if entity @a[distance=(0, range)]
                                     function f"animated_java:speaker_{region}/animations/beat_{(i+1)}/play"
 
                     continue
@@ -117,6 +121,7 @@ for song_stuff in enumerate(song_manifest):
     function f"nbs:song/{song_id}/{tick + 40}/root":
         function f"nbs:playback/{region}/advance"
 
+    break
 
 
 print("🎉 LGTM")

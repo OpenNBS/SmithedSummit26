@@ -1,0 +1,14 @@
+ctx.meta["speaker_ranges"] = [
+    {
+        "name": "short",
+        "range": 16
+    },
+    {
+        "name": "mid",
+        "range": 32,
+    },
+    {
+        "name": "long",
+        "range": 48,
+    },
+]
