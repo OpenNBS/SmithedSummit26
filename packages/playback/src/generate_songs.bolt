@@ -24,11 +24,16 @@ with open(SONG_DATA, "r", encoding="utf-8") as f:
 
 # Load regions
 regions = set()
-for song in song_manifest:
-    region = song["region"]
-    if region is not None:
-        regions.add(region)
+region_counts = {}
+for song_data in song_manifest:
+    region = song_data["region"]
+    if region is None:
+        continue
+    regions.add(region)
+    region_counts[region] = region_counts.get(region, 0) + 1
+
 ctx.meta["regions"] = regions
+ctx.meta["region_counts"] = region_counts
 
 append function ~/../playback/load:
     data modify storage nbs:playback songs set value []

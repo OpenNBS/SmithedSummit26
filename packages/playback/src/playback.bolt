@@ -83,7 +83,7 @@ for region in ctx.meta["regions"]:
 
     #> Song Controls
 
-    song_count = len(glob.glob(f"songs/{region}/*.nbs")) + 1 #> TODO: REMOVE
+    song_count = ctx.meta["region_counts"][region] + 1
 
     function ~/{region}/next:
         scoreboard players add f"{region}.songindex" nbs 1
