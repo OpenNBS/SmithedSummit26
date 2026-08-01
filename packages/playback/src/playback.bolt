@@ -19,16 +19,18 @@ append function ~/load:
     schedule function ~/../tick 1t replace
     
     execute function ~/save_speaker_positions:
-        data modify storage nbs:playback locations set value {speaker: [], loudspeaker: []}
+        data modify storage nbs:playback locations set value {}
         data modify storage nbs:temp input set value {}
-        for entity in ["speaker", "loudspeaker"]:
-            as @e[type=item_display, tag=f"nbs_{entity}"]:
+        for variant in config.SPEAKER_RANGES:
+            speaker_type = variant["name"]
+            data modify storage nbs:temp f"locations.{speaker_type}" set value []
+            as @e[type=item_display, tag=f"nbs.speaker.{speaker_type}"]:
                 data modify storage nbs:temp input.UUID set from entity @s UUID
                 function animated_java:global/internal/gu/convert_uuid_array_to_string with storage nbs:temp input
-                data modify storage nbs:playback f"locations.{entity}" append from storage aj:uuid main.out
+                data modify storage nbs:playback f"locations.{speaker_type}" append from storage aj:uuid main.out
 
-# Helper function that iterates through all speaker and loudspeaker in the world
-# Takes {speaker_type: "speaker", i: 0, song: "song", tick: 0}
+# Helper function that iterates through all speakers in the world
+# Takes {speaker_type: "short|mid|long", i: 0, song: "song_id", tick: 0}
 function ~/speaker_iter:
     $data modify storage nbs:temp input.uuid set from storage nbs:playback locations.$(speaker_type)[$(i)]
     execute function ~/uuid with storage nbs:temp input:
