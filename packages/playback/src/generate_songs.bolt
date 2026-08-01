@@ -15,14 +15,17 @@ append function ~/../playback/load:
     for region in config.REGIONS:
         data modify storage nbs:playback f"songs.{region}" set value []
 
-for song_stuff in enumerate(config.SONG_MANIFEST):
-    song_index = song_stuff[0]
-    song_data = song_stuff[1]
+current_index_per_region = {}
+for region in config.REGIONS:
+    current_index_per_region[region] = 0
 
+for song_data in config.SONG_MANIFEST:
     song_id = song_data["id"]
     title = song_data["title"]
     author = song_data["author"]
     region = song_data["region"]
+    song_index = current_index_per_region[region]
+    current_index_per_region[region] += 1
 
     if region is None:
         continue
