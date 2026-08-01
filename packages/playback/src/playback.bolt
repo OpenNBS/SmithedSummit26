@@ -80,12 +80,11 @@ for region in config.REGIONS:
         variant = speaker["name"]
         range = speaker["range"]
 
-        function ~/{region}/speaker/place/{variant}:
-            function f"animated_java:speaker_{region}/summon/default"
-            execute positioned as @s rotated as @s run summon minecraft:item_display ~ ~ ~ {item:{count:1b,id:"minecraft:note_block"},Tags:["nbs.speaker_new", "nbs.speaker"]}
-            tag @n[type=item_display,distance=..1,tag=nbs.speaker_new] add f"nbs.speaker.{region}"
-            tag @n[type=item_display,distance=..1,tag=nbs.speaker_new] add f"nbs.speaker.{variant}"
-            tag @n[type=item_display,distance=..1,tag=nbs.speaker_new] remove nbs.speaker_new
+        function ~/speaker/place/{region}/{variant}:
+            execute positioned ~ ~ ~ rotated ~ 0 run function f"summit_ambiance:speaker_{region}/summon" {args: {}}
+            tag @n[type=item_display,distance=..1,tag=f"summit_ambiance.speaker_{region}.root"] add f"nbs.speaker"
+            tag @n[type=item_display,distance=..1,tag=f"summit_ambiance.speaker_{region}.root"] add f"nbs.speaker.{region}"
+            tag @n[type=item_display,distance=..1,tag=f"summit_ambiance.speaker_{region}.root"] add f"nbs.speaker.{variant}"
 
     #> Song Controls
 
@@ -136,5 +135,6 @@ for region in config.REGIONS:
     append function ~/tick:
         function ~/../{region}/tick
 
-function ~/remove_speaker:
-    kill @n[tag=nbs.speaker,distance=..1]
+function ~/speaker/remove/nearest:
+    for region in config.REGIONS:
+        execute as @n[distance=..1,type=minecraft:item_display,tag=f"summit_ambiance.speaker_{region}.root"] run function f"summit_ambiance:speaker_{region}/remove/this"
