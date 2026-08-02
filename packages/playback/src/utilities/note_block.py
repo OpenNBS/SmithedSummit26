@@ -57,6 +57,12 @@ octaves = {
     "trumpet_oxidized": -1,
 }
 
+# NBS key ranges (inclusive)
+TWO_OCTAVE_MIN, TWO_OCTAVE_MAX = 33, 57
+SIX_OCTAVE_MIN, SIX_OCTAVE_MAX = 9, 81
+SIX_OCTAVE_CENTER = (SIX_OCTAVE_MIN + SIX_OCTAVE_MAX) / 2  # 45
+SIX_OCTAVE_HALF_SPAN = SIX_OCTAVE_CENTER - SIX_OCTAVE_MIN  # 36
+
 
 @dataclass
 class Note:
@@ -209,8 +215,8 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["Note"]]]:
         note.tick = new_tick
         note_pitch = note.key + note.pitch / 100
         is_custom_instrument = note.instrument >= song.header.default_instruments
-        is_2_octave = 33 <= note_pitch <= 57
-        is_6_octave = 9 <= note_pitch <= 81
+        is_2_octave = TWO_OCTAVE_MIN <= note_pitch <= TWO_OCTAVE_MAX
+        is_6_octave = SIX_OCTAVE_MIN <= note_pitch <= SIX_OCTAVE_MAX
 
         if is_custom_instrument and not is_2_octave:
             # print(
@@ -320,13 +326,14 @@ def linear(x: float, slope: float = 1, offset: float = 0) -> float:
 def get_rolloff_factor(pitch: float, instrument: str) -> float:
     """
     Return the rolloff factor of a note, given its pitch and instrument.
-    The rolloff factor is a value between -1 and 1 that determines how far
-    the note can be heard. Its value is zero at the center of the 6-octave
-    range (45) and increases linearly towards the edges of the range.
+
+    Maps absolute pitch onto [-1, 1]: 0 at the center of the 6-octave range
+    (key 45), negative for lower pitches (travel farther), positive for higher
+    pitches (travel less). Clamped so instrument octave offsets cannot push
+    the factor outside that range.
     """
 
     # Calculate true pitch taking into account each instrument's octave offset
-    real_pitch = pitch + 12 * octaves.get(instrument, 1)
-    # 45 is the middle point (33-57) of the 6-octave range, where the rolloff factor should be 0
-    factor = (real_pitch - 45) / (45 - 8)
-    return factor
+    real_pitch = pitch + 12 * octaves.get(instrument, 0)
+    factor = (real_pitch - SIX_OCTAVE_CENTER) / SIX_OCTAVE_HALF_SPAN
+    return max(-1.0, min(1.0, factor))
