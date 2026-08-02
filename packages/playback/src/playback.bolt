@@ -14,9 +14,6 @@ append function ~/load:
     scoreboard objectives add nbs dummy
     scoreboard objectives add nbs_stats dummy
     scoreboard players set shuffle nbs 1
-    function ~/play
-
-    schedule function ~/../tick 1t replace
     
     execute function ~/save_speaker_positions:
         data modify storage nbs:playback locations set value {}
@@ -28,6 +25,13 @@ append function ~/load:
                     function animated_java:global/gu/get_entity_uuid_string
                     data modify storage nbs:playback f"locations.{region}" append value {speaker_type: f"{speaker_type}"}
                     data modify storage nbs:playback f"locations.{region}[-1].uuid" set from storage animated_java:gu out
+
+    # load the current songs into storage to ensure playback starts
+    for region in config.REGIONS:
+        function ~/../{region}/change_song
+
+    schedule function ~/../tick 1t replace
+    function ~/../play
 
 
 for region in config.REGIONS:
