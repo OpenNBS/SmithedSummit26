@@ -58,7 +58,7 @@ for region in config.REGIONS:
         scoreboard players add songs_played nbs_stats 1
         scoreboard players set f"{region}.songtime" nbs -1
         execute store result storage nbs:playback f"playing.{region}.index" int 1 run scoreboard players get f"{region}.songindex" nbs
-        function ~/../zzz_change_song with storage nbs:playback f"playing.{region}"   
+        function ~/../zzz_change_song with storage nbs:playback f"playing.{region}"
 
     function ~/{region}/zzz_change_song:
         raw f"$data modify storage nbs:playback playing.{region} set from storage nbs:playback songs.{region}[$(index)]"
