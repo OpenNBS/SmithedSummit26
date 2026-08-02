@@ -198,6 +198,8 @@ def main() -> None:
         if song_data:
             manifest_data.append(song_data)
 
+        manifest_data.sort(key=lambda x: x["id"])
+
     with open(MANIFEST_PATH, "w", encoding="utf-8") as f:
         json.dump(manifest_data, f, indent="\t", separators=(",", ": "))
 
