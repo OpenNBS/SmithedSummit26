@@ -25,6 +25,8 @@ for song_data in config.SONG_MANIFEST:
     author = song_data["author"]
     region = song_data["region"]
 
+    print("Processing:", song_id)
+
     if region is None:
         print(f"Song {song_id} has no region assigned; skipping")
         continue
@@ -44,8 +46,6 @@ for song_data in config.SONG_MANIFEST:
         continue
 
     song = pynbs.read(path)
-
-    print("Processing:", song_id)
 
     append function ~/../playback/load:
         data modify storage nbs:playback f"songs.{region}" append value {
