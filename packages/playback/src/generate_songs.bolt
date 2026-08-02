@@ -61,7 +61,7 @@ for song_data in config.SONG_MANIFEST:
             data modify storage nbs:temp input.tick set value (tick)
             store result score f"{region}.#len" nbs if data storage nbs:playback f"locations.{region}[]"
             store result storage nbs:temp input.i int 1 scoreboard players set f"{region}.#iter" nbs 0
-            function f"nbs:playback/{region}/speaker_iter" with storage nbs:temp input
+            function f"nbs:playback/{region}/speaker_iter/root" with storage nbs:temp input
 
             scoreboard players add notes_played nbs_stats f"{len(notes)}"
             scoreboard players add ticks_played nbs_stats 1
