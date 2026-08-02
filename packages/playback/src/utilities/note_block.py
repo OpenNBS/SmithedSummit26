@@ -74,11 +74,44 @@ class PlaysoundNote:
     pitch: float = 1
     panning: float = 0
 
+    def play(
+        self, inner_range: float, outer_range: float, stereo_separation: float = None
+    ) -> str:
+        """Play a sound that can be heard in a range by all players in range
+
+        Args:
+            `inner_range`: The range (in blocks) at which all frequencies of the sound will be audible at full volume.
+            `outer_range`: The range (in blocks) at which all frequencies of the sound will be inaudible.
+            `stereo_separation`: The separation (in blocks) between the two stereo audio channels.
+
+        Returns:
+            The `/playsound` command to play the note for the given player.
+        """
+
+        play_function = (
+            self.play_short_range if outer_range <= 16 else self.play_long_range
+        )
+
+        if stereo_separation is None:  # use the function's default stereo separation
+            return play_function(full_range=inner_range, decay_range=outer_range)
+        else:
+            return play_function(
+                full_range=inner_range,
+                decay_range=outer_range,
+                stereo_separation=stereo_separation,
+            )
+
     def play_short_range(
-        self, full_range: 9, decay_range: 12, stereo_separation: float = 4
+        self,
+        full_range: float = 9,
+        decay_range: float = 12,
+        stereo_separation: float = 4,
     ) -> str:
         """
         Play a sound that can be heard in a small radius by all players in range.
+
+        The sound will be audible at full volume inside a spherical range of `full_range` blocks.
+        As the player moves away from the source, higher notes will stop being audible. At `decay_range` blocks, all notes will be inaudible.
         """
 
         # This is achieved by bypassing the `volume` argument completely and instead using the
@@ -111,7 +144,9 @@ class PlaysoundNote:
 
             return sigmoid(x, -6, -0.5, 6)
 
-        radius = 9 + rolloff_curve(self.falloff)
+        transition_range = full_range - decay_range
+        radius = full_range + rolloff_curve(self.falloff) * transition_range
+        radius = clamp(radius, 0, full_range)
 
         stereo_offset = self.panning * stereo_separation // 2
         position = f"^{stereo_offset} ^ ^"
@@ -120,18 +155,23 @@ class PlaysoundNote:
             radius=radius, position=position, volume=self.volume
         )
 
-    def play_long_range(self, stereo_separation: float = 8) -> str:
+    def play_long_range(
+        self,
+        full_range: float = 32,
+        decay_range: float = 48,
+        stereo_separation: float = 8,
+    ) -> str:
         """
         Play a sound that can be heard in a large radius by all players in range.
+
+        The sound will be audible at full volume inside a spherical range of `full_range` blocks.
+        As the player moves away from the source, the volume will decrease until it reaches 0 at `decay_range` blocks.
         """
 
         # This is achieved by using a large `volume` (sound will be audible at full volume
         # inside a spherical range of `volume * 16` blocks) and setting `min_volume` to 0.
         # The volume is multiplied by the `rolloff_factor` to make bass notes propagate further,
         # giving the impression of the song 'fading' away as the player moves away from the source.
-
-        full_range = 32  # all notes will be audible at this range
-        decay_range = 48  # only bass notes will be audible at this range
 
         min_volume = full_range // 16
         max_volume = decay_range // 16
@@ -325,6 +365,11 @@ def sigmoid(x: float, slope: float = 1, offset: float = 0, scale: float = 1) -> 
 
 def linear(x: float, slope: float = 1, offset: float = 0) -> float:
     return x * slope + offset
+
+
+def clamp(value: float, min_value: float, max_value: float) -> float:
+    """Clamp a value between a minimum and maximum value."""
+    return max(min_value, min(value, max_value))
 
 
 def get_rolloff_factor(pitch: float, instrument: str) -> float:

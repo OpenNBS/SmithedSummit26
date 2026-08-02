@@ -69,7 +69,8 @@ for song_data in config.SONG_MANIFEST:
             for note in notes:
                 for speaker in config.SPEAKER_RANGES:
                     speaker_type = speaker["name"]
-                    speaker_range = speaker["range"]
+                    outer_range = speaker["range"]
+                    inner_range = speaker["inner_range"]
 
                     if note.instrument == "BEAT":
                             append function ~/../{speaker_type}:
@@ -77,14 +78,14 @@ for song_data in config.SONG_MANIFEST:
                                 for i in range(config.ANIM_COUNT):
                                     execute
                                         if score #random nbs matches (i+1)
-                                        if entity @a[distance=(0, speaker_range)]
+                                        if entity @a[distance=(0, outer_range)]
                                         function f"summit_ambiance:speaker_{region}/animations/beat_{(i+1)}/play"
                                 particle minecraft:note ~ ~1.25 ~ 0 0 0 1 1
                         continue
                 
                     # TODO: dynamically inject the correct function name based on the speaker type
                     append function ~/../{speaker_type}:
-                        playsound f"{note.play_short_range()}"
+                        playsound f"{note.play(inner_range, outer_range)}"
 
                 config.INSTRUMENTS.add(note.instrument)
 
