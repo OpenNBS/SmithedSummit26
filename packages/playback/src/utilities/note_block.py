@@ -190,7 +190,11 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["Note"]]]:
 
     # Add special notes to mark the beats
     # (we'll quantize the song afterwards so doing it later on would be out of sync)
-    for tick in range(0, song.header.song_length, 4):
+    beat_interval_ticks = 4
+    if song.header.tempo > 15:
+        beat_interval_ticks = 8
+
+    for tick in range(0, song.header.song_length, beat_interval_ticks):
         song.notes.append(
             pynbs.Note(
                 tick=tick,
