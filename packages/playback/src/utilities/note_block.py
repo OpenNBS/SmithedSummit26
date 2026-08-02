@@ -247,8 +247,13 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["PlaysoundNote"]]]:
             )
         )
 
+    # Songs with tempo greater than 20 t/s are slowed down so they can be played in Minecraft
+    effective_tempo = song.header.tempo
+    if effective_tempo > 20:
+        effective_tempo = 20
+
     for note in song.notes:
-        new_tick = round(note.tick * 20 / song.header.tempo)
+        new_tick = round(note.tick * 20 / effective_tempo)
         note.tick = new_tick
         note_pitch = note.key + note.pitch / 100
         is_custom_instrument = note.instrument >= song.header.default_instruments
