@@ -126,27 +126,30 @@ class PlaysoundNote:
         # 0.5 = 8 blocks). Instead, the sound is still audible within a 16-block range, but is
         # softer overall.
         #
-        # So, the only to achieve a gradual rolloff less than 16 blocks, is by entirely limiting
+        # So, the only way to achieve a gradual rolloff less than 16 blocks is by entirely limiting
         # who will be able to hear the songs at all via target selection. As such, we can use the
-        # `distance` condition to play notes only to players in a certain range. The code
-        # works with a base range of 9, adding ±3 blocks for lower and higher notes, giving an
-        # effective range between 6-12 blocks. This rolloff can be easily customized by tweaking
-        # the parameters of the sigmoid function used in the calculation. This creates a harsher
-        # decay/rolloff than using volume, but is necessary to achieve rolloff with a ranger smaller
-        # than 16 blocks.
+        # `distance` condition to play notes only to players in a certain range.
+        #
+        # Audible radius is centered on the midpoint of [full_range, decay_range]. Notes at the
+        # center of the scale (falloff=0, key 45) use that midpoint; lower notes add up to
+        # +span/2 and higher notes subtract down to -span/2.
+
+        span = decay_range - full_range
+        half_span = span / 2
+        midpoint = (full_range + decay_range) / 2
 
         def rolloff_curve(x: float) -> float:
-            # slope  = -6   -> make curve steeper towards the center and mirror it in the x axis
-            # offset = -0.5 -> move the curve down so its center is at y=0
-            # scale  = 6    -> scale the curve so it goes from -3 to 3 as x approaches +/-inf
-
+            # slope  = -6   -> steeper towards the center; mirror across x so low→+, high→-
+            # offset = -0.5 -> center the sigmoid at y=0
+            # Rescale so x=±1 maps exactly to ±half_span (falloff is clamped to [-1, 1]).
             # see: https://www.desmos.com/calculator/roidl8wnxl
 
-            return sigmoid(x, -6, -0.5, 6)
+            raw = sigmoid(x, -6, -0.5, 1)
+            endpoint = abs(sigmoid(1.0, -6, -0.5, 1))
+            return (raw / endpoint) * half_span
 
-        transition_range = full_range - decay_range
-        radius = full_range + rolloff_curve(self.falloff) * transition_range
-        radius = clamp(radius, 0, full_range)
+        radius = midpoint + rolloff_curve(self.falloff)
+        radius = clamp(radius, full_range, decay_range)
 
         stereo_offset = self.panning * stereo_separation // 2
         position = f"^{stereo_offset} ^ ^"
