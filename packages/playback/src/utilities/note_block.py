@@ -1,5 +1,5 @@
 __all__ = [
-    "Note",
+    "PlaysoundNote",
     "get_notes",
     "get_pitch",
 ]
@@ -65,16 +65,18 @@ SIX_OCTAVE_HALF_SPAN = SIX_OCTAVE_CENTER - SIX_OCTAVE_MIN  # 36
 
 
 @dataclass
-class Note:
+class PlaysoundNote:
     """Represents a note produced by a /playsound command."""
 
     instrument: str = "block.note_block.harp"
     volume: float = 1
-    radius: float = 16
+    falloff: float = 16
     pitch: float = 1
     panning: float = 0
 
-    def play_short_range(self, stereo_separation: float = 4) -> str:
+    def play_short_range(
+        self, full_range: 9, decay_range: 12, stereo_separation: float = 4
+    ) -> str:
         """
         Play a sound that can be heard in a small radius by all players in range.
         """
@@ -109,12 +111,14 @@ class Note:
 
             return sigmoid(x, -6, -0.5, 6)
 
-        radius = 9 + rolloff_curve(self.radius)
+        radius = 9 + rolloff_curve(self.falloff)
 
         stereo_offset = self.panning * stereo_separation // 2
         position = f"^{stereo_offset} ^ ^"
 
-        return self.play(radius=radius, position=position, volume=self.volume)
+        return self.get_playsound_command(
+            radius=radius, position=position, volume=self.volume
+        )
 
     def play_long_range(self, stereo_separation: float = 8) -> str:
         """
@@ -132,7 +136,7 @@ class Note:
         min_volume = full_range // 16
         max_volume = decay_range // 16
 
-        rolloff_factor = self.radius
+        rolloff_factor = self.falloff
 
         target_volume = (
             min_volume + (max_volume - min_volume) * linear(rolloff_factor, -0.5, 0.5)
@@ -144,13 +148,13 @@ class Note:
         stereo_offset = self.panning * stereo_separation // 2
         position = f"^{stereo_offset} ^ ^"
 
-        return self.play(
+        return self.get_playsound_command(
             radius=radius,
             volume=volume,
             position=position,
         )
 
-    def play(
+    def get_playsound_command(
         self,
         radius: float | None = None,
         tag: str | None = None,
@@ -185,7 +189,7 @@ class Note:
         return args
 
 
-def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["Note"]]]:
+def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["PlaysoundNote"]]]:
     """Yield all the notes from the given nbs file."""
 
     # Quantize notes to nearest tick (pigstep always exports at 20 t/s)
@@ -250,7 +254,7 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["Note"]]]:
         for instrument in song.instruments
     ]
 
-    def get_note(note: pynbs.Note) -> Note:
+    def get_playsound_note(note: pynbs.Note) -> PlaysoundNote:
         """Get an intermediary note for /playsound based on a pynbs note."""
 
         layer = song.layers[note.layer]
@@ -265,14 +269,14 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["Note"]]]:
         instrument = sound.split(".")[-1]
         volume = layer_volume * note_volume
 
-        radius = get_rolloff_factor(pitch, instrument)
+        falloff = get_rolloff_factor(pitch, instrument)
         panning = get_panning(note, layer)
         pitch = get_pitch(note)
 
-        return Note(
+        return PlaysoundNote(
             instrument=source,
             volume=volume,
-            radius=radius,
+            falloff=falloff,
             panning=panning,
             pitch=pitch,
         )
@@ -285,7 +289,7 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["Note"]]]:
     for tick, chord in song:
         if tick not in output:
             output[tick] = []
-        output[tick].extend(get_note(note) for note in chord)
+        output[tick].extend(get_playsound_note(note) for note in chord)
 
     for tick, notes in output.items():
         yield tick, notes
