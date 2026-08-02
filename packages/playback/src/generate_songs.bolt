@@ -24,6 +24,11 @@ for song_data in config.SONG_MANIFEST:
     title = song_data["title"]
     author = song_data["author"]
     region = song_data["region"]
+
+    if region is None:
+        print(f"Song {song_id} has no region assigned; skipping")
+        continue
+
     song_index = current_index_per_region[region]
     current_index_per_region[region] += 1
 
