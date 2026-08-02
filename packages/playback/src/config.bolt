@@ -31,7 +31,9 @@ INSTRUMENTS = set()
 
 SOUNDS = Path("sounds")
 
-SONG_DATA = SONGS_PATH.parent / "manifest.json"
+
+song_manifest_path = ctx.meta["song_manifest_path"]
+SONG_DATA = SONGS_PATH.parent / song_manifest_path
 
 # Load song manifest
 with open(SONG_DATA, "r", encoding="utf-8") as f:

@@ -54,7 +54,7 @@ cwd = "packages/booth"
 
 [tool.poe.tasks.playback]
 help = "Build the playback package"
-cmd = "beet"
+cmd = "beet --project beet_prd.yml"
 cwd = "packages/playback"
 
 [tool.poe.tasks.playback-watch]
