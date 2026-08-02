@@ -1,6 +1,6 @@
 from src.utilities.sphere import sphere
 import logging
-import src.config as config
+import ./config as config
 
 
 DELAY_TICKS = 80

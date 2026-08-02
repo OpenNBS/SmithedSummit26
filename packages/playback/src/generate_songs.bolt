@@ -6,7 +6,7 @@ import pynbs
 import logging
 
 from src.utilities.note_block import get_notes
-import src.config as config
+import ./config as config
 
 logging.info("Generating songs")
 

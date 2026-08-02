@@ -38,8 +38,8 @@ with open(SONG_DATA, "r", encoding="utf-8") as f:
     SONG_MANIFEST = json.load(f)
 
 # Load regions
-regions: set[str] = set()
-region_counts: dict[str, int] = {}
+regions = set()
+region_counts = {}
 for song_data in SONG_MANIFEST:
     region = song_data["region"]
     if region is None:
