@@ -89,7 +89,6 @@ for song_data in config.SONG_MANIFEST:
                 config.INSTRUMENTS.add(note.instrument)
 
 
-
     function f"nbs:song/{song_id}/{tick + 40}/root":
         function f"nbs:playback/{region}/advance"
 
