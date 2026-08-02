@@ -201,6 +201,7 @@ class PlaysoundNote:
         instrument = self.instrument.replace("/", "_")
 
         selector_arguments = []
+        selector_arguments.append("tag=!nbs.nomusic")
         if radius is not None:
             selector_arguments.append(f"distance=..{radius:.2f}")
         if tag is not None:
