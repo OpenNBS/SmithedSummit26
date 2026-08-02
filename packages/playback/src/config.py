@@ -3,18 +3,23 @@ from pathlib import Path
 
 from src.songs import SONGS_PATH
 
+# range: distance from the speaker to where the song starts being audible
+# inner_range: distance from the speaker to where the song is fully audible
 SPEAKER_RANGES = [
     {
         "name": "short",
-        "range": 16,
+        "range": 12,
+        "inner_range": 9,
     },
     {
         "name": "mid",
-        "range": 32,
+        "range": 20,
+        "inner_range": 16,
     },
     {
         "name": "long",
-        "range": 48,
+        "range": 32,
+        "inner_range": 24,
     },
 ]
 
