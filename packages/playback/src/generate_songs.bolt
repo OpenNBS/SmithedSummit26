@@ -78,7 +78,7 @@ for song_data in config.SONG_MANIFEST:
                                     execute
                                         if score #random nbs matches (i+1)
                                         if entity @a[distance=(0, speaker_range)]
-                                        function f"animated_java:speaker_{region}/animations/beat_{(i+1)}/play"
+                                        function f"summit_ambiance:speaker_{region}/animations/beat_{(i+1)}/play"
                         continue
                 
                     # TODO: dynamically inject the correct function name based on the speaker type
