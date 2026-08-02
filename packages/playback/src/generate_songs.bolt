@@ -92,7 +92,5 @@ for song_data in config.SONG_MANIFEST:
     function f"nbs:song/{song_id}/{tick + 40}/root":
         function f"nbs:playback/{region}/advance"
 
-    break
-
 
 print("🎉 LGTM")
