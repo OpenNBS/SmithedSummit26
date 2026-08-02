@@ -138,17 +138,7 @@ class PlaysoundNote:
         half_span = span / 2
         midpoint = (full_range + decay_range) / 2
 
-        def rolloff_curve(x: float) -> float:
-            # slope  = -6   -> steeper towards the center; mirror across x so low→+, high→-
-            # offset = -0.5 -> center the sigmoid at y=0
-            # Rescale so x=±1 maps exactly to ±half_span (falloff is clamped to [-1, 1]).
-            # see: https://www.desmos.com/calculator/roidl8wnxl
-
-            raw = sigmoid(x, -6, -0.5, 1)
-            endpoint = abs(sigmoid(1.0, -6, -0.5, 1))
-            return (raw / endpoint) * half_span
-
-        radius = midpoint + rolloff_curve(self.falloff)
+        radius = midpoint + pitch_rolloff_offset(self.falloff, half_span)
         radius = clamp(radius, full_range, decay_range)
 
         stereo_offset = self.panning * stereo_separation // 2
@@ -167,25 +157,24 @@ class PlaysoundNote:
         """
         Play a sound that can be heard in a large radius by all players in range.
 
-        The sound will be audible at full volume inside a spherical range of `full_range` blocks.
-        As the player moves away from the source, the volume will decrease until it reaches 0 at `decay_range` blocks.
+        In Java Edition, `/playsound` volume ≥ 1 sets the silence distance to
+        `volume * 16` blocks, with gradual falloff from the source (not a full-volume
+        plateau). Bass notes use `decay_range`; treble notes use `full_range`.
         """
 
-        # This is achieved by using a large `volume` (sound will be audible at full volume
-        # inside a spherical range of `volume * 16` blocks) and setting `min_volume` to 0.
-        # The volume is multiplied by the `rolloff_factor` to make bass notes propagate further,
-        # giving the impression of the song 'fading' away as the player moves away from the source.
+        # volume ≥ 1: audible range = volume * 16 (silence at that distance, minVolume=0).
+        # Map falloff onto [full_range, decay_range] the same way as short-range, then
+        # convert distance → playsound volume. Selector radius stays at decay_range so
+        # players in the outer band still receive the command.
 
-        min_volume = full_range // 16
-        max_volume = decay_range // 16
+        span = decay_range - full_range
+        half_span = span / 2
+        midpoint = (full_range + decay_range) / 2
 
-        rolloff_factor = self.falloff
+        silence_distance = midpoint + pitch_rolloff_offset(self.falloff, half_span)
+        silence_distance = clamp(silence_distance, full_range, decay_range)
 
-        target_volume = (
-            min_volume + (max_volume - min_volume) * linear(rolloff_factor, -0.5, 0.5)
-        ) * self.volume
-
-        volume = target_volume
+        volume = (silence_distance / 16) * self.volume
         radius = decay_range
 
         stereo_offset = self.panning * stereo_separation // 2
@@ -366,13 +355,23 @@ def sigmoid(x: float, slope: float = 1, offset: float = 0, scale: float = 1) -> 
     return (1 / (1 + math.exp(-x * slope)) + offset) * scale
 
 
-def linear(x: float, slope: float = 1, offset: float = 0) -> float:
-    return x * slope + offset
-
-
 def clamp(value: float, min_value: float, max_value: float) -> float:
     """Clamp a value between a minimum and maximum value."""
     return max(min_value, min(value, max_value))
+
+
+def pitch_rolloff_offset(falloff: float, half_span: float) -> float:
+    """
+    Map falloff in [-1, 1] onto exactly [-half_span, half_span].
+
+    Low pitches (negative falloff) return positive offsets (travel farther);
+    high pitches return negative offsets. Zero at the center of the scale.
+    see: https://www.desmos.com/calculator/roidl8wnxl
+    """
+    # slope = -6, offset = -0.5 → steep S-curve centered at y=0, low→+, high→-
+    raw = sigmoid(falloff, -6, -0.5, 1)
+    endpoint = abs(sigmoid(1.0, -6, -0.5, 1))
+    return (raw / endpoint) * half_span
 
 
 def get_rolloff_factor(pitch: float, instrument: str) -> float:
