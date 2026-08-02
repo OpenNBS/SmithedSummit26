@@ -85,7 +85,7 @@ for song_data in config.SONG_MANIFEST:
                                         if score #random nbs matches (i+1)
                                         if entity @a[distance=(0, outer_range)]
                                         function f"summit_ambiance:speaker_{region}/animations/beat_{(i+1)}/play"
-                                particle minecraft:note ~ ~1.25 ~ 0 0 0 1 1
+                                execute if entity @a[distance=(0, outer_range)] run particle minecraft:note ~ ~1.25 ~ 0 0 0 1 1
                         continue
                 
                     # TODO: dynamically inject the correct function name based on the speaker type
