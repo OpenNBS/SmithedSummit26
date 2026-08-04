@@ -273,15 +273,9 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["PlaysoundNote"]]]:
         is_2_octave = TWO_OCTAVE_MIN <= note_pitch <= TWO_OCTAVE_MAX
         is_6_octave = SIX_OCTAVE_MIN <= note_pitch <= SIX_OCTAVE_MAX
 
-        if is_custom_instrument and not is_2_octave:
+        if not is_6_octave:
             # print(
-            #    f"Warning: Custom instrument out of 2-octave range at {note.tick},{note.layer}: {note_pitch}"
-            # )
-            continue
-
-        if not is_custom_instrument and not is_6_octave:
-            # print(
-            #    f"Warning: Vanilla instrument out of 6-octave range at {note.tick},{note.layer}: {note_pitch}"
+            #     f"Warning: Instrument out of 6-octave range at {note.tick},{note.layer}: {note_pitch}"
             # )
             continue
 
