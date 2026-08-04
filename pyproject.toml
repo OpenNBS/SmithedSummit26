@@ -53,8 +53,13 @@ cmd = "beet watch --reload"
 cwd = "packages/booth"
 
 [tool.poe.tasks.playback]
-help = "Build the playback package"
-cmd = "beet --project beet_prd.yml"
+help = "Build the playback package for production"
+cmd = "beet --project beet_prd.yml --log INFO"
+cwd = "packages/playback"
+
+[tool.poe.tasks.playback-debug]
+help = "Build the playback package for development"
+cmd = "beet --project beet.yml --log DEBUG"
 cwd = "packages/playback"
 
 [tool.poe.tasks.playback-watch]
