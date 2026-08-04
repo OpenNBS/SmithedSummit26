@@ -29,10 +29,10 @@ for song_data in ctx.meta["song_manifest"]:
     author = song_data["author"]
     region = song_data["region"]
 
-    print("Processing:", song_id)
+    logging.info("Processing: %s", song_id)
 
     if region is None:
-        print(f"Song {song_id} has no region assigned; skipping")
+        logging.warn(f"Song {song_id} has no region assigned; skipping")
         continue
 
     song_index = current_index_per_region[region]
@@ -46,7 +46,7 @@ for song_data in ctx.meta["song_manifest"]:
     path = SONGS_PATH / f"{song_id}.nbs"
 
     if not path.exists():
-        print(f"Song file not found: {path}")
+        logging.warn(f"Song file not found: {path}")
         continue
 
     song = pynbs.read(path)
@@ -103,4 +103,4 @@ for song_data in ctx.meta["song_manifest"]:
         function f"nbs:playback/{region}/advance"
 
 
-print("🎉 LGTM")
+logging.info("🎉 Song processing complete!")
