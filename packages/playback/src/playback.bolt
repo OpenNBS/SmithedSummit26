@@ -15,7 +15,7 @@ REGION_COUNTS = ctx.meta["region_counts"]
 append function ~/load:
     scoreboard objectives add nbs dummy
     scoreboard objectives add nbs_stats dummy
-    scoreboard players set shuffle nbs 1
+    scoreboard players set shuffle nbs 0
     
     execute function ~/save_speaker_positions:
         data modify storage nbs:playback locations set value {}
