@@ -6,20 +6,24 @@ import pynbs
 import logging
 
 from src.utilities.note_block import get_notes
-import ./config as config
+from src.config import SONGS_PATH
+
+SPEAKER_RANGES = ctx.meta["speaker_ranges"]
+REGIONS = ctx.meta["regions"]
+ANIM_COUNT = ctx.meta["anim_count"]
 
 logging.info("Generating songs")
 
 append function ~/../playback/load:
     data modify storage nbs:playback songs set value {}
-    for region in config.REGIONS:
+    for region in REGIONS:
         data modify storage nbs:playback f"songs.{region}" set value []
 
 current_index_per_region = {}
-for region in config.REGIONS:
+for region in REGIONS:
     current_index_per_region[region] = 0
 
-for song_data in config.SONG_MANIFEST:
+for song_data in ctx.meta["song_manifest"]:
     song_id = song_data["id"]
     title = song_data["title"]
     author = song_data["author"]
@@ -39,7 +43,7 @@ for song_data in config.SONG_MANIFEST:
 
     formatted_string = f"{title} - {author}"
 
-    path = config.SONGS_PATH / f"{song_id}.nbs"
+    path = SONGS_PATH / f"{song_id}.nbs"
 
     if not path.exists():
         print(f"Song file not found: {path}")
@@ -72,15 +76,15 @@ for song_data in config.SONG_MANIFEST:
             scoreboard players add ticks_played nbs_stats 1
 
             for note in notes:
-                for speaker in config.SPEAKER_RANGES:
+                for speaker in SPEAKER_RANGES:
                     speaker_type = speaker["name"]
                     outer_range = speaker["range"]
                     inner_range = speaker["inner_range"]
 
                     if note.instrument == "BEAT":
                             append function ~/../{speaker_type}:
-                                store result score #random nbs random value (1, config.ANIM_COUNT)
-                                for i in range(config.ANIM_COUNT):
+                                store result score #random nbs random value (1, ANIM_COUNT)
+                                for i in range(ANIM_COUNT):
                                     execute
                                         if score #random nbs matches (i+1)
                                         if entity @a[distance=(0, outer_range)]
@@ -92,7 +96,7 @@ for song_data in config.SONG_MANIFEST:
                     append function ~/../{speaker_type}:
                         playsound f"{note.play(inner_range, outer_range)}"
 
-                config.INSTRUMENTS.add(note.instrument)
+                ctx.meta["instruments"].add(note.instrument)
 
 
     function f"nbs:song/{song_id}/{tick + 40}/root":

@@ -1,6 +1,6 @@
 from src.utilities.sphere import sphere
 import logging
-import ./config as config
+from src.config import SONGS_PATH
 
 
 DELAY_TICKS = 80
@@ -21,7 +21,7 @@ append function ~/toggle:
 
 #> display
 
-for data in config.SPEAKER_RANGES:
+for data in ctx.meta["speaker_ranges"]:
     speaker_type = data["name"]
     radius = data["range"]
 

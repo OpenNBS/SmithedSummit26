@@ -1,14 +1,16 @@
 import glob
 import logging
 
-import ./config as config
-
 logging.info("Generating playback functions")
 
 #> setup
 merge function_tag minecraft:load {
     "values": [(~/load)]
 }
+
+SPEAKER_RANGES = ctx.meta["speaker_ranges"]
+REGIONS = ctx.meta["regions"]
+REGION_COUNTS = ctx.meta["region_counts"]
 
 append function ~/load:
     scoreboard objectives add nbs dummy
@@ -17,9 +19,9 @@ append function ~/load:
     
     execute function ~/save_speaker_positions:
         data modify storage nbs:playback locations set value {}
-        for region in config.REGIONS:
+        for region in ctx.meta["regions"]:
             data modify storage nbs:playback f"locations.{region}" set value []
-            for speaker in config.SPEAKER_RANGES:
+            for speaker in ctx.meta["speaker_ranges"]:
                 speaker_type = speaker["name"]
                 as @e[type=item_display, tag=f"nbs.speaker.{region}", tag=f"nbs.speaker.{speaker_type}"]:
                     function animated_java:global/gu/get_entity_uuid_string
@@ -27,14 +29,14 @@ append function ~/load:
                     data modify storage nbs:playback f"locations.{region}[-1].uuid" set from storage animated_java:gu out
 
     # load the current songs into storage to ensure playback starts
-    for region in config.REGIONS:
+    for region in REGIONS:
         function ~/../{region}/change_song
 
     schedule function ~/../tick 1t replace
     function ~/../play
 
 
-for region in config.REGIONS:
+for region in REGIONS:
     # Iterates all speakers for this region.
     # Takes {i: 0, song: "song_id", tick: 0}. Reads speaker_type from each location entry.
     function ~/{region}/speaker_iter/root:
@@ -68,7 +70,7 @@ for region in config.REGIONS:
     #> Effects
 
     function ~/{region}/title:
-        for speaker in config.SPEAKER_RANGES:
+        for speaker in SPEAKER_RANGES:
             speaker_type = speaker["name"]
             speaker_range = speaker["range"]
             raw f'$execute at @e[type=item_display,tag=nbs.speaker.{region},tag=nbs.speaker.{speaker_type}] run title @a[distance=..{speaker_range}] actionbar [{{"text":"🎵 Now Playing: ","color":"green"}},{{"text":"$(formatted_string)","color":"white"}}]'
@@ -77,7 +79,7 @@ for region in config.REGIONS:
 
     #> Spawn Speakers
 
-    for speaker in config.SPEAKER_RANGES:
+    for speaker in SPEAKER_RANGES:
         variant = speaker["name"]
         range = speaker["range"]
 
@@ -89,7 +91,7 @@ for region in config.REGIONS:
 
     #> Song Controls
 
-    song_count = config.REGION_COUNTS[region]
+    song_count = REGION_COUNTS[region]
 
     function ~/{region}/next:
         scoreboard players add f"{region}.songindex" nbs 1
@@ -137,5 +139,5 @@ for region in config.REGIONS:
         function ~/../{region}/tick
 
 function ~/speaker/remove/nearest:
-    for region in config.REGIONS:
+    for region in REGIONS:
         execute as @n[distance=..1,type=minecraft:item_display,tag=f"summit_ambiance.speaker_{region}.root"] run function f"summit_ambiance:speaker_{region}/remove/this"

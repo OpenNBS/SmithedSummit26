@@ -17,6 +17,7 @@ require:
   - bolt
 
 pipeline:
+  - src.config
   - mecha
   #- src.sounds
 
