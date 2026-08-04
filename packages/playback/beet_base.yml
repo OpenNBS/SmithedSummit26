@@ -1,0 +1,27 @@
+# Base configuration. Do not use directly; use one of the extended configs.
+
+id: nbs
+
+data_pack:
+  name: nbs-summit26-playback-dp
+  description: "Smithed Summit 2026 OpenNBS playback system"
+  load:
+    - data/nbs/module: src
+
+resource_pack:
+  name: nbs-summit26-playback-rp
+  description: "Smithed Summit 2026 OpenNBS playback system"
+
+require:
+  - bolt
+
+pipeline:
+  - src.config
+  - mecha
+  #- src.sounds
+
+meta:
+  bolt:
+    entrypoint: "nbs:main"
+
+output: dist

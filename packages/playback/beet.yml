@@ -1,30 +1,14 @@
-id: nbs
+# Beet config for used for live reload (development). We leave it as beet.yml
+# because the 'beet watch' command currently does not support changing the project.
+
+extend: beet_base.yml
 
 data_pack:
-  name: nbs-summit26-playback-dp
-  description: "[DEBUG] Smithed Summit 2026 OpenNBS playback system"
-
-  load:
-    - data/nbs/module: src
-
   zipped: false
 
 resource_pack:
-  name: nbs-summit26-playback-rp
-  description: "Smithed Summit 2026 OpenNBS playback system"
-
-require:
-  - bolt
-
-pipeline:
-  - src.config
-  - mecha
-  #- src.sounds
+  zipped: false
 
 meta:
-  bolt:
-    entrypoint: "nbs:main"
   debug: true
   song_manifest_path: "manifest_debug.json"
-
-output: dist

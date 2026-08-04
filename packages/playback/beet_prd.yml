@@ -1,29 +1,13 @@
-id: nbs
+# Full production build with all songs. Use for generating the final pack.
+
+extend: beet_base.yml
 
 data_pack:
-  name: nbs-summit26-playback-dp
-  description: "Smithed Summit 2026 OpenNBS playback system"
-
-  load:
-    - data/nbs/module: src
-
   zipped: true
 
 resource_pack:
-  name: nbs-summit26-playback-rp
-  description: "Smithed Summit 2026 OpenNBS playback system"
-
-require:
-  - bolt
-
-pipeline:
-  - mecha
-  #- src.sounds
+  zipped: true
 
 meta:
-  bolt:
-    entrypoint: "nbs:main"
-  debug: true # TODO: change to 'false' for production build
+  debug: false
   song_manifest_path: "manifest.json"
-
-output: dist
