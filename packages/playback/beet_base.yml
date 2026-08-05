@@ -23,6 +23,9 @@ pipeline:
   - src.generate_songs_multiprocessing
 
 meta:
+  minecraft: "26.2"
+  vanilla:
+    version: "26.2"
   bolt:
     entrypoint: "nbs:main"
 

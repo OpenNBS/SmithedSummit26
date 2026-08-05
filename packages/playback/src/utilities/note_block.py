@@ -7,32 +7,46 @@ __all__ = [
 
 import math
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Iterator, List, Tuple
 
 import pynbs
 
-NBS_DEFAULT_INSTRUMENTS = [
-    "block.note_block.harp",
-    "block.note_block.bass",
-    "block.note_block.basedrum",
-    "block.note_block.snare",
-    "block.note_block.hat",
-    "block.note_block.guitar",
-    "block.note_block.flute",
-    "block.note_block.bell",
-    "block.note_block.chime",
-    "block.note_block.xylophone",
-    "block.note_block.iron_xylophone",
-    "block.note_block.cow_bell",
-    "block.note_block.didgeridoo",
-    "block.note_block.bit",
-    "block.note_block.banjo",
-    "block.note_block.pling",
-    "block.note_block.trumpet",
-    "block.note_block.trumpet_exposed",
-    "block.note_block.trumpet_weathered",
-    "block.note_block.trumpet_oxidized",
+from src.sounds import (
+    TWO_OCTAVE_HIGH,
+    TWO_OCTAVE_LOW,
+    SoundResource,
+)
+
+# Logical instrument names for distance rolloff (indexed like NBS default instruments)
+NBS_ROLLOFF_INSTRUMENTS = [
+    "harp",
+    "bass",
+    "basedrum",
+    "snare",
+    "hat",
+    "guitar",
+    "flute",
+    "bell",
+    "chime",
+    "xylophone",
+    "iron_xylophone",
+    "cow_bell",
+    "didgeridoo",
+    "bit",
+    "banjo",
+    "pling",
+    "trumpet",
+    "trumpet_exposed",
+    "trumpet_weathered",
+    "trumpet_oxidized",
 ]
+
+_FILE_STEM_ALIASES = {
+    "bassattack": "bass",
+    "icechime": "chime",
+    "xylobone": "xylophone",
+}
 
 octaves = {
     "harp": 0,
@@ -57,8 +71,8 @@ octaves = {
     "trumpet_oxidized": -1,
 }
 
-# NBS key ranges (inclusive)
-TWO_OCTAVE_MIN, TWO_OCTAVE_MAX = 33, 57
+# NBS key ranges (inclusive); 2-octave band shared with src.sounds
+TWO_OCTAVE_MIN, TWO_OCTAVE_MAX = TWO_OCTAVE_LOW, TWO_OCTAVE_HIGH
 SIX_OCTAVE_MIN, SIX_OCTAVE_MAX = 9, 81
 SIX_OCTAVE_CENTER = (SIX_OCTAVE_MIN + SIX_OCTAVE_MAX) / 2  # 45
 SIX_OCTAVE_HALF_SPAN = SIX_OCTAVE_CENTER - SIX_OCTAVE_MIN  # 36
@@ -68,7 +82,7 @@ SIX_OCTAVE_HALF_SPAN = SIX_OCTAVE_CENTER - SIX_OCTAVE_MIN  # 36
 class PlaysoundNote:
     """Represents a note produced by a /playsound command."""
 
-    instrument: str = "block.note_block.harp"
+    instrument: str = "nbs:note_harp"
     volume: float = 1
     falloff: float = 16
     pitch: float = 1
@@ -269,8 +283,6 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["PlaysoundNote"]]]:
         new_tick = round(note.tick * expansion_factor * 20 / effective_tempo)
         note.tick = new_tick
         note_pitch = note.key + note.pitch / 100
-        is_custom_instrument = note.instrument >= song.header.default_instruments
-        is_2_octave = TWO_OCTAVE_MIN <= note_pitch <= TWO_OCTAVE_MAX
         is_6_octave = SIX_OCTAVE_MIN <= note_pitch <= SIX_OCTAVE_MAX
 
         if not is_6_octave:
@@ -294,27 +306,30 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["PlaysoundNote"]]]:
         if not instrument.file.startswith("minecraft/"):
             print(f"Warning: Invalid instrument path: {instrument.file}")
 
-    sounds = NBS_DEFAULT_INSTRUMENTS + [
-        instrument.file.replace("minecraft/", "").replace(".ogg", "")
-        for instrument in song.instruments
-    ]
+    def rolloff_instrument_name(note: pynbs.Note) -> str:
+        if 0 <= note.instrument < len(NBS_ROLLOFF_INSTRUMENTS):
+            return NBS_ROLLOFF_INSTRUMENTS[note.instrument]
+        resource = SoundResource.from_note(song, note)
+        stem = Path(resource.src_path).stem
+        return _FILE_STEM_ALIASES.get(stem, stem)
 
     def get_playsound_note(note: pynbs.Note) -> PlaysoundNote:
         """Get an intermediary note for /playsound based on a pynbs note."""
 
         layer = song.layers[note.layer]
 
-        sound = sounds[note.instrument % 15] if note.instrument >= 0 else "BEAT"
-        pitch = note.key + (note.pitch / 100)
-        octave_suffix = "_-1" if pitch < 33 else "_1" if pitch > 57 else ""
-        source = f"{sound}{octave_suffix}"
+        if note.instrument < 0:
+            return PlaysoundNote(instrument="BEAT")
 
+        resource = SoundResource.from_note(song, note)
+        source = f"nbs:{resource.sound_event}"
+
+        note_pitch = note.key + (note.pitch / 100)
         layer_volume = layer.volume / 100
         note_volume = note.velocity / 100
-        instrument = sound.split(".")[-1]
         volume = layer_volume * note_volume
 
-        falloff = get_rolloff_factor(pitch, instrument)
+        falloff = get_rolloff_factor(note_pitch, rolloff_instrument_name(note))
         panning = get_panning(note, layer)
         pitch = get_pitch(note)
 
@@ -354,9 +369,9 @@ def get_pitch(note: Any) -> float:
     """Get pitch for a given nbs note."""
     key = note.key + note.pitch / 100
 
-    if key < 33:
+    if key < TWO_OCTAVE_MIN:
         key -= 9
-    elif key > 57:
+    elif key > TWO_OCTAVE_MAX:
         key -= 57
     else:
         key -= 33
