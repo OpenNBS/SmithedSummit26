@@ -16,7 +16,6 @@ from typing import Any
 
 import pynbs
 from beet import Context, Function
-
 from src.config import ANIM_COUNT, SONGS_PATH, SPEAKER_RANGES
 from src.utilities.note_block import get_notes
 
@@ -280,18 +279,6 @@ def beet_default(ctx: Context) -> None:
     )
 
     load_commands = generated.pop(_PLAYBACK_LOAD, [])
-    song_keys = [k for k in generated if k.startswith("nbs:song/")]
-    song_ids = sorted({k.split("/", 2)[1] for k in song_keys})
-    logger.info(
-        "Injecting %s functions (%s song ids: %s); load has %s commands",
-        len(generated) + 1,
-        len(song_ids),
-        song_ids,
-        len(load_commands),
-    )
-    if load_commands:
-        logger.info("First load command: %s", load_commands[0])
-        logger.info("Last load command: %s", load_commands[-1])
 
     # Song registry must run before playback/load's change_song calls.
     # Replace the Function wholesale — mutating .lines on Mecha-built
