@@ -18,6 +18,7 @@ require:
 pipeline:
   - src.config
   - mecha
+  - src.generate_songs
   #- src.sounds
 
 meta:

@@ -9,6 +9,8 @@ data_pack:
 resource_pack:
   zipped: false
 
+output: dist
+
 meta:
   debug: true
   song_manifest_path: "manifest_debug.json"
