@@ -1,0 +1,15 @@
+# Zipped build with test songs. Use for development and testing.
+
+extend: beet_base.yml
+
+data_pack:
+  zipped: true
+
+resource_pack:
+  zipped: true
+
+output: dist
+
+meta:
+  debug: true
+  song_manifest_path: "manifest_debug.json"

@@ -1,3 +1,0 @@
-from nbs_shared.project import SONGS_FILES_DIRECTORY
-
-SONGS_PATH = SONGS_FILES_DIRECTORY

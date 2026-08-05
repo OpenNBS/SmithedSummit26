@@ -1,46 +1,74 @@
+"""Pre-populate the context with data to be processed by the remaining pipeline stages."""
+
 import json
-from pathlib import Path
 
-from src.songs import SONGS_PATH
+from beet import Context
+from nbs_shared.project import SONGS_FILES_DIRECTORY
 
+SONGS_PATH = SONGS_FILES_DIRECTORY
+
+# range: distance from the speaker to where the song starts being audible
+# inner_range: distance from the speaker to where the song is fully audible
 SPEAKER_RANGES = [
     {
         "name": "short",
-        "range": 16,
+        "range": 12,
+        "inner_range": 9,
     },
     {
         "name": "mid",
-        "range": 32,
+        "range": 20,
+        "inner_range": 16,
     },
     {
         "name": "long",
-        "range": 48,
+        "range": 32,
+        "inner_range": 24,
     },
 ]
 
-# Number of 'play' animation variants in the AJ speaker model
+# Number of 'play' animation variants in the AJ speaker models
 ANIM_COUNT = 6
 
-# memo:
-INSTRUMENTS = set()
 
-SOUNDS = Path("sounds")
+def load_song_manifest(ctx: Context):
+    song_manifest_path = SONGS_PATH.parent / ctx.meta["song_manifest_path"]
 
-SONG_DATA = SONGS_PATH.parent / "manifest.json"
+    SONG_DATA = SONGS_PATH.parent / song_manifest_path
 
-# Load song manifest
-with open(SONG_DATA, "r", encoding="utf-8") as f:
-    SONG_MANIFEST = json.load(f)
+    if not SONG_DATA.exists():
+        raise FileNotFoundError(f"Song manifest file not found: {SONG_DATA}")
 
-# Load regions
-regions: set[str] = set()
-region_counts: dict[str, int] = {}
-for song_data in SONG_MANIFEST:
-    region = song_data["region"]
-    if region is None:
-        continue
-    regions.add(region)
-    region_counts[region] = region_counts.get(region, 0) + 1
+    with open(SONG_DATA, "r", encoding="utf-8") as f:
+        song_manifest = json.load(f)
+        ctx.meta["song_manifest"] = song_manifest
 
-REGIONS = regions
-REGION_COUNTS = region_counts
+
+def load_speaker_ranges(ctx: Context):
+    ctx.meta["speaker_ranges"] = SPEAKER_RANGES
+    ctx.meta["anim_count"] = ANIM_COUNT
+
+
+def load_instruments(ctx: Context):
+    ctx.meta["instruments"] = set()
+
+
+def load_regions(ctx: Context):
+    regions = set()
+    region_counts = {}
+    for song_data in ctx.meta["song_manifest"]:
+        region = song_data["region"]
+        if region is None:
+            continue
+        regions.add(region)
+        region_counts[region] = region_counts.get(region, 0) + 1
+
+    ctx.meta["regions"] = regions
+    ctx.meta["region_counts"] = region_counts
+
+
+def beet_default(ctx: Context):
+    load_song_manifest(ctx)
+    load_speaker_ranges(ctx)
+    load_instruments(ctx)
+    load_regions(ctx)

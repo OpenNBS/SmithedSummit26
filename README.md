@@ -34,7 +34,8 @@ Run `uv run poe` at any time to list the available tasks.
   beet's link configuration.
 - `uv run poe booth` builds only the booth package.
 - `uv run poe booth-watch` watches the booth package and rebuilds it on changes.
-- `uv run poe playback` builds only the playback package.
+- `uv run poe playback` builds only the playback package for production.
+- `uv run poe playback-debug` builds only the playback package for debugging.
 - `uv run poe playback-watch` watches the playback package and rebuilds it on
   changes.
 - `uv run poe download-songs` downloads source song files from Backblaze B2 and

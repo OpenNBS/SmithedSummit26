@@ -71,6 +71,7 @@ def extract_id_from_title(title: str) -> str:
         .split("OST")[-1]
         .split("Super Mario Bros Wonder")[-1]
         .split("Super Mario 3D Land")[-1]
+        .split("Compressed")[0]
     )
 
     # Normalize '-' separators, then keep only the first part
@@ -197,6 +198,8 @@ def main() -> None:
         song_data = process_song(store, row, song_id, existing_meta)
         if song_data:
             manifest_data.append(song_data)
+
+        manifest_data.sort(key=lambda x: x["id"])
 
     with open(MANIFEST_PATH, "w", encoding="utf-8") as f:
         json.dump(manifest_data, f, indent="\t", separators=(",", ": "))

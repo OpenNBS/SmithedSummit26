@@ -1,6 +1,6 @@
 from src.utilities.sphere import sphere
 import logging
-import src.config as config
+from src.config import SONGS_PATH
 
 
 DELAY_TICKS = 80
@@ -21,7 +21,7 @@ append function ~/toggle:
 
 #> display
 
-for data in config.SPEAKER_RANGES:
+for data in ctx.meta["speaker_ranges"]:
     speaker_type = data["name"]
     radius = data["range"]
 
@@ -35,7 +35,7 @@ for data in config.SPEAKER_RANGES:
                 particle minecraft:block_marker{block_state:{Name:"minecraft:green_concrete"}} ~ f"~{pos}" ~ 0 0 0 0 1 force
                 particle minecraft:block_marker{block_state:{Name:"minecraft:blue_concrete"}} ~ ~ f"~{pos}" 0 0 0 0 1 force
 
-        for point in sphere(radius=radius, density=0.02):
+        for point in sphere(radius=radius, density=0.03):
             x = point[0]
             y = point[1]
             z = point[2]

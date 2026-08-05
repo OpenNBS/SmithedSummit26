@@ -1,14 +1,12 @@
+# Base configuration. Do not use directly; use one of the extended configs.
+
 id: nbs
 
 data_pack:
   name: nbs-summit26-playback-dp
   description: "Smithed Summit 2026 OpenNBS playback system"
-
   load:
     - data/nbs/module: src
-
-  # Reduce filesystem writes due to song tick functions
-  zipped: true
 
 resource_pack:
   name: nbs-summit26-playback-rp
@@ -18,10 +16,16 @@ require:
   - bolt
 
 pipeline:
-  - mecha
+  - src.config
   #- src.sounds
+  - mecha
+  # After Mecha: inject raw mcfunction text without Mecha parsing/codegen.
+  - src.generate_songs_multiprocessing
 
 meta:
+  minecraft: "26.2"
+  vanilla:
+    version: "26.2"
   bolt:
     entrypoint: "nbs:main"
 

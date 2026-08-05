@@ -1,0 +1,15 @@
+# Full production build with all songs. Use for generating the final pack.
+
+extend: beet_base.yml
+
+data_pack:
+  zipped: true
+
+resource_pack:
+  zipped: true
+
+output: dist
+
+meta:
+  debug: false
+  song_manifest_path: "manifest.json"

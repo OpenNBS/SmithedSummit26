@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# cProfile dumps
+*.prof
+
 # Distribution / packaging
 .Python
 build/

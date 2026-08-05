@@ -1,5 +1,5 @@
 __all__ = [
-    "Note",
+    "PlaysoundNote",
     "get_notes",
     "get_pitch",
 ]
@@ -7,32 +7,46 @@ __all__ = [
 
 import math
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Iterator, List, Tuple
 
 import pynbs
 
-NBS_DEFAULT_INSTRUMENTS = [
-    "block.note_block.harp",
-    "block.note_block.bass",
-    "block.note_block.basedrum",
-    "block.note_block.snare",
-    "block.note_block.hat",
-    "block.note_block.guitar",
-    "block.note_block.flute",
-    "block.note_block.bell",
-    "block.note_block.chime",
-    "block.note_block.xylophone",
-    "block.note_block.iron_xylophone",
-    "block.note_block.cow_bell",
-    "block.note_block.didgeridoo",
-    "block.note_block.bit",
-    "block.note_block.banjo",
-    "block.note_block.pling",
-    "block.note_block.trumpet",
-    "block.note_block.trumpet_exposed",
-    "block.note_block.trumpet_weathered",
-    "block.note_block.trumpet_oxidized",
+from src.sounds import (
+    TWO_OCTAVE_HIGH,
+    TWO_OCTAVE_LOW,
+    SoundResource,
+)
+
+# Logical instrument names for distance rolloff (indexed like NBS default instruments)
+NBS_ROLLOFF_INSTRUMENTS = [
+    "harp",
+    "bass",
+    "basedrum",
+    "snare",
+    "hat",
+    "guitar",
+    "flute",
+    "bell",
+    "chime",
+    "xylophone",
+    "iron_xylophone",
+    "cow_bell",
+    "didgeridoo",
+    "bit",
+    "banjo",
+    "pling",
+    "trumpet",
+    "trumpet_exposed",
+    "trumpet_weathered",
+    "trumpet_oxidized",
 ]
+
+_FILE_STEM_ALIASES = {
+    "bassattack": "bass",
+    "icechime": "chime",
+    "xylobone": "xylophone",
+}
 
 octaves = {
     "harp": 0,
@@ -57,20 +71,61 @@ octaves = {
     "trumpet_oxidized": -1,
 }
 
+# NBS key ranges (inclusive); 2-octave band shared with src.sounds
+TWO_OCTAVE_MIN, TWO_OCTAVE_MAX = TWO_OCTAVE_LOW, TWO_OCTAVE_HIGH
+SIX_OCTAVE_MIN, SIX_OCTAVE_MAX = 9, 81
+SIX_OCTAVE_CENTER = (SIX_OCTAVE_MIN + SIX_OCTAVE_MAX) / 2  # 45
+SIX_OCTAVE_HALF_SPAN = SIX_OCTAVE_CENTER - SIX_OCTAVE_MIN  # 36
+
 
 @dataclass
-class Note:
+class PlaysoundNote:
     """Represents a note produced by a /playsound command."""
 
-    instrument: str = "block.note_block.harp"
+    instrument: str = "nbs:note_harp"
     volume: float = 1
-    radius: float = 16
+    falloff: float = 16
     pitch: float = 1
     panning: float = 0
 
-    def play_short_range(self, stereo_separation: float = 4) -> str:
+    def play(
+        self, inner_range: float, outer_range: float, stereo_separation: float = None
+    ) -> str:
+        """Play a sound that can be heard in a range by all players in range
+
+        Args:
+            `inner_range`: The range (in blocks) at which all frequencies of the sound will be audible at full volume.
+            `outer_range`: The range (in blocks) at which all frequencies of the sound will be inaudible.
+            `stereo_separation`: The separation (in blocks) between the two stereo audio channels.
+
+        Returns:
+            The `/playsound` command to play the note for the given player.
+        """
+
+        play_function = (
+            self.play_short_range if outer_range <= 16 else self.play_long_range
+        )
+
+        if stereo_separation is None:  # use the function's default stereo separation
+            return play_function(full_range=inner_range, decay_range=outer_range)
+        else:
+            return play_function(
+                full_range=inner_range,
+                decay_range=outer_range,
+                stereo_separation=stereo_separation,
+            )
+
+    def play_short_range(
+        self,
+        full_range: float = 9,
+        decay_range: float = 12,
+        stereo_separation: float = 4,
+    ) -> str:
         """
         Play a sound that can be heard in a small radius by all players in range.
+
+        The sound will be audible at full volume inside a spherical range of `full_range` blocks.
+        As the player moves away from the source, higher notes will stop being audible. At `decay_range` blocks, all notes will be inaudible.
         """
 
         # This is achieved by bypassing the `volume` argument completely and instead using the
@@ -85,66 +140,72 @@ class Note:
         # 0.5 = 8 blocks). Instead, the sound is still audible within a 16-block range, but is
         # softer overall.
         #
-        # So, the only to achieve a gradual rolloff less than 16 blocks, is by entirely limiting
+        # So, the only way to achieve a gradual rolloff less than 16 blocks is by entirely limiting
         # who will be able to hear the songs at all via target selection. As such, we can use the
-        # `distance` condition to play notes only to players in a certain range. The code
-        # works with a base range of 9, adding ±3 blocks for lower and higher notes, giving an
-        # effective range between 6-12 blocks. This rolloff can be easily customized by tweaking
-        # the parameters of the sigmoid function used in the calculation. This creates a harsher
-        # decay/rolloff than using volume, but is necessary to achieve rolloff with a ranger smaller
-        # than 16 blocks.
+        # `distance` condition to play notes only to players in a certain range.
+        #
+        # Audible radius is centered on the midpoint of [full_range, decay_range]. Notes at the
+        # center of the scale (falloff=0, key 45) use that midpoint; lower notes add up to
+        # +span/2 and higher notes subtract down to -span/2.
 
-        def rolloff_curve(x: float) -> float:
-            # slope  = -6   -> make curve steeper towards the center and mirror it in the x axis
-            # offset = -0.5 -> move the curve down so its center is at y=0
-            # scale  = 6    -> scale the curve so it goes from -3 to 3 as x approaches +/-inf
+        span = decay_range - full_range
+        half_span = span / 2
+        midpoint = (full_range + decay_range) / 2
 
-            # see: https://www.desmos.com/calculator/roidl8wnxl
-
-            return sigmoid(x, -6, -0.5, 6)
-
-        radius = 9 + rolloff_curve(self.radius)
+        radius = midpoint + pitch_rolloff_offset(self.falloff, half_span)
+        radius = clamp(radius, full_range, decay_range)
 
         stereo_offset = self.panning * stereo_separation // 2
         position = f"^{stereo_offset} ^ ^"
 
-        return self.play(radius=radius, position=position, volume=self.volume)
+        return self.get_playsound_command(
+            radius=radius, position=position, volume=self.volume
+        )
 
-    def play_long_range(self, stereo_separation: float = 8) -> str:
+    def play_long_range(
+        self,
+        full_range: float = 32,
+        decay_range: float = 48,
+        stereo_separation: float = 8,
+    ) -> str:
         """
         Play a sound that can be heard in a large radius by all players in range.
+
+        In Java Edition, `/playsound` volume ≥ 1 sets the silence distance to
+        `volume * 16` blocks, with gradual falloff from the source (not a full-volume
+        plateau). Bass notes use `decay_range`; treble notes use `full_range`.
         """
 
-        # This is achieved by using a large `volume` (sound will be audible at full volume
-        # inside a spherical range of `volume * 16` blocks) and setting `min_volume` to 0.
-        # The volume is multiplied by the `rolloff_factor` to make bass notes propagate further,
-        # giving the impression of the song 'fading' away as the player moves away from the source.
+        # volume ≥ 1: audible range = volume * 16 (silence at that distance, minVolume=0).
+        # Map falloff onto [full_range, decay_range] the same way as short-range, then
+        # convert distance → playsound volume. Selector radius stays at decay_range so
+        # players in the outer band still receive the command.
 
-        full_range = 32  # all notes will be audible at this range
-        decay_range = 48  # only bass notes will be audible at this range
+        span = decay_range - full_range
+        half_span = span / 2
+        midpoint = (full_range + decay_range) / 2
 
-        min_volume = full_range // 16
-        max_volume = decay_range // 16
+        silence_distance = midpoint + pitch_rolloff_offset(self.falloff, half_span)
+        silence_distance = clamp(silence_distance, full_range, decay_range)
 
-        rolloff_factor = self.radius
-
-        target_volume = (
-            min_volume + (max_volume - min_volume) * linear(rolloff_factor, -0.5, 0.5)
-        ) * self.volume
-
-        volume = target_volume
+        # Reduce contribution of note volume because it also shrinks the audible sphere.
+        # Since it's very common to use lower layer volumes, some songs are 'capped' and
+        # end up not reaching the speaker's full range. At the same time, we don't want to
+        # completely ignore the note volume as that would kill the song's dynamics.
+        note_volume_factor = 0.5 + self.volume * 0.5
+        volume = (silence_distance / 16) * note_volume_factor
         radius = decay_range
 
         stereo_offset = self.panning * stereo_separation // 2
         position = f"^{stereo_offset} ^ ^"
 
-        return self.play(
+        return self.get_playsound_command(
             radius=radius,
             volume=volume,
             position=position,
         )
 
-    def play(
+    def get_playsound_command(
         self,
         radius: float | None = None,
         tag: str | None = None,
@@ -159,6 +220,7 @@ class Note:
         instrument = self.instrument.replace("/", "_")
 
         selector_arguments = []
+        selector_arguments.append("tag=!nbs.nomusic")
         if radius is not None:
             selector_arguments.append(f"distance=..{radius:.2f}")
         if tag is not None:
@@ -179,7 +241,7 @@ class Note:
         return args
 
 
-def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["Note"]]]:
+def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["PlaysoundNote"]]]:
     """Yield all the notes from the given nbs file."""
 
     # Quantize notes to nearest tick (pigstep always exports at 20 t/s)
@@ -190,7 +252,11 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["Note"]]]:
 
     # Add special notes to mark the beats
     # (we'll quantize the song afterwards so doing it later on would be out of sync)
-    for tick in range(0, song.header.song_length, 4):
+    beat_interval_ticks = 4
+    if song.header.tempo > 15:
+        beat_interval_ticks = 8
+
+    for tick in range(0, song.header.song_length, beat_interval_ticks):
         song.notes.append(
             pynbs.Note(
                 tick=tick,
@@ -200,23 +266,28 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["Note"]]]:
             )
         )
 
+    # Songs with tempo greater than 20 t/s are slowed down so they can be played in Minecraft
+    effective_tempo = song.header.tempo
+
+    # Special case: 'expanded' songs that only use even ticks (effectively half the tempo)
+    # In Summit '26, 'Permafrost' is the only song that uses this.
+    expansion_factor = 1
+    if effective_tempo >= 30:
+        expansion_factor = 0.5
+    effective_tempo *= expansion_factor
+
+    if effective_tempo > 20:
+        effective_tempo = 20
+
     for note in song.notes:
-        new_tick = round(note.tick * 20 / song.header.tempo)
+        new_tick = round(note.tick * expansion_factor * 20 / effective_tempo)
         note.tick = new_tick
         note_pitch = note.key + note.pitch / 100
-        is_custom_instrument = note.instrument >= song.header.default_instruments
-        is_2_octave = 33 <= note_pitch <= 57
-        is_6_octave = 9 <= note_pitch <= 81
+        is_6_octave = SIX_OCTAVE_MIN <= note_pitch <= SIX_OCTAVE_MAX
 
-        if is_custom_instrument and not is_2_octave:
+        if not is_6_octave:
             # print(
-            #    f"Warning: Custom instrument out of 2-octave range at {note.tick},{note.layer}: {note_pitch}"
-            # )
-            continue
-
-        if not is_custom_instrument and not is_6_octave:
-            # print(
-            #    f"Warning: Vanilla instrument out of 6-octave range at {note.tick},{note.layer}: {note_pitch}"
+            #     f"Warning: Instrument out of 6-octave range at {note.tick},{note.layer}: {note_pitch}"
             # )
             continue
 
@@ -235,34 +306,37 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["Note"]]]:
         if not instrument.file.startswith("minecraft/"):
             print(f"Warning: Invalid instrument path: {instrument.file}")
 
-    sounds = NBS_DEFAULT_INSTRUMENTS + [
-        instrument.file.replace("minecraft/", "").replace(".ogg", "")
-        for instrument in song.instruments
-    ]
+    def rolloff_instrument_name(note: pynbs.Note) -> str:
+        if 0 <= note.instrument < len(NBS_ROLLOFF_INSTRUMENTS):
+            return NBS_ROLLOFF_INSTRUMENTS[note.instrument]
+        resource = SoundResource.from_note(song, note)
+        stem = Path(resource.src_path).stem
+        return _FILE_STEM_ALIASES.get(stem, stem)
 
-    def get_note(note: pynbs.Note) -> Note:
+    def get_playsound_note(note: pynbs.Note) -> PlaysoundNote:
         """Get an intermediary note for /playsound based on a pynbs note."""
 
         layer = song.layers[note.layer]
 
-        sound = sounds[note.instrument % 15] if note.instrument >= 0 else "BEAT"
-        pitch = note.key + (note.pitch / 100)
-        octave_suffix = "_-1" if pitch < 33 else "_1" if pitch > 57 else ""
-        source = f"{sound}{octave_suffix}"
+        if note.instrument < 0:
+            return PlaysoundNote(instrument="BEAT")
 
+        resource = SoundResource.from_note(song, note)
+        source = f"nbs:{resource.sound_event}"
+
+        note_pitch = note.key + (note.pitch / 100)
         layer_volume = layer.volume / 100
         note_volume = note.velocity / 100
-        instrument = sound.split(".")[-1]
         volume = layer_volume * note_volume
 
-        radius = get_rolloff_factor(pitch, instrument)
+        falloff = get_rolloff_factor(note_pitch, rolloff_instrument_name(note))
         panning = get_panning(note, layer)
         pitch = get_pitch(note)
 
-        return Note(
+        return PlaysoundNote(
             instrument=source,
             volume=volume,
-            radius=radius,
+            falloff=falloff,
             panning=panning,
             pitch=pitch,
         )
@@ -275,7 +349,7 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["Note"]]]:
     for tick, chord in song:
         if tick not in output:
             output[tick] = []
-        output[tick].extend(get_note(note) for note in chord)
+        output[tick].extend(get_playsound_note(note) for note in chord)
 
     for tick, notes in output.items():
         yield tick, notes
@@ -295,9 +369,9 @@ def get_pitch(note: Any) -> float:
     """Get pitch for a given nbs note."""
     key = note.key + note.pitch / 100
 
-    if key < 33:
+    if key < TWO_OCTAVE_MIN:
         key -= 9
-    elif key > 57:
+    elif key > TWO_OCTAVE_MAX:
         key -= 57
     else:
         key -= 33
@@ -309,20 +383,36 @@ def sigmoid(x: float, slope: float = 1, offset: float = 0, scale: float = 1) -> 
     return (1 / (1 + math.exp(-x * slope)) + offset) * scale
 
 
-def linear(x: float, slope: float = 1, offset: float = 0) -> float:
-    return x * slope + offset
+def clamp(value: float, min_value: float, max_value: float) -> float:
+    """Clamp a value between a minimum and maximum value."""
+    return max(min_value, min(value, max_value))
+
+
+def pitch_rolloff_offset(falloff: float, half_span: float) -> float:
+    """
+    Map falloff in [-1, 1] onto exactly [-half_span, half_span].
+
+    Low pitches (negative falloff) return positive offsets (travel farther);
+    high pitches return negative offsets. Zero at the center of the scale.
+    see: https://www.desmos.com/calculator/roidl8wnxl
+    """
+    # slope = -6, offset = -0.5 → steep S-curve centered at y=0, low→+, high→-
+    raw = sigmoid(falloff, -6, -0.5, 1)
+    endpoint = abs(sigmoid(1.0, -6, -0.5, 1))
+    return (raw / endpoint) * half_span
 
 
 def get_rolloff_factor(pitch: float, instrument: str) -> float:
     """
     Return the rolloff factor of a note, given its pitch and instrument.
-    The rolloff factor is a value between -1 and 1 that determines how far
-    the note can be heard. Its value is zero at the center of the 6-octave
-    range (45) and increases linearly towards the edges of the range.
+
+    Maps absolute pitch onto [-1, 1]: 0 at the center of the 6-octave range
+    (key 45), negative for lower pitches (travel farther), positive for higher
+    pitches (travel less). Clamped so instrument octave offsets cannot push
+    the factor outside that range.
     """
 
     # Calculate true pitch taking into account each instrument's octave offset
-    real_pitch = pitch + 12 * octaves.get(instrument, 1)
-    # 45 is the middle point (33-57) of the 6-octave range, where the rolloff factor should be 0
-    factor = (real_pitch - 45) / (45 - 8)
-    return factor
+    real_pitch = pitch + 12 * octaves.get(instrument, 0)
+    factor = (real_pitch - SIX_OCTAVE_CENTER) / SIX_OCTAVE_HALF_SPAN
+    return max(-1.0, min(1.0, factor))
