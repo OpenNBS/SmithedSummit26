@@ -17,9 +17,10 @@ require:
 
 pipeline:
   - src.config
-  - mecha
-  - src.generate_songs
   #- src.sounds
+  - mecha
+  # After Mecha: inject raw mcfunction text without Mecha parsing/codegen.
+  - src.generate_songs_multiprocessing
 
 meta:
   bolt:

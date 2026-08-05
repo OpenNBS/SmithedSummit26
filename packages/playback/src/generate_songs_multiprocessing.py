@@ -1,8 +1,7 @@
-"""Pure-Python port of generate_songs.bolt for profiling.
+"""Pure-Python song function generator (bolt-free, multiprocessing).
 
-Builds the same command logic in memory: each function file is a list of
-command strings, stored in a dict keyed by pack-relative path. No files are
-written and Mecha/beet are not involved.
+Builds mcfunction bodies in memory, then a beet_default pipeline stage injects
+them into the data pack after Mecha so they aren't re-parsed.
 """
 
 from __future__ import annotations
@@ -16,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 import pynbs
+from beet import Context, Function
 
 from src.config import ANIM_COUNT, SONGS_PATH, SPEAKER_RANGES
 from src.utilities.note_block import get_notes
@@ -23,6 +23,7 @@ from src.utilities.note_block import get_notes
 logger = logging.getLogger(__name__)
 
 _LOG_FORMAT = "%(levelname)s | %(message)s"
+_PLAYBACK_LOAD = "nbs:playback/load"
 
 
 def _configure_worker_logging() -> None:
@@ -30,19 +31,12 @@ def _configure_worker_logging() -> None:
     logging.basicConfig(level=logging.INFO, format=_LOG_FORMAT, force=True)
 
 
-def function_pack_path(resource_location: str) -> str:
-    """Map `namespace:path/to/fn` → pack-relative `.mcfunction` path."""
-    namespace, path = resource_location.split(":", 1)
-    return f"data/{namespace}/function/{path}.mcfunction"
-
-
 def _append(
     functions: MutableMapping[str, list[str]],
     resource_location: str,
     *commands: str,
 ) -> None:
-    key = function_pack_path(resource_location)
-    functions.setdefault(key, []).extend(commands)
+    functions.setdefault(resource_location, []).extend(commands)
 
 
 def _define(
@@ -50,7 +44,7 @@ def _define(
     resource_location: str,
     commands: Sequence[str],
 ) -> None:
-    functions[function_pack_path(resource_location)] = list(commands)
+    functions[resource_location] = list(commands)
 
 
 def _snbt_string(value: str) -> str:
@@ -202,8 +196,7 @@ def generate_songs(
     results are merged in manifest order so `nbs:playback/load` appends stay
     deterministic.
 
-    Returns a dict of pack-relative function paths → command lines, matching
-    the functions that generate_songs.bolt would emit into the data pack.
+    Returns a dict of function resource locations → command lines.
     """
     regions_set = (
         set(regions) if regions is not None else _regions_from_manifest(song_manifest)
@@ -215,16 +208,15 @@ def generate_songs(
 
     logger.info("Generating songs")
 
-    # append function nbs:playback/load
     _append(
         functions,
-        "nbs:playback/load",
+        _PLAYBACK_LOAD,
         "data modify storage nbs:playback songs set value {}",
     )
     for region in regions_set:
         _append(
             functions,
-            "nbs:playback/load",
+            _PLAYBACK_LOAD,
             f"data modify storage nbs:playback songs.{region} set value []",
         )
 
@@ -269,12 +261,50 @@ def generate_songs(
     for result in results:
         if result is None:
             continue
-        _append(functions, "nbs:playback/load", result.load_command)
+        _append(functions, _PLAYBACK_LOAD, result.load_command)
         functions.update(result.functions)
         instruments.update(result.instruments)
 
     logger.info("Song processing complete!")
     return functions
+
+
+def beet_default(ctx: Context) -> None:
+    """Inject generated song functions into the pack after Mecha."""
+    generated = generate_songs(
+        ctx.meta["song_manifest"],
+        speaker_ranges=ctx.meta["speaker_ranges"],
+        regions=ctx.meta["regions"],
+        anim_count=ctx.meta["anim_count"],
+        instruments=ctx.meta["instruments"],
+    )
+
+    load_commands = generated.pop(_PLAYBACK_LOAD, [])
+    song_keys = [k for k in generated if k.startswith("nbs:song/")]
+    song_ids = sorted({k.split("/", 2)[1] for k in song_keys})
+    logger.info(
+        "Injecting %s functions (%s song ids: %s); load has %s commands",
+        len(generated) + 1,
+        len(song_ids),
+        song_ids,
+        len(load_commands),
+    )
+    if load_commands:
+        logger.info("First load command: %s", load_commands[0])
+        logger.info("Last load command: %s", load_commands[-1])
+
+    # Song registry must run before playback/load's change_song calls.
+    # Replace the Function wholesale — mutating .lines on Mecha-built
+    # functions is not always persisted to the dumped pack.
+    existing_load = (
+        list(ctx.data.functions[_PLAYBACK_LOAD].lines)
+        if _PLAYBACK_LOAD in ctx.data.functions
+        else []
+    )
+    ctx.data[_PLAYBACK_LOAD] = Function(load_commands + existing_load)
+
+    for path, commands in generated.items():
+        ctx.data[path] = Function(commands)
 
 
 def load_manifest(manifest_path: Path) -> list[dict[str, Any]]:
