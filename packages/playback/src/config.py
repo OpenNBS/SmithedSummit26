@@ -32,7 +32,8 @@ ANIM_COUNT = 6
 
 
 def load_song_manifest(ctx: Context):
-    song_manifest_path = ctx.meta["song_manifest_path"]
+    song_manifest_path = SONGS_PATH.parent / ctx.meta["song_manifest_path"]
+
     SONG_DATA = SONGS_PATH.parent / song_manifest_path
 
     if not SONG_DATA.exists():
