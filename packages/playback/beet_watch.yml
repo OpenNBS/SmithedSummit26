@@ -1,5 +1,5 @@
-# Beet config for used for live reload (development). We leave it as beet.yml
-# because the 'beet watch' command currently does not support changing the project.
+# Beet config for used for live reload (development). Writes file directly to
+# filesystem instead of zipping.
 
 extend: beet_base.yml
 

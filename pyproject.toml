@@ -61,12 +61,12 @@ cwd = "packages/playback"
 
 [tool.poe.tasks.playback-debug]
 help = "Build the playback package for development"
-cmd = "beet --project beet.yml --log DEBUG"
+cmd = "beet --project beet_dev.yml --log DEBUG"
 cwd = "packages/playback"
 
 [tool.poe.tasks.playback-watch]
 help = "Watch and rebuild the playback package"
-cmd = "beet watch --reload"
+cmd = "beet --project beet_watch.yml watch --reload"
 cwd = "packages/playback"
 
 [tool.poe.tasks.playback-cprofile]
