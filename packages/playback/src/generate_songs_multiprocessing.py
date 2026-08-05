@@ -221,7 +221,7 @@ def generate_songs(
 
     # Always go through the package module so ProcessPool pickling works when
     # this file is executed as __main__ (e.g. under cProfile with a file path).
-    from src import generate_songs_profile as _mod
+    from src import generate_songs_multiprocessing as _mod
 
     current_index_per_region = {region: 0 for region in regions_set}
     speaker_ranges_tuple = tuple(dict(speaker) for speaker in speaker_ranges)
