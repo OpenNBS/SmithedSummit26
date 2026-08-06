@@ -38,7 +38,7 @@ append function ~/load:
             generate_song_advancement(region, song["id"], song["title"], song["author"])
         
     for region in REGIONS:
-        # just incase
+        # just in case
         execute unless data storage TEMP[region] input run data modify storage TEMP[region] input set value {}
         
         # do we want to change song on reload?
