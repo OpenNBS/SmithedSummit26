@@ -9,5 +9,5 @@ SONG_MANIFEST = ctx.meta["song_manifest"]
 SONG_INDICES = {}
 
 for region in REGIONS:
-    TEMP[region] = f"nbs:{region}/temp"
-    PLAYBACK[region] = f"nbs:{region}/playback"
+    TEMP[region] = f"nbs:temp/{region}"
+    PLAYBACK[region] = f"nbs:playback/{region}"
