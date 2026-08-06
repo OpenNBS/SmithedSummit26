@@ -24,7 +24,7 @@ append function ~/load:
             for speaker in ctx.meta["speaker_ranges"]:
                 speaker_type = speaker["name"]
                 as @e[type=item_display, tag=f"nbs.speaker.{region}", tag=f"nbs.speaker.{speaker_type}"]:
-                    function animated_java:global/gu/get_entity_uuid_string
+                    function gu:convert from entity @s
                     data modify storage nbs:playback f"locations.{region}" append value {speaker_type: f"{speaker_type}"}
                     data modify storage nbs:playback f"locations.{region}[-1].uuid" set from storage animated_java:gu out
 

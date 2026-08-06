@@ -7,6 +7,7 @@ data_pack:
   description: "Smithed Summit 2026 OpenNBS playback system"
   load:
     - data/nbs/module: src
+    - ../../vendor/gu1.2
 
 resource_pack:
   name: nbs-summit26-playback-rp
