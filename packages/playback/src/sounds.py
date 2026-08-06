@@ -151,13 +151,27 @@ def get_all_custom_sounds(song_manifest: dict) -> set[SoundResource]:
     return sound_files
 
 
+# libvorbis stack-overflows on Windows when encoding large buffers in one write
+# (bastibe/python-soundfile#396). Chunk to keep vorbis_analysis_wrote small.
+OGG_WRITE_FRAMES = 4096
+
+
 def pitch_shift_ogg(ogg_bytes: bytes, semitones: int) -> bytes:
     """Varispeed pitch shift: raise/lower pitch and shorten/lengthen duration together."""
     data, sr = sf.read(BytesIO(ogg_bytes), dtype="float32", always_2d=True)
     factor = 2 ** (semitones / 12)
     shifted = samplerate.resample(data, 1 / factor, "sinc_best")
     out = BytesIO()
-    sf.write(out, shifted, sr, format="OGG", subtype="VORBIS")
+    with sf.SoundFile(
+        out,
+        mode="w",
+        samplerate=sr,
+        channels=shifted.shape[1],
+        format="OGG",
+        subtype="VORBIS",
+    ) as sound_file:
+        for start in range(0, len(shifted), OGG_WRITE_FRAMES):
+            sound_file.write(shifted[start : start + OGG_WRITE_FRAMES])
     return out.getvalue()
 
 
