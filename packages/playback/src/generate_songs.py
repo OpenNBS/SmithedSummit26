@@ -110,6 +110,7 @@ def render_variant(
     ]
 
     # only every tick cooresponding to 1s
+    # TODO: this tick may not exist in the song
     if (tick % 20) == 0:
         commands = [
             f"tag {listeners} add {options.new_in_range_tag}",

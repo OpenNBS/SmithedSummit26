@@ -22,7 +22,7 @@ pipeline:
   - src.sounds
   - mecha
   # After Mecha: inject raw mcfunction text without Mecha parsing/codegen.
-  - src.generate_songs_multithreading
+  - src.generate_songs
 
 meta:
   minecraft: "26.2"
