@@ -1,102 +1,102 @@
 [project]
-name = "nbs-summit26"
-version = "0.1.0"
-description = "Note Block Studio data pack + resource pack for Smithed Summit 2026"
-authors = [{ name = "Bentroen" }]
-requires-python = ">=3.14,<4"
-readme = "README.md"
+authors = [{name = "Bentroen"}]
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.14",
 ]
+description = "Note Block Studio data pack + resource pack for Smithed Summit 2026"
+name = "nbs-summit26"
+readme = "README.md"
+requires-python = ">=3.14,<4"
+version = "0.1.0"
 
 dependencies = [
-    "beet>=0.115.0,<0.116",
-    "bolt>=0.50.1,<0.51",
-    "nbs-summit26-booth",
-    "nbs-summit26-playback",
-    "nbs-summit26-shared",
+  "beet>=0.115.0,<0.116",
+  "bolt>=0.50.1,<0.51",
+  "nbs-summit26-booth",
+  "nbs-summit26-playback",
+  "nbs-summit26-shared",
 ]
 
 [dependency-groups]
 dev = [
-    "poethepoet>=0.37.0",
-    "snakeviz>=2.2.2",
-    "tuna>=0.5.15",
+  "poethepoet>=0.37.0",
+  "snakeviz>=2.2.2",
+  "tuna>=0.5.15",
 ]
 
 [tool.uv]
 default-groups = ["dev"]
 
 [tool.uv.sources]
-nbs-summit26-booth = { workspace = true }
-nbs-summit26-playback = { workspace = true }
-nbs-summit26-shared = { workspace = true }
+nbs-summit26-booth = {workspace = true}
+nbs-summit26-playback = {workspace = true}
+nbs-summit26-shared = {workspace = true}
 
 [tool.uv.workspace]
 members = ["packages/*"]
 
 [tool.poe.tasks.build]
-help = "Build the full project (root beet.yml)"
 cmd = "beet"
+help = "Build the full project (root beet.yml)"
 
 [tool.poe.tasks.link]
-help = "Link built packs to a Minecraft installation"
 cmd = "beet link"
+help = "Link built packs to a Minecraft installation"
 
 [tool.poe.tasks.booth]
-help = "Build the booth package"
 cmd = "beet"
 cwd = "packages/booth"
+help = "Build the booth package"
 
 [tool.poe.tasks.booth-watch]
-help = "Watch and rebuild the booth package"
 cmd = "beet watch --reload"
 cwd = "packages/booth"
+help = "Watch and rebuild the booth package"
 
 [tool.poe.tasks.playback]
-help = "Build the playback package for production"
 cmd = "beet --project beet_prd.yml --log INFO"
 cwd = "packages/playback"
+help = "Build the playback package for production"
 
 [tool.poe.tasks.playback-debug]
-help = "Build the playback package for development"
 cmd = "beet --project beet_dev.yml --log DEBUG"
 cwd = "packages/playback"
+help = "Build the playback package for development"
 
 [tool.poe.tasks.playback-watch]
-help = "Watch and rebuild the playback package"
 cmd = "beet --project beet_watch.yml watch --reload"
 cwd = "packages/playback"
+help = "Watch and rebuild the playback package"
 
 [tool.poe.tasks.playback-cprofile]
-help = "Profile the playback package build with cProfile (writes playback.prof)"
 cwd = "packages/playback"
+help = "Profile the playback package build with cProfile (writes playback.prof)"
 sequence = [
-  { cmd = "beet cache --clear mecha" },
-  { cmd = "python -m cProfile -o playback.prof -m beet --project beet.yml --log DEBUG" },
+  {cmd = "beet cache --clear mecha"},
+  {cmd = "python -m cProfile -o playback.prof -m beet --project beet.yml --log DEBUG"},
 ]
 
 [tool.poe.tasks.playback-profile]
-help = "Profile the playback package build and open in snakeviz"
 cwd = "packages/playback"
+help = "Profile the playback package build and open in snakeviz"
 sequence = [
   "playback-cprofile",
-  { cmd = "snakeviz playback.prof" },
+  {cmd = "snakeviz playback.prof"},
 ]
 
 [tool.poe.tasks.playback-profile-tuna]
-help = "Profile the playback package build and open in tuna (better for deep call graphs)"
 cwd = "packages/playback"
+help = "Profile the playback package build and open in tuna (better for deep call graphs)"
 sequence = [
   "playback-cprofile",
-  { cmd = "tuna playback.prof" },
+  {cmd = "tuna playback.prof"},
 ]
 
 [tool.poe.tasks.download-songs]
-help = "Download song files and update the submissions manifest"
 cmd = "uv run scripts/download_songs.py"
+help = "Download song files and update the submissions manifest"
 
 [tool.poe.tasks.create-thumbnails]
-help = "Generate booth thumbnails from remote song files"
 cmd = "uv run scripts/create_thumbnail.py"
+help = "Generate booth thumbnails from remote song files"
