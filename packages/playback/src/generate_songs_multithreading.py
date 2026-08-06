@@ -12,7 +12,6 @@ from pathlib import Path
 
 import pynbs
 from beet import Context, Function
-
 from src.config import SONGS_PATH
 from src.utilities.note_block import PlaysoundNote, get_notes
 
@@ -59,7 +58,6 @@ def render_root(task: SongTask, tick: int) -> list[str]:
     # execute if entity @s[tag=nbs.speaker.mid] run return run function nbs:song/demo/8/mid
     # return run function nbs:song/demo/8/long
 
-
     if not task.speaker_ranges:
         raise ValueError("At least one speaker range is required")
 
@@ -93,9 +91,7 @@ def render_variant(
     options = task.options
     listeners = f"@a[distance=..{speaker.outer}]"
     current_listeners = f"@a[tag={options.new_in_range_tag}]"
-    new_listeners = (
-        f"@a[tag={options.new_in_range_tag},tag=!{options.in_range_tag}]"
-    )
+    new_listeners = f"@a[tag={options.new_in_range_tag},tag=!{options.in_range_tag}]"
     no_longer_listeners = (
         f"@a[tag=!{options.new_in_range_tag}, tag={options.in_range_tag}]"
     )
@@ -132,7 +128,7 @@ def render_variant(
         f"playsound {note.play(speaker.inner, speaker.outer)}"
         for note in notes
         if note.instrument != "BEAT"
-    ) 
+    )
     commands.extend(extra_commands)  # jank to handle last note in right place
 
     # keep track of songs listened to

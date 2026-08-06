@@ -67,7 +67,7 @@ class SoundResource:
 
     @property
     def _relative_stem(self) -> str:
-        """Path under sounds/ without .ogg, e.g. note/harp."""
+        """Path under sounds/ without .ogg, e.g. `note/harp`."""
         return self.src_path.removeprefix("minecraft/").removesuffix(".ogg")
 
     @property
@@ -77,22 +77,22 @@ class SoundResource:
 
     @property
     def vanilla_sound_key(self) -> str:
-        """Key in vanilla.assets['minecraft'].sounds."""
+        """Key in `vanilla.assets['minecraft'].sounds`."""
         return self._relative_stem
 
     @property
     def vanilla_sound_name(self) -> str:
-        """sounds.json file reference for the unpitched vanilla sample."""
+        """`sounds.json` file reference for the unpitched vanilla sample."""
         return f"minecraft:{self.vanilla_sound_key}"
 
     @property
     def pack_sound_path(self) -> str:
-        """Path under assets/nbs/sounds/ (no .ogg)."""
+        """Path under `assets/nbs/sounds/` (no .ogg)."""
         return f"{self._relative_stem}{self.octave_offset.value.suffix}"
 
     @property
     def sound_event(self) -> str:
-        """Key in nbs sounds.json → plays as nbs:{sound_event}."""
+        """Key in `nbs/sounds.json` → plays as `nbs:{sound_event}`."""
         return self.pack_sound_path.replace("/", "_")
 
 
@@ -161,6 +161,7 @@ def pitch_shift_ogg(ogg_bytes: bytes, semitones: int) -> bytes:
     data, sr = sf.read(BytesIO(ogg_bytes), dtype="float32", always_2d=True)
     factor = 2 ** (semitones / 12)
     shifted = samplerate.resample(data, 1 / factor, "sinc_best")
+
     out = BytesIO()
     with sf.SoundFile(
         out,
@@ -181,7 +182,9 @@ def load_vanilla_ogg(jar: ClientJar, resource: SoundResource) -> bytes | None:
     try:
         sound = jar.assets["minecraft"].sounds[resource.vanilla_sound_key]
     except KeyError:
-        logging.warning(f"Sound not found in vanilla assets: {resource.vanilla_sound_key}")
+        logging.warning(
+            f"Sound not found in vanilla assets: {resource.vanilla_sound_key}"
+        )
 
         return
 
@@ -204,7 +207,6 @@ def generate_sounds(ctx: Context, sound_list: set[SoundResource]) -> None:
             }
             continue
 
-        
         if (ogg_bytes := load_vanilla_ogg(jar, resource)) is None:
             continue
 

@@ -11,12 +11,7 @@ from pathlib import Path
 from typing import Any, Iterator, List, Tuple
 
 import pynbs
-
-from src.sounds import (
-    TWO_OCTAVE_HIGH,
-    TWO_OCTAVE_LOW,
-    SoundResource,
-)
+from src.sounds import TWO_OCTAVE_HIGH, TWO_OCTAVE_LOW, SoundResource
 
 # Logical instrument names for distance rolloff (indexed like NBS default instruments)
 NBS_ROLLOFF_INSTRUMENTS = [
