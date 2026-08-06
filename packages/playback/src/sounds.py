@@ -205,6 +205,8 @@ def generate_sounds(ctx: Context, sound_list: set[SoundResource]) -> None:
     sound_config: dict = {}
 
     for resource in sound_list:
+        logging.debug(f"Generating sound for {resource.resource_location}")
+
         event = resource.sound_event
 
         if resource.octave_offset is OctaveOffsetEnum.NONE:
