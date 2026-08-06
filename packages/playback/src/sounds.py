@@ -12,8 +12,8 @@ from src.config import SONGS_PATH
 
 DEFAULT_SOUNDS = [
     "minecraft/note/harp.ogg",
-    "minecraft/note/bassattack.ogg",
-    "minecraft/note/basedrum.ogg",
+    "minecraft/note/bass.ogg",
+    "minecraft/note/bd.ogg",
     "minecraft/note/snare.ogg",
     "minecraft/note/hat.ogg",
     "minecraft/note/guitar.ogg",
@@ -67,7 +67,7 @@ class SoundResource:
 
     @property
     def _relative_stem(self) -> str:
-        """Path under sounds/ without .ogg, e.g. note/basedrum."""
+        """Path under sounds/ without .ogg, e.g. note/harp."""
         return self.src_path.removeprefix("minecraft/").removesuffix(".ogg")
 
     @property
