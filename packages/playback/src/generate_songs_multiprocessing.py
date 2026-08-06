@@ -122,7 +122,6 @@ def _process_song(job: _SongJob) -> _SongResult | None:
         notes = chord[1]
 
         root_commands: list[str] = [
-            "data modify storage nbs:temp input set value {}",
             f"data modify storage nbs:temp input.song set value {_snbt_string(job.song_id)}",
             f"data modify storage nbs:temp input.tick set value {tick}",
             f"execute store result score {job.region}.#len nbs "
@@ -130,8 +129,6 @@ def _process_song(job: _SongJob) -> _SongResult | None:
             f"execute store result storage nbs:temp input.i int 1 "
             f"run scoreboard players set {job.region}.#iter nbs 0",
             f"function nbs:playback/{job.region}/speaker_iter/root with storage nbs:temp input",
-            f"scoreboard players add notes_played nbs_stats {len(notes)}",
-            "scoreboard players add ticks_played nbs_stats 1",
         ]
         _define(functions, f"nbs:song/{job.song_id}/{tick}/root", root_commands)
 

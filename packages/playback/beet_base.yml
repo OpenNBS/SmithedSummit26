@@ -18,10 +18,10 @@ require:
 
 pipeline:
   - src.config
-  #- src.sounds
+  - src.sounds
   - mecha
   # After Mecha: inject raw mcfunction text without Mecha parsing/codegen.
-  - src.generate_songs_multiprocessing
+  - src.generate_songs_multithreading
 
 meta:
   minecraft: "26.2"
@@ -29,5 +29,7 @@ meta:
     version: "26.2"
   bolt:
     entrypoint: "nbs:main"
+
+  bake_entity_uuids: false
 
 output: dist

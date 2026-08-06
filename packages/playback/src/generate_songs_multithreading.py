@@ -1,9 +1,10 @@
-"""Generate playback functions from the NBS song manifest."""
+"""Generate per-song, per-tick speaker note functions from NBS files."""
 
 import json
 import logging
 import os
 import sys
+from collections.abc import Sequence
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from multiprocessing import get_context
@@ -13,9 +14,20 @@ import pynbs
 from beet import Context, Function
 
 from src.config import SONGS_PATH
-from src.utilities.note_block import get_notes
+from src.utilities.note_block import PlaysoundNote, get_notes
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class RenderOptions:
+    """Commands and resource names shared by every generated song tick."""
+
+    in_range_tag: str = "nbs.in_range"
+    new_in_range_tag: str = "nbs.in_range.new"
+    actionbar_prefix: str = "🎵 Now Listening: "
+    advancement_template: str = "nbs:song/{song_id}"
+    particle: str = "minecraft:note ~ ~1.25 ~ 0 0 0 1 1 normal"
 
 
 @dataclass(frozen=True)
@@ -30,101 +42,159 @@ class SongTask:
     song_id: str
     title: str
     author: str
-    region: str
-    region_index: int
     path: Path
     speaker_ranges: tuple[SpeakerRange, ...]
-    animation_count: int
+    options: RenderOptions = RenderOptions()
 
 
 @dataclass
 class SongResult:
     functions: dict[str, list[str]]
-    instruments: set[str]
 
 
-def quote(value: str) -> str:
-    """Serialize a string using the quoting accepted by SNBT commands."""
+def render_root(task: SongTask, tick: int) -> list[str]:
+    """Route to the matching variant, using the final variant as fallback."""
 
-    return json.dumps(value)
+    # execute if entity @s[tag=nbs.speaker.short] run return run function nbs:song/demo/8/short
+    # execute if entity @s[tag=nbs.speaker.mid] run return run function nbs:song/demo/8/mid
+    # return run function nbs:song/demo/8/long
 
 
-def render_beat(
-    region: str, speaker: SpeakerRange, animation_count: int
-) -> list[str]:
-    lines = [
-        f"execute store result score #random nbs run random value 1..{animation_count}"
+    if not task.speaker_ranges:
+        raise ValueError("At least one speaker range is required")
+
+    # we always ensure that fallback gets hit (usually long)
+    *checked_ranges, fallback = task.speaker_ranges
+
+    commands = [
+        f"execute if entity @s[tag=nbs.speaker.{speaker.name}] "
+        f"run return run function nbs:song/{task.song_id}/{tick}/{speaker.name}"
+        for speaker in checked_ranges
     ]
-    lines.extend(
-        f"execute if score #random nbs matches {animation} "
-        f"if entity @a[distance=0..{speaker.outer}] run function "
-        f"summit_ambiance:speaker_{region}/animations/beat_{animation}/play"
-        for animation in range(1, animation_count + 1)
+    commands.append(
+        f"return run function nbs:song/{task.song_id}/{tick}/{fallback.name}"
     )
-    lines.append(
-        f"execute if entity @a[distance=0..{speaker.outer}] "
-        "run particle minecraft:note ~ ~1.25 ~ 0 0 0 1 1"
+    return commands
+
+
+def render_variant(
+    task: SongTask,
+    tick: int,
+    speaker: SpeakerRange,
+    notes: Sequence[PlaysoundNote],
+    extra_commands: Sequence[str] = (),
+) -> list[str]:
+    """Render one range-specific tick function.
+
+    Keep the lifecycle commands here so range tracking, UI, advancements, and
+    particles can be customized independently from note parsing.
+    """
+
+    options = task.options
+    listeners = f"@a[distance=..{speaker.outer}]"
+    current_listeners = f"@a[tag={options.new_in_range_tag}]"
+    new_listeners = (
+        f"@a[tag={options.new_in_range_tag},tag=!{options.in_range_tag}]"
     )
-    return lines
+    no_longer_listeners = (
+        f"@a[tag=!{options.new_in_range_tag}, tag={options.in_range_tag}]"
+    )
+    actionbar = json.dumps(
+        [
+            {"text": options.actionbar_prefix, "color": "green"},
+            {"text": f"{task.title} - {task.author}", "color": "white"},
+        ],
+        separators=(",", ":"),
+        ensure_ascii=False,
+    )
+
+    # handles dynamic actionbar showcasing (comment out 107-111 if too much)
+    commands = [
+        f"execute unless entity {listeners} run return fail",
+    ]
+
+    # only every tick cooresponding to 1s
+    if (tick % 20) == 0:
+        commands = [
+            f"tag {listeners} add {options.new_in_range_tag}",
+            f"title {new_listeners} actionbar {actionbar}",
+            f"tag {current_listeners} add {options.in_range_tag}",
+            f"tag {no_longer_listeners} remove {options.in_range_tag}",
+            f"tag {current_listeners} remove {options.new_in_range_tag}",
+        ] + commands
+
+    # we handle beats later outside
+    if any(note.instrument == "BEAT" for note in notes):
+        commands.append("tag @s add nbs.beat")
+
+    # play our chord
+    commands.extend(
+        f"playsound {note.play(speaker.inner, speaker.outer)}"
+        for note in notes
+        if note.instrument != "BEAT"
+    ) 
+    commands.extend(extra_commands)  # jank to handle last note in right place
+
+    # keep track of songs listened to
+    advancement = options.advancement_template.format(song_id=task.song_id)
+    commands.extend(
+        [
+            f"advancement grant {listeners} only {advancement}",
+            f"return run particle {options.particle} {listeners}",
+        ]
+    )
+    return commands
+
+
+def render_chord(
+    task: SongTask,
+    tick: int,
+    notes: Sequence[PlaysoundNote],
+    extra_commands: Sequence[str] = (),
+) -> dict[str, list[str]]:
+    """Render a tick root and all of its range-specific child functions."""
+
+    functions = {
+        f"nbs:song/{task.song_id}/{tick}/root": render_root(task, tick),
+    }
+    functions.update(
+        {
+            f"nbs:song/{task.song_id}/{tick}/{speaker.name}": render_variant(
+                task,
+                tick,
+                speaker,
+                notes,
+                extra_commands,
+            )
+            for speaker in task.speaker_ranges
+        }
+    )
+    return functions
 
 
 def render_song(task: SongTask) -> SongResult:
-    """Render one song without mutating the shared Beet context."""
+    """Render one song"""
 
     song = pynbs.read(task.path)
     functions: dict[str, list[str]] = {}
-    instruments: set[str] = set()
     last_tick: int | None = None
 
     for tick, notes in get_notes(song):
         last_tick = tick
-        root = f"nbs:song/{task.song_id}/{tick}/root"
-        functions[root] = [
-            "data modify storage nbs:temp input set value {}",
-            f"data modify storage nbs:temp input.song set value {quote(task.song_id)}",
-            f"data modify storage nbs:temp input.tick set value {tick}",
-            f"execute store result score {task.region}.#len nbs "
-            f"if data storage nbs:playback locations.{task.region}[]",
-            "execute store result storage nbs:temp input.i int 1 run "
-            f"scoreboard players set {task.region}.#iter nbs 0",
-            f"function nbs:playback/{task.region}/speaker_iter/root "
-            "with storage nbs:temp input",
-            f"scoreboard players add notes_played nbs_stats {len(notes)}",
-            "scoreboard players add ticks_played nbs_stats 1",
-        ]
-
-        for note in notes:
-            instruments.add(note.instrument)
-
-            for speaker in task.speaker_ranges:
-                path = f"nbs:song/{task.song_id}/{tick}/{speaker.name}"
-
-                if note.instrument == "BEAT":
-                    functions.setdefault(path, []).extend(
-                        render_beat(task.region, speaker, task.animation_count)
-                    )
-                else:
-                    functions.setdefault(path, []).append(
-                        f"playsound {note.play(speaker.inner, speaker.outer)}"
-                    )
+        functions.update(render_chord(task, tick, notes))
 
     if last_tick is not None:
-        end_path = f"nbs:song/{task.song_id}/{last_tick + 40}/root"
-        functions.setdefault(end_path, []).append(
-            f"function nbs:playback/{task.region}/advance"
+        end_tick = last_tick + 40
+        functions.update(
+            render_chord(
+                task,
+                end_tick,
+                [],
+                extra_commands=("tag @s add nbs.advance",),
+            )
         )
 
-    return SongResult(functions, instruments)
-
-
-def render_load_command(task: SongTask) -> str:
-    formatted_string = f"{task.title} - {task.author}"
-    return (
-        f"data modify storage nbs:playback songs.{task.region} append value {{"
-        f"name: {quote(task.song_id)}, index: {task.region_index}, "
-        f"formatted_string: {quote(formatted_string)}, title: {quote(task.title)}, "
-        f"author: {quote(task.author)}}}"
-    )
+    return SongResult(functions)
 
 
 def prepare_tasks(ctx: Context) -> list[SongTask]:
@@ -136,20 +206,14 @@ def prepare_tasks(ctx: Context) -> list[SongTask]:
         )
         for speaker in ctx.meta["speaker_ranges"]
     )
-    animation_count = ctx.meta["anim_count"]
-    current_index_per_region = dict.fromkeys(ctx.meta["regions"], 0)
     tasks: list[SongTask] = []
 
     for song_data in ctx.meta["song_manifest"]:
         song_id = song_data["id"]
-        region = song_data["region"]
-
-        if region is None:
+        if song_data["region"] is None:
             logger.warning("Song %s has no region assigned; skipping", song_id)
             continue
 
-        region_index = current_index_per_region[region]
-        current_index_per_region[region] += 1
         path = SONGS_PATH / f"{song_id}.nbs"
 
         if not path.exists():
@@ -162,11 +226,8 @@ def prepare_tasks(ctx: Context) -> list[SongTask]:
                 song_id=song_id,
                 title=song_data["title"],
                 author=song_data["author"],
-                region=region,
-                region_index=region_index,
                 path=path,
                 speaker_ranges=speaker_ranges,
-                animation_count=animation_count,
             )
         )
 
@@ -174,16 +235,8 @@ def prepare_tasks(ctx: Context) -> list[SongTask]:
 
 
 def beet_default(ctx: Context) -> None:
-    logger.info("Generating songs")
-
-    load_lines = ["data modify storage nbs:playback songs set value {}"]
-    load_lines.extend(
-        f"data modify storage nbs:playback songs.{region} set value []"
-        for region in ctx.meta["regions"]
-    )
-
+    logger.info("Generating song note functions")
     tasks = prepare_tasks(ctx)
-    load_lines.extend(render_load_command(task) for task in tasks)
 
     if tasks:
         available_workers = min(len(tasks), os.process_cpu_count() or 1)
@@ -226,11 +279,9 @@ def beet_default(ctx: Context) -> None:
                     logger.exception("Failed to process song: %s", song_id)
                     raise
 
-                ctx.meta["instruments"].update(result.instruments)
                 for path, lines in result.functions.items():
                     # Store serialized text so the finished pack doesn't retain
                     # millions of individual command strings and list entries.
                     ctx.data.functions[path] = Function("\n".join(lines) + "\n")
 
-    ctx.data.functions.setdefault("nbs:playback/load", Function()).prepend(load_lines)
-    logger.info("🎉 Song processing complete!")
+    logger.info("🎉 Song note generation complete!")

@@ -1,143 +1,174 @@
 import glob
 import logging
 
+from src.config import SPEAKER_RANGES
+from ./const import REGIONS, PLAYBACK, TEMP, SONG_MANIFEST, SONG_INDICES, REGION_COUNTS
+
 logging.info("Generating playback functions")
 
-#> setup
-merge function_tag minecraft:load {
-    "values": [(~/load)]
-}
 
-SPEAKER_RANGES = ctx.meta["speaker_ranges"]
-REGIONS = ctx.meta["regions"]
-REGION_COUNTS = ctx.meta["region_counts"]
+
+#> setup
 
 append function ~/load:
-    scoreboard objectives add nbs dummy
-    scoreboard objectives add nbs_stats dummy
-    scoreboard players set shuffle nbs 0
-    
-    execute function ~/save_speaker_positions:
-        data modify storage nbs:playback locations set value {}
-        for region in ctx.meta["regions"]:
-            data modify storage nbs:playback f"locations.{region}" set value []
-            for speaker in ctx.meta["speaker_ranges"]:
-                speaker_type = speaker["name"]
-                as @e[type=item_display, tag=f"nbs.speaker.{region}", tag=f"nbs.speaker.{speaker_type}"]:
-                    function gu:convert from entity @s
-                    data modify storage nbs:playback f"locations.{region}" append value {speaker_type: f"{speaker_type}"}
-                    data modify storage nbs:playback f"locations.{region}[-1].uuid" set from storage animated_java:gu out
+    merge function_tag minecraft:load {"values": [(~/)]}
 
-    # load the current songs into storage to ensure playback starts
+    scoreboard objectives add nbs dummy
+    scoreboard players set shuffle nbs 0
+
+    # load manifest
+    for song in SONG_MANIFEST:
+        region = song["region"]
+
+        if region is not None:
+            index = SONG_INDICES.setdefault(region, 0)
+            SONG_INDICES[region] += 1
+
+            entry = {
+                "name": song["id"],
+                "index": index,
+                "formatted_string": f'{song["title"]} - {song["author"]}',
+                "title": song["title"],
+                "author": song["author"],
+            }
+
+            data modify storage PLAYBACK[region] f"songs.{region}" append value entry
+        
     for region in REGIONS:
+        TEMP[region] = f"nbs:{region}/temp"
+        PLAYBACK[region] = f"nbs:{region}/playback"
+
+        # just incase
+        execute unless data storage TEMP[region] input run data modify storage TEMP[region] input set value {}
+        
+        # do we want to change song on reload?
         function ~/../{region}/change_song
 
-    schedule function ~/../tick 1t replace
-    function ~/../play
+    function #nbs:playback/play
+
+
+append function ~/tick:
+    merge function_tag minecraft:tick {"values": [(~/)]}
+    
+    # handles tick TBD: threading
+    for region in REGIONS:
+        if score f"{region}.playing" nbs matches 1.. function ~/../{region}/tick
 
 
 for region in REGIONS:
-    # Iterates all speakers for this region.
-    # Takes {i: 0, song: "song_id", tick: 0}. Reads speaker_type from each location entry.
-    function ~/{region}/speaker_iter/root:
-        raw f"$data modify storage nbs:temp input.uuid set from storage nbs:playback locations.{region}[$(i)].uuid"
-        raw f"$data modify storage nbs:temp input.speaker_type set from storage nbs:playback locations.{region}[$(i)].speaker_type"
-        execute function ~/../run with storage nbs:temp input:
-            $execute as $(uuid) at @s run function nbs:song/$(song)/$(tick)/$(speaker_type)
-        store result storage nbs:temp input.i int 1 scoreboard players add f"{region}.#iter" nbs 1
-        if score f"{region}.#iter" nbs < f"{region}.#len" nbs function (~/) with storage nbs:temp input
+    #> Main regional namespace
+    function ~/{region}:
 
-    function ~/{region}/tick:
-        schedule function (~/) 1t replace
-        execute if score f"{region}.playing" nbs matches 1 run scoreboard players add f"{region}.songtime" nbs 1
-        execute store result storage nbs:playback f"playing.{region}.tick" int 1 run scoreboard players get f"{region}.songtime" nbs
-        function ~/../playback with storage nbs:playback f"playing.{region}"
+        #> Region tick
+        function ~/tick:
+            # grab playback info
+            if score f"{region}.playing" nbs matches 1 run scoreboard players add f"{region}.songtime" nbs 1
+            store result storage PLAYBACK[region] f"playing.{region}.tick" int 1 run scoreboard players get f"{region}.songtime" nbs
+            
+            # copy for input for macro
+            data modify storage TEMP[region] input set from storage PLAYBACK[region] f"playing.{region}"
+            
+            # all regional speakers anim. w/ the same randomness
+            store result storage TEMP[region] input.random int 1 run random value 1..6
 
-    function ~/{region}/playback:
-        $function nbs:song/$(name)/$(tick)/root
+            as @e[type=item_display,tag=f"nbs.speaker.{region}"] at @s function ~/speaker with storage TEMP[region] input:
+                # This handles our main song tick.
+                #  First, we run our tick for our current region song, this should return true if there was a player who heard it.
+                #    The `/root` will choose the specific short/med/long (which returns val up the stack for us)
+                #  Then, if we pass, we can detect if we need to play a beat.
+                #  If we do, then we play a random beet provisoned earlier
+                raw f"$execute if function nbs:song/$(name)/$(tick)/root if entity @s[tag=nbs.beat] run function summit_ambiance:speaker_{region}/animations/beat_$(random)/play"
+                
+                tag @s remove nbs.beat
+            
+        # Changing the song fixes out PLAYBACK storage
+        # We reset our tick songtime counter
+        # Then we grab the index of our song
+        # Lastly, we grab and set our song from our storage and set it to the right spot
+        #  sharing the new song w/ the current listeners
+        function ~/change_song:
+            scoreboard players set f"{region}.songtime" nbs -1
+            store result storage PLAYBACK[region] f"playing.{region}.index" int 1 run scoreboard players get f"{region}.songindex" nbs
+            
+            # actually do da macro (and set our title ;)
+            with storage PLAYBACK[region] f"playing.{region}":
+                raw f"$data modify storage {PLAYBACK[region]} playing.{region} set from storage {PLAYBACK[region]} songs.{region}[$(index)]"
+                function ~/../title with storage PLAYBACK[region] f"playing.{region}"
 
-    function ~/{region}/change_song:
-        scoreboard players add songs_played nbs_stats 1
-        scoreboard players set f"{region}.songtime" nbs -1
-        execute store result storage nbs:playback f"playing.{region}.index" int 1 run scoreboard players get f"{region}.songindex" nbs
-        function ~/../zzz_change_song with storage nbs:playback f"playing.{region}"
 
-    function ~/{region}/zzz_change_song:
-        raw f"$data modify storage nbs:playback playing.{region} set from storage nbs:playback songs.{region}[$(index)]"
-        function ~/../title with storage nbs:playback f"playing.{region}"
+        #> Effects
+        # display AJ text
+        function ~/{region}/title:
+            raw f'$execute \
+                as @e[type=item_display,tag=nbs.speaker.{region}] \
+                on passengers \
+                if entity @s[tag=aj.global.node.text_display] \
+                run data modify entity @s text.text set value "🎵 $(formatted_string)"'
 
-
-    #> Effects
-
-    function ~/{region}/title:
+        # display actionbar to nearby players (a bit laggy but very rare)
         for speaker in SPEAKER_RANGES:
-            speaker_type = speaker["name"]
-            speaker_range = speaker["range"]
-            raw f'$execute at @e[type=item_display,tag=nbs.speaker.{region},tag=nbs.speaker.{speaker_type}] run title @a[distance=..{speaker_range}] actionbar [{{"text":"🎵 Now Playing: ","color":"green"}},{{"text":"$(formatted_string)","color":"white"}}]'
-        raw f'$execute as @e[type=item_display,tag=nbs.speaker.{region}] on passengers if entity @s[tag=aj.global.node.text_display] run data modify entity @s text.text set value "🎵 $(formatted_string)"'
+            variant = speaker["name"]
+            range = speaker["range"]
+
+            append function ~/../title:
+                raw f'$execute at @e[type=item_display,tag=nbs.speaker.{region},tag=nbs.speaker.{variant}] run title @a[distance=..{range}] actionbar [{{"text":"🎵 Now Playing: ","color":"green"}},{{"text":"$(formatted_string)","color":"white"}}]'
 
 
-    #> Spawn Speakers
+            #> Spawn Speakers
 
-    for speaker in SPEAKER_RANGES:
-        variant = speaker["name"]
-        range = speaker["range"]
-
-        function ~/speaker/place/{region}/{variant}:
-            execute positioned ~ ~ ~ rotated ~ 0 run function f"summit_ambiance:speaker_{region}/summon" {args: {}}
-            tag @n[type=item_display,distance=..1,tag=f"summit_ambiance.speaker_{region}.root"] add f"nbs.speaker"
-            tag @n[type=item_display,distance=..1,tag=f"summit_ambiance.speaker_{region}.root"] add f"nbs.speaker.{region}"
-            tag @n[type=item_display,distance=..1,tag=f"summit_ambiance.speaker_{region}.root"] add f"nbs.speaker.{variant}"
-
-    #> Song Controls
-
-    song_count = REGION_COUNTS[region]
-
-    function ~/{region}/next:
-        scoreboard players add f"{region}.songindex" nbs 1
-        execute if score f"{region}.songindex" nbs matches f"{song_count}.." run scoreboard players set f"{region}.songindex" nbs 0
-        function ~/../change_song
-
-    function ~/{region}/prev:
-        scoreboard players remove f"{region}.songindex" nbs 1
-        execute if score f"{region}.songindex" nbs matches ..-1 run scoreboard players set f"{region}.songindex" nbs (song_count - 1)
-        function ~/../change_song
-
-    function ~/{region}/pause:
-        scoreboard players set f"{region}.playing" nbs 0
-
-    function ~/{region}/play:
-        scoreboard players set f"{region}.playing" nbs 1
-
-    function ~/{region}/stop:
-        scoreboard players set f"{region}.playing" nbs 0
-        scoreboard players set f"{region}.songtime" nbs -1
-
-    function ~/{region}/shuffle:
-        scoreboard players operation f"{region}.prevsong" nbs = songindex nbs
-        execute store result score f"{region}.songindex" nbs run random value (0, song_count - 1)
-        execute if score f"{region}.songindex" nbs = f"{region}.prevsong" nbs run function ~/../next
-        function ~/../change_song
-
-    function ~/{region}/advance:
-        execute if score shuffle nbs matches 0 run function ~/../next
-        execute if score shuffle nbs matches 1 run function ~/../shuffle
+            function ~/speaker/place/{region}/{variant}:
+                execute positioned ~ ~ ~ rotated ~ 0 run function f"summit_ambiance:speaker_{region}/summon" {args: {}}
+                tag @n[type=item_display,distance=..1,tag=f"summit_ambiance.speaker_{region}.root"] add f"nbs.speaker"
+                tag @n[type=item_display,distance=..1,tag=f"summit_ambiance.speaker_{region}.root"] add f"nbs.speaker.{region}"
+                tag @n[type=item_display,distance=..1,tag=f"summit_ambiance.speaker_{region}.root"] add f"nbs.speaker.{variant}"
 
 
-    #> Global Controls
+        #> Song Controls
 
-    append function ~/pause:
-        function ~/../{region}/pause
+        song_count = REGION_COUNTS[region]
 
-    append function ~/play:
-        function ~/../{region}/play
+        # we use function tags for easy search
+        function ~/next:
+            merge function_tag (~/) {"values": [(~/)]}
+            scoreboard players add f"{region}.songindex" nbs 1
+            if score f"{region}.songindex" nbs matches f"{song_count}.." run scoreboard players set f"{region}.songindex" nbs 0
+            function ~/../change_song
 
-    append function ~/stop:
-        function ~/../{region}/stop
+        function ~/prev:
+            merge function_tag (~/) {"values": [(~/)]}
+            scoreboard players remove f"{region}.songindex" nbs 1
+            if score f"{region}.songindex" nbs matches ..-1 run scoreboard players set f"{region}.songindex" nbs (song_count - 1)
+            function ~/../change_song
 
-    append function ~/tick:
-        function ~/../{region}/tick
+        function ~/pause:
+            merge function_tag (~/../../pause) {"values": [(~/)]}
+            scoreboard players set f"{region}.playing" nbs 0
+
+        function ~/play:
+            merge function_tag (~/../../play) {"values": [(~/)]}
+            scoreboard players set f"{region}.playing" nbs 1
+
+        function ~/stop:
+            merge function_tag (~/../../stop) {"values": [(~/)]}
+            scoreboard players set f"{region}.playing" nbs 0
+            scoreboard players set f"{region}.songtime" nbs -1
+
+        function ~/shuffle:
+            merge function_tag (~/) {"values": [(~/)]}
+
+            scoreboard players operation f"{region}.prevsong" nbs = sf"{region}.songindex" nbs
+            store result score f"{region}.songindex" nbs run random value (0, song_count - 1)
+            if score f"{region}.songindex" nbs = f"{region}.prevsong" nbs run function ~/../next
+            function ~/../change_song
+
+        function ~/advance:
+            merge function_tag (~/) {"values": [(~/)]}
+            if score shuffle nbs matches 0 run function ~/../next
+            if score shuffle nbs matches 1 run function ~/../shuffle
+
 
 function ~/speaker/remove/nearest:
     for region in REGIONS:
-        execute as @n[distance=..1,type=minecraft:item_display,tag=f"summit_ambiance.speaker_{region}.root"] run function f"summit_ambiance:speaker_{region}/remove/this"
+        execute 
+            as @n[distance=..1,type=minecraft:item_display,tag=f"summit_ambiance.speaker_{region}.root"]
+            run function f"summit_ambiance:speaker_{region}/remove/this"
