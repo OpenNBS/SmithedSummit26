@@ -2,13 +2,12 @@ import logging
 from dataclasses import dataclass
 from enum import Enum
 from io import BytesIO
-from pathlib import Path
 
 import pynbs
 import samplerate
 import soundfile as sf
 from beet import Context, Sound, SoundConfig
-from beet.contrib.vanilla import Vanilla
+from beet.contrib.vanilla import ClientJar, Vanilla
 from src.config import SONGS_PATH
 
 DEFAULT_SOUNDS = [
@@ -162,41 +161,23 @@ def pitch_shift_ogg(ogg_bytes: bytes, semitones: int) -> bytes:
     return out.getvalue()
 
 
-def load_vanilla_ogg(vanilla: Vanilla, resource: SoundResource) -> bytes | None:
+def load_vanilla_ogg(jar: ClientJar, resource: SoundResource) -> bytes | None:
     """Fetch raw ogg bytes for a vanilla sound via the asset index."""
-    key = resource.vanilla_sound_key
 
-    for _ in range(2):
-        try:
-            client = vanilla.mount(resource.resource_location, fetch_objects=True)
-            sound = client.assets["minecraft"].sounds[key]
-        except KeyError:
-            logging.warning(f"Sound not found: {resource.resource_location}")
-            return None
+    try:
+        sound = jar.assets["minecraft"].sounds[resource.vanilla_sound_key]
+    except KeyError:
+        logging.warning(f"Sound not found in vanilla assets: {resource.vanilla_sound_key}")
 
-        if sound.source_path:
-            path = Path(sound.source_path)
-            data = path.read_bytes()
-            if data:
-                return data
-            # Beet only downloads when the object file is missing; a 0-byte file
-            # from a failed download blocks refetch until it is removed.
-            logging.warning(f"Empty cached vanilla object {path}, re-downloading")
-            path.unlink(missing_ok=True)
-            del client.assets["minecraft"].sounds[key]
-            continue
+        return
 
-        data = sound.to_bytes(sound.get_content())
-        if data:
-            return data
-        break
-
-    logging.warning(f"Failed to load sound bytes: {resource.resource_location}")
-    return None
+    return sound.get_content()
 
 
 def generate_sounds(ctx: Context, sound_list: set[SoundResource]) -> None:
     vanilla = ctx.inject(Vanilla)
+    jar = vanilla.releases[ctx.minecraft_version].mount(fetch_objects=True)
+
     sound_config: dict = {}
 
     for resource in sound_list:
@@ -209,8 +190,8 @@ def generate_sounds(ctx: Context, sound_list: set[SoundResource]) -> None:
             }
             continue
 
-        ogg_bytes = load_vanilla_ogg(vanilla, resource)
-        if ogg_bytes is None:
+        
+        if (ogg_bytes := load_vanilla_ogg(jar, resource)) is None:
             continue
 
         shifted = pitch_shift_ogg(ogg_bytes, resource.key_offset)
