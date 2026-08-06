@@ -15,6 +15,7 @@ resource_pack:
 
 require:
   - bolt
+  - bolt.contrib.defer
 
 pipeline:
   - src.config

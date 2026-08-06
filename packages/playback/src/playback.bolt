@@ -2,7 +2,9 @@ import glob
 import logging
 
 from src.config import SPEAKER_RANGES
+
 from ./const import REGIONS, PLAYBACK, TEMP, SONG_MANIFEST, SONG_INDICES, REGION_COUNTS
+from ./advancements import generate_song_advancement
 
 logging.info("Generating playback functions")
 
@@ -33,6 +35,7 @@ append function ~/load:
             }
 
             data modify storage PLAYBACK[region] f"songs.{region}" append value entry
+            generate_song_advancement(region, song["id"], song["title"], song["author"])
         
     for region in REGIONS:
         TEMP[region] = f"nbs:{region}/temp"

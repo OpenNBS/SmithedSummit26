@@ -1,0 +1,113 @@
+from ./const import REGIONS
+
+
+def icon(region: str):
+    if region == "plateaus":
+        return "summit_icons:patched_plateaus"
+    
+    if region == "tropics":
+        return "summit_icons:textured_tropics"
+    
+    if region == "woodlands":
+        return "summit_icons:welded_woodlands"
+
+
+advancement f"nbs:playback/root" {
+    "display": {
+        "icon": {
+            "id": "minecraft:jukebox"
+        },
+        "title": "Note Block Studio Songs",
+        "description": "All of the songs at Smithed Summit!",
+        "background": "minecraft:block/note_block",
+        "show_toast": false,
+        "announce_to_chat": false
+    },
+    "criteria": {
+        "song": {
+            "trigger": "minecraft:impossible"
+        }
+    }
+}
+
+LAST_SONG_PARENT = {}
+for region in REGIONS:
+    advancement f"nbs:playback/{region}" {
+        "display": {
+            "icon": {
+                "id": "minecraft:poisonous_potato",
+                "components": {
+                    "minecraft:item_model": icon(region)
+                }
+            },
+            "title": "Patched Plateaus Songs",
+            "description": "",
+            "show_toast": false,
+            "announce_to_chat": false
+        },
+        "parent": f"nbs:playback/root",
+        "criteria": {
+            "region": {
+                "trigger": "minecraft:impossible"
+            }
+        }
+    }
+
+    LAST_SONG_PARENT[region] = f"nbs:playback/{region}"
+
+
+def generate_song_advancement(region: str, song_id: str, song: str, author: str):
+    global LAST_SONG_PARENT
+    adv_path = f"nbs:song/{song_id}"
+    advancement adv_path {
+        "display": {
+            "icon": {
+                "id": "minecraft:note_block"
+            },
+            "title": song,
+            "description": author,
+            "show_toast": false,
+            "announce_to_chat": false
+        },
+        "parent": LAST_SONG_PARENT[region],
+        "criteria": {
+            "song": {
+                "trigger": "minecraft:impossible"
+            }
+        }
+    }
+    LAST_SONG_PARENT[region] = adv_path
+
+
+@defer
+def end_cap():
+    for region in REGIONS:
+        advancement f"nbs:playback/{region}/end" {
+            "display": {
+                "icon": {
+                    "id": "minecraft:poisonous_potato",
+                    "components": {
+                        "minecraft:item_model": icon(region)
+                    }
+                },
+                "title": "Patched Plateaus Songs",
+                "description": "",
+                "show_toast": false,
+                "announce_to_chat": false
+            },
+            "parent": LAST_SONG_PARENT[region],
+            "criteria": {
+                "region": {
+                    "trigger": "minecraft:impossible"
+                }
+            }
+        }
+
+function ~/base:
+    merge function_tag summit:api/on_join {"values": [(~/)]}
+
+    advancement grant @s only nbs:playback/root
+
+    for region in REGIONS:
+        advancement grant @s only f"nbs:playback/{region}"
+        advancement grant @s only f"nbs:playback/{region}/end"
