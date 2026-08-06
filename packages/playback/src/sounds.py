@@ -96,7 +96,9 @@ class SoundResource:
         return self.pack_sound_path.replace("/", "_")
 
 
-def map_note_to_sound_resource(song: pynbs.File, note: pynbs.Note) -> SoundResource:
+def map_note_to_sound_resource(
+    song: pynbs.File, note: pynbs.Note
+) -> SoundResource | None:
     """Map a note to a sound file and octave variant. Single source of truth for RP + playsound."""
 
     is_higher = note.key > TWO_OCTAVE_HIGH
@@ -109,6 +111,10 @@ def map_note_to_sound_resource(song: pynbs.File, note: pynbs.Note) -> SoundResou
         sound_path = instrument.file.lower().replace(" ", "_")
     else:
         sound_path = DEFAULT_SOUNDS[note.instrument]
+
+    if sound_path == "":
+        # No sound file assigned to instrument; ignore this note
+        return None
 
     if is_higher:
         octave_offset = OctaveOffsetEnum.HIGH
@@ -125,7 +131,8 @@ def get_song_custom_sounds(song: pynbs.File) -> set[SoundResource]:
     for note in song.notes:
         if note.instrument < 0:
             continue
-        sound_files.add(map_note_to_sound_resource(song, note))
+        if sound_resource := map_note_to_sound_resource(song, note):
+            sound_files.add(sound_resource)
     return sound_files
 
 

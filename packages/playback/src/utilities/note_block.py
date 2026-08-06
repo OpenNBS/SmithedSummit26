@@ -5,6 +5,7 @@ __all__ = [
 ]
 
 
+import logging
 import math
 from dataclasses import dataclass
 from pathlib import Path
@@ -236,6 +237,15 @@ class PlaysoundNote:
         return args
 
 
+def get_empty_instrument_ids(song: pynbs.File) -> list[int]:
+    """Get the IDs of all instruments that have no sound file assigned."""
+    return [
+        instrument.id + song.header.default_instruments
+        for instrument in song.instruments
+        if instrument.file == ""
+    ]
+
+
 def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["PlaysoundNote"]]]:
     """Yield all the notes from the given nbs file."""
 
@@ -274,6 +284,8 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["PlaysoundNote"]]]:
     if effective_tempo > 20:
         effective_tempo = 20
 
+    empty_instrument_ids = get_empty_instrument_ids(song)
+
     for note in song.notes:
         new_tick = round(note.tick * expansion_factor * 20 / effective_tempo)
         note.tick = new_tick
@@ -286,6 +298,10 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["PlaysoundNote"]]]:
             # )
             continue
 
+        if note.instrument in empty_instrument_ids:
+            # No sound file assigned to instrument; ignore this note
+            continue
+
         new_notes.append(note)
 
     song.notes = new_notes
@@ -294,12 +310,6 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["PlaysoundNote"]]]:
     max_layer = max(note.layer for note in song.notes)
     while len(song.layers) <= max_layer:
         song.layers.append(pynbs.Layer(id=len(song.layers)))
-
-    # Make sure instrument paths are valid
-    for instrument in song.instruments:
-        instrument.file = instrument.file.lower().replace(" ", "_")
-        if not instrument.file.startswith("minecraft/"):
-            print(f"Warning: Invalid instrument path: {instrument.file}")
 
     def rolloff_instrument_name(note: pynbs.Note) -> str:
         if 0 <= note.instrument < len(NBS_ROLLOFF_INSTRUMENTS):
@@ -317,6 +327,10 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["PlaysoundNote"]]]:
             return PlaysoundNote(instrument="BEAT")
 
         resource = SoundResource.from_note(song, note)
+        if resource is None:
+            # This should never happen because we already filtered out empty instruments
+            raise ValueError(f"No sound file assigned to instrument: {note.instrument}")
+
         source = f"nbs:{resource.sound_event}"
 
         note_pitch = note.key + (note.pitch / 100)
