@@ -38,9 +38,6 @@ append function ~/load:
             generate_song_advancement(region, song["id"], song["title"], song["author"])
         
     for region in REGIONS:
-        TEMP[region] = f"nbs:temp/{region}"
-        PLAYBACK[region] = f"nbs:playback/{region}"
-
         # just incase
         execute unless data storage TEMP[region] input run data modify storage TEMP[region] input set value {}
         
