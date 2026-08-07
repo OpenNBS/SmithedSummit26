@@ -3,7 +3,7 @@ import logging
 
 from src.config import SPEAKER_RANGES
 
-from ./const import REGIONS, PLAYBACK, TEMP, SONG_MANIFEST, SONG_INDICES, REGION_COUNTS
+from ./const import REGIONS, PLAYBACK, TEMP, SONG_MANIFEST, SONG_INDICES
 from ./advancements import generate_song_advancement
 
 
@@ -118,7 +118,7 @@ for region in REGIONS:
 
         #> Song Controls
 
-        song_count = REGION_COUNTS[region]
+        song_count = REGIONS[region].song_count
 
         # we use function tags for easy search
         function ~/next:

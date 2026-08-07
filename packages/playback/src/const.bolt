@@ -4,7 +4,6 @@ PLAYBACK = {}
 
 SPEAKER_RANGES = ctx.meta["speaker_ranges"]
 REGIONS = ctx.meta["regions"]
-REGION_COUNTS = ctx.meta["region_counts"]
 SONG_MANIFEST = ctx.meta["song_manifest"]
 SONG_INDICES = {}
 

@@ -2,6 +2,7 @@
 
 import json
 import logging
+from dataclasses import dataclass
 
 from beet import Context
 from nbs_shared.project import SONGS_FILES_DIRECTORY
@@ -34,6 +35,18 @@ SPEAKER_RANGES = [
 ANIM_COUNT = 6
 
 
+@dataclass
+class RegionConfig:
+    name: str
+    song_count: int
+
+    def __eq__(self, other: object) -> bool:
+        return self.name == other.name
+
+    def __hash__(self) -> int:
+        return hash(self.name)
+
+
 def load_song_manifest(ctx: Context):
     song_manifest_path = SONGS_PATH.parent / ctx.meta["song_manifest_path"]
 
@@ -63,19 +76,22 @@ def load_instruments(ctx: Context):
 
 
 def load_regions(ctx: Context):
-    regions = set()
-    region_counts = {}
+    regions: dict[str, RegionConfig] = {}
     for song_data in ctx.meta["song_manifest"]:
         region = song_data["region"]
         if region is None:
             continue
-        regions.add(region)
-        region_counts[region] = region_counts.get(region, 0) + 1
+        region = RegionConfig(name=region, song_count=0, title_color=region_color)
+        regions[region.name] = region
+        regions[region.name].song_count += 1
 
     ctx.meta["regions"] = regions
-    ctx.meta["region_counts"] = region_counts
 
-    logger.info("Loaded %d regions: %s", len(regions), ", ".join(regions))
+    logger.info(
+        "Loaded %d regions: %s",
+        len(regions),
+        ", ".join(regions),
+    )
 
 
 def beet_default(ctx: Context):
