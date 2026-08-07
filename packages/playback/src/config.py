@@ -40,6 +40,16 @@ REGION_COLORS: dict[str, str] = {
 # Number of 'play' animation variants in the AJ speaker models
 ANIM_COUNT = 6
 
+# Storage-backed song playback. Minecraft 26.2 uses DataVersion 4903 and the
+# namespaced world-data path data/<namespace>/command_storage.dat.
+# This is a validation ceiling, not the number of generated templates. The
+# storage renderer publishes only chord sizes that actually occur. The current
+# production catalog peaks at 55, so 64 leaves a little headroom.
+DEFAULT_MAX_PLAYSOUNDS_PER_TICK = 64
+SONG_STORAGE_ID_TEMPLATE = "nbs.{region}:songs"
+COMMAND_STORAGE_DATA_VERSION = 4903
+DEFAULT_DEBUG_STORAGE_COMMAND_LIMIT = 1_900_000
+
 
 @dataclass
 class RegionConfig:
@@ -82,6 +92,37 @@ def load_instruments(ctx: Context):
     ctx.meta["instruments"] = set()
 
 
+def load_song_storage_config(ctx: Context):
+    max_playsounds = ctx.meta.setdefault(
+        "max_playsounds_per_tick", DEFAULT_MAX_PLAYSOUNDS_PER_TICK
+    )
+    if isinstance(max_playsounds, bool) or not isinstance(max_playsounds, int):
+        raise TypeError("max_playsounds_per_tick must be an integer")
+    if max_playsounds < 1:
+        raise ValueError("max_playsounds_per_tick must be at least 1")
+
+    storage_id_template = ctx.meta.setdefault(
+        "song_storage_id_template", SONG_STORAGE_ID_TEMPLATE
+    )
+    if not isinstance(storage_id_template, str):
+        raise TypeError("song_storage_id_template must be a string")
+    if "{region}" not in storage_id_template:
+        raise ValueError("song_storage_id_template must contain {region}")
+    ctx.meta.setdefault("command_storage_data_version", COMMAND_STORAGE_DATA_VERSION)
+    ctx.meta.setdefault(
+        "generate_storage_load_functions", bool(ctx.meta.get("debug", False))
+    )
+    debug_command_limit = ctx.meta.setdefault(
+        "debug_storage_command_limit", DEFAULT_DEBUG_STORAGE_COMMAND_LIMIT
+    )
+    if isinstance(debug_command_limit, bool) or not isinstance(
+        debug_command_limit, int
+    ):
+        raise TypeError("debug_storage_command_limit must be an integer")
+    if debug_command_limit < 1_000:
+        raise ValueError("debug_storage_command_limit must be at least 1000")
+
+
 def load_regions(ctx: Context):
     regions: dict[str, RegionConfig] = {}
     for song_data in ctx.meta["song_manifest"]:
@@ -95,9 +136,13 @@ def load_regions(ctx: Context):
             logger.warning("Warning: Region %s has no color assigned", region)
             region_color = "#FFFFFF"
 
-        region = RegionConfig(name=region, song_count=0, title_color=region_color)
-        regions[region.name] = region
-        regions[region.name].song_count += 1
+        if region not in regions:
+            regions[region] = RegionConfig(
+                name=region,
+                song_count=0,
+                title_color=region_color,
+            )
+        regions[region].song_count += 1
 
     ctx.meta["regions"] = regions
 
@@ -111,5 +156,6 @@ def load_regions(ctx: Context):
 def beet_default(ctx: Context):
     load_song_manifest(ctx)
     load_speaker_ranges(ctx)
+    load_song_storage_config(ctx)
     load_instruments(ctx)
     load_regions(ctx)

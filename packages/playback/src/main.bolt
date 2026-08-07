@@ -1,4 +1,5 @@
 import ./speaker as speaker
 import ./playback as playback
+import ./songs as songs
 import ./debug as debug
 import ./advancement as adv

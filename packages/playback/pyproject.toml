@@ -11,6 +11,7 @@ classifiers = [
 ]
 dependencies = [
     "nbs-summit26-shared",
+    "nbtlib==1.12.1",
     "pynbs>=1.1.0,<2",
     "samplerate>=0.2.4",
     "soundfile>=0.14.0",

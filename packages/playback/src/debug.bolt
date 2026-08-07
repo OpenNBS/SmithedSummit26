@@ -48,30 +48,31 @@ for data in ctx.meta["speaker_ranges"]:
             particle minecraft:block_marker{block_state:{Name:"minecraft:purple_stained_glass"}} f"~{x}" f"~{y}" f"~{z}" 0 0 0 0 1 force
 
 
-function ~/place_speakers:
+# function ~/place_speakers:
 
-    # The largest speaker range determines the grid cell size
-    grid_cell_size = 0
-    for speaker_type in SPEAKER_RANGES:
-        if speaker_type["outer_range"] > grid_cell_size:
-            grid_cell_size = speaker_type["outer_range"]
+#     # Keep a one-block gap between the largest speaker ranges.  This gives us
+#     # a simple grid that works for every speaker type without overlapping.
+#     grid_cell_size = 0
+#     for speaker_type in SPEAKER_RANGES:
+#         diameter = speaker_type["outer_range"] * 2 + 1
+#         if diameter > grid_cell_size:
+#             grid_cell_size = diameter
 
-    #function nbs:speaker/remove/all
+#     #function nbs:speaker/remove/all
 
-    offset_x = grid_cell_size // 2
-    offset_z = grid_cell_size // 2
+#     row = 0
 
-    for region in REGIONS:
+#     for region in REGIONS:
 
-        for speaker in SPEAKER_RANGES:
-            speaker_type = speaker["name"]
-            radius = speaker["outer_range"]
+#         for speaker in SPEAKER_RANGES:
+#             speaker_type = speaker["name"]
 
-            coords = f"~{offset_x} ~ ~{offset_z}"
-            execute positioned coords run function f"nbs:speaker/place/{region}/{speaker_type}/{radius}"
-            setblock coords minecraft:stone keep
-            offset_x += grid_cell_size
+#             # Ten copies of each region/type, laid out in a row from X/Z 0,0.
+#             for placement in range(10):
+#                 x = placement * grid_cell_size
+#                 z = row * grid_cell_size
+#                 coords = f"{x} ~ {z}"
+#                 execute positioned coords run function f"nbs:speaker/place/{region}/{speaker_type}"
+#                 setblock coords minecraft:stone keep
 
-        # Reset offset_x for the next region
-        offset_x = grid_cell_size // 2
-        offset_z += grid_cell_size
+#             row += 1

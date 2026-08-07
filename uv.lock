@@ -269,6 +269,7 @@ version = "0.1.0"
 source = { virtual = "packages/playback" }
 dependencies = [
     { name = "nbs-summit26-shared" },
+    { name = "nbtlib" },
     { name = "pynbs" },
     { name = "samplerate" },
     { name = "soundfile" },
@@ -277,6 +278,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "nbs-summit26-shared", editable = "packages/shared" },
+    { name = "nbtlib", specifier = "==1.12.1" },
     { name = "pynbs", specifier = ">=1.1.0,<2" },
     { name = "samplerate", specifier = ">=0.2.4" },
     { name = "soundfile", specifier = ">=0.14.0" },

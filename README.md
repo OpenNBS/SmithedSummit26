@@ -83,6 +83,51 @@ The root beet project composes `packages/booth` and `packages/playback`.
 `packages/shared` contains Python code imported by both projects, including the
 shared image optimization plugin and repository data-path helpers.
 
+### Storage-backed song artifact
+
+`packages/playback/src/generate_song_storage.py` is a storage-backed alternative
+to the per-tick function generator. It writes a Minecraft 26.2 command-storage
+saved-data file to:
+
+```text
+<build output>/world-data/data/nbs.<region>/command_storage.dat
+```
+
+This is a companion world artifact, not a data-pack resource. With the server
+stopped, copy `world-data/data` into the world's top-level `data` directory.
+Minecraft does not import this file on `/reload`.
+
+The generator writes one isolated database per region. For example, woodlands
+is stored at `nbs.woodlands:songs`, with top-level `index` and `songs`
+compounds containing only woodlands entries. The maximum chord size is a
+configurable validation ceiling. `songs.bolt` only generates macro leaves for
+the chord sizes actually observed in the selected manifest:
+
+```yaml
+meta:
+  max_playsounds_per_tick: 64
+```
+
+Generation fails rather than dropping notes when a chord exceeds the configured
+maximum. The current full production manifest peaks at 55 simultaneous
+playsounds, while the debug manifest peaks at 44.
+
+Debug builds also contain opt-in in-game loaders. They are never added to the
+load tag because parsing and applying the SNBT is intentionally expensive:
+
+```mcfunction
+function #nbs:debug/load/all
+function #nbs:debug/load/woodlands
+```
+
+These short function tags wrap the generated `nbs:songs/debug/load/...`
+functions and keep the debug loaders easy to find in command suggestions. The
+underlying function IDs remain available directly as well.
+
+Each song uses one storage mutation when its serialized payload fits. Oversized
+songs are automatically divided into string-keyed tick batches below
+`debug_storage_command_limit` (1,900,000 characters by default).
+
 Booth and playback are virtual uv workspace members because they are beet
 projects rather than distributable Python packages. Shared has a build backend
 so uv can install it in editable mode and make `nbs_shared` importable.

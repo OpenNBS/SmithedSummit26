@@ -1,9 +1,8 @@
-import glob
 import logging
 
 from src.config import SPEAKER_RANGES
 
-from ./const import REGIONS, PLAYBACK, TEMP, SONG_MANIFEST, SONG_INDICES
+from ./const import REGIONS, PLAYBACK, TEMP, SONG_MANIFEST, SONG_STORAGE
 from ./advancement import generate_song_advancement
 
 
@@ -20,28 +19,22 @@ append function ~/load:
     scoreboard objectives add nbs dummy
     scoreboard players set shuffle nbs 0
 
-    # load manifest
+    # Advancements are build-time data. Song metadata and region indices live
+    # in each generated nbs.<region>:songs storage instead of a runtime list.
     for song in SONG_MANIFEST:
         region = song["region"]
 
         if region is not None:
-            index = SONG_INDICES.setdefault(region, 0)
-            SONG_INDICES[region] += 1
-
-            entry = {
-                "name": song["id"],
-                "index": index,
-                "formatted_string": f'{song["title"]} - {song["author"]}',
-                "title": song["title"],
-                "author": song["author"],
-            }
-
-            data modify storage PLAYBACK[region] f"songs.{region}" append value entry
             generate_song_advancement(region, song["id"], song["title"], song["author"])
         
     for region in REGIONS:
         # just in case
         execute unless data storage TEMP[region] input run data modify storage TEMP[region] input set value {}
+
+        # Keep a valid current-song index across reloads and manifest changes.
+        execute unless score f"{region}.songindex" nbs matches -2147483648..2147483647 run scoreboard players set f"{region}.songindex" nbs 0
+        if score f"{region}.songindex" nbs matches f"{REGIONS[region].song_count}.." run scoreboard players set f"{region}.songindex" nbs 0
+        if score f"{region}.songindex" nbs matches ..-1 run scoreboard players set f"{region}.songindex" nbs 0
         
         # do we want to change song on reload?
         function ~/../{region}/change_song
@@ -65,37 +58,61 @@ for region in REGIONS:
         function ~/tick:
             # grab playback info
             if score f"{region}.playing" nbs matches 1 run scoreboard players add f"{region}.songtime" nbs 1
-            store result storage PLAYBACK[region] f"playing.{region}.tick" int 1 run scoreboard players get f"{region}.songtime" nbs
+            store result storage PLAYBACK[region] f"playing.tick" int 1 run scoreboard players get f"{region}.songtime" nbs
             
-            # copy for input for macro
-            data modify storage TEMP[region] input set from storage PLAYBACK[region] f"playing.{region}"
-            
-            # all regional speakers anim. w/ the same randomness
+            # these should cache nicely as it's only 6 states during a songs runtime
+            data modify storage TEMP[region] input.song set from storage PLAYBACK[region] playing.name
             store result storage TEMP[region] input.random int 1 run random value 1..6
 
-            as @e[type=item_display,tag=f"nbs.speaker.{region}"] at @s function ~/speaker with storage TEMP[region] input:
-                # This handles our main song tick.
-                #  First, we run our tick for our current region song, this should return true if there was a player who heard it.
-                #    The `/root` will choose the specific short/med/long (which returns val up the stack for us)
-                #  Then, if we pass, we can detect if we need to play a beat.
-                #  If we do, then we play a random beet provisoned earlier
-                raw f"$execute if function nbs:song/$(name)/$(tick)/root if entity @s[tag=nbs.beat] run function summit_ambiance:speaker_{region}/animations/beat_$(random)/play"
-                
-                tag @s remove nbs.beat
-            
-        # Changing the song fixes out PLAYBACK storage
-        # We reset our tick songtime counter
-        # Then we grab the index of our song
-        # Lastly, we grab and set our song from our storage and set it to the right spot
-        #  sharing the new song w/ the current listeners
+            for speaker_range in SPEAKER_RANGES:
+                execute function ~/{speaker_range.name}:
+                    # Ticks are consistent per speaker range
+                    data remove storage TEMP[region] payload
+                    with storage PLAYBACK[region] playing:
+                        raw f"$data modify storage {TEMP[region]} payload \
+                            set from storage {SONG_STORAGE[region]} songs.$(name).ticks.t$(tick).{speaker_range.name}"
+                    
+                    # empty tick
+                    execute unless data storage TEMP[region] payload.count run return fail
+
+                    # advance
+                    execute if data storage TEMP[region] payload{advance:1b} run function ~/../../advance
+                    
+                    execute
+                        as @e[type=item_display,tag=f"nbs.speaker.{region}",tag=f"nbs.speaker.{speaker_range.name}"]
+                        at @s
+                        if entity @a[distance=(0, speaker_range.outer_range), limit=1]
+                        run function ~/speaker_{speaker_range.name} with storage TEMP[region] input:
+                            # run the beat, also this macro cache should be consistent
+                            raw f"$execute \
+                                if data storage {TEMP[region]} payload{{beat:1b}} \
+                                run function summit_ambiance:speaker_{region}/animations/beat_$(random)/play"
+
+                            raw f"$advancement grant @a[distance=..{speaker_range.outer_range}] only nbs:song/$(name)"
+
+                            function f"nbs:songs/dispatch/{region}"
+
+        # Song selection is a two-step hash lookup. The first macro turns the
+        # scoreboard index into a string-keyed song id (`i0`, `i1`, ...). The
+        # second uses that id to copy only the small metadata compound into
+        # PLAYBACK. Song tick data is never copied on song changes.
         function ~/change_song:
             scoreboard players set f"{region}.songtime" nbs -1
-            store result storage PLAYBACK[region] f"playing.{region}.index" int 1 run scoreboard players get f"{region}.songindex" nbs
-            
-            # actually do da macro (and set our title ;)
-            with storage PLAYBACK[region] f"playing.{region}":
-                raw f"$data modify storage {PLAYBACK[region]} playing.{region} set from storage {PLAYBACK[region]} songs.{region}[$(index)]"
-                function ~/../title with storage PLAYBACK[region] f"playing.{region}"
+            data remove storage PLAYBACK[region] playing
+            data modify storage TEMP[region] input set value {}
+            store result storage TEMP[region] input.index int 1 run scoreboard players get f"{region}.songindex" nbs
+            function ~/../select_song with storage TEMP[region] input
+
+        function ~/select_song:
+            raw f"$data modify storage {TEMP[region]} input.name set from storage {SONG_STORAGE[region]} index.i$(index)"
+            execute unless data storage TEMP[region] input.name run return fail
+            return run function ~/metadata with storage TEMP[region] input
+
+            function ~/metadata:
+                raw f"$data modify storage {PLAYBACK[region]} playing set from storage {SONG_STORAGE[region]} songs.$(name).metadata"
+                execute unless data storage PLAYBACK[region] playing.name run return fail
+                function ~/../../title with storage PLAYBACK[region] playing
+                return 1
 
 
         #> Effects

@@ -2,8 +2,8 @@
 
 extend: beet_base.yml
 
-# data_pack:
-#   zipped: true
+data_pack:
+  zipped: false
 
 resource_pack:
   zipped: true

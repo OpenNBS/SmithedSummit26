@@ -20,9 +20,10 @@ require:
 pipeline:
   - src.config
   - src.sounds
+  # Pre-Mecha: render storage and publish the sparse chord-size leaf set.
+  # Post-Mecha: write NBT and inject large raw debug loader commands.
+  - src.generate_song_storage
   - mecha
-  # After Mecha: inject raw mcfunction text without Mecha parsing/codegen.
-  - src.generate_songs
 
 meta:
   minecraft: "26.2"

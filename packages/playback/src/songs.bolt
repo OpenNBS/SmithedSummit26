@@ -1,0 +1,41 @@
+"""Sparse playsound macro leaves and their ascending dispatchers.
+
+The storage renderer runs before Bolt and records every non-zero chord size it
+observes. We generate only those leaves rather than every number up to the
+configured validation ceiling. Dispatch checks are ascending so the common
+small chords return before reaching the rarer, denser leaves.
+
+The caller has already assembled ``input.payload`` from the string-keyed song
+and tick compounds. This module performs no song-sized copies: it selects one
+leaf and invokes one final playsound macro.
+"""
+
+from ./const import REGIONS, TEMP
+
+
+PLAYSOUND_COUNTS = ctx.meta["song_storage_playsound_counts"]
+PLAYSOUND_COUNTS_BY_REGION = ctx.meta["song_storage_playsound_counts_by_region"]
+
+
+for note_count in PLAYSOUND_COUNTS:
+    function ~/template/{note_count}:
+        for note_index in range(note_count):
+            raw f"$playsound $(sound_{note_index})"
+
+        return 1
+
+
+for region in REGIONS:
+    temp_storage = TEMP[region]
+    region_counts = PLAYSOUND_COUNTS_BY_REGION[region]
+
+    function ~/dispatch/{region}:
+        # The ending sentinel deliberately has no zero-playsound macro leaf.
+        execute if data storage TEMP[region] payload{count:0} run return 1
+
+        for note_count in region_counts:
+            execute
+                if data storage TEMP[region] payload{count: note_count}
+                return run function ~/../../template/{note_count} with storage TEMP[region] payload
+
+        return fail

@@ -1,6 +1,5 @@
 """Generate per-song, per-tick speaker note functions from NBS files."""
 
-import json
 import logging
 import os
 import sys
@@ -22,11 +21,7 @@ logger = logging.getLogger(__name__)
 class RenderOptions:
     """Commands and resource names shared by every generated song tick."""
 
-    in_range_tag: str = "nbs.in_range"
-    new_in_range_tag: str = "nbs.in_range.new"
-    actionbar_prefix: str = "🎵 Now Playing: "
     advancement_template: str = "nbs:song/{song_id}"
-    particle: str = "minecraft:note ~ ~1.25 ~ 0 0 0 1 1 normal"
 
 
 @dataclass(frozen=True)
@@ -91,35 +86,11 @@ def render_variant(
 
     options = task.options
     listeners = f"@a[distance=..{speaker.outer}]"
-    current_listeners = f"@a[tag={options.new_in_range_tag}]"
-    new_listeners = f"@a[tag={options.new_in_range_tag},tag=!{options.in_range_tag}]"
-    no_longer_listeners = (
-        f"@a[tag=!{options.new_in_range_tag}, tag={options.in_range_tag}]"
-    )
-    actionbar = json.dumps(
-        [
-            {"text": options.actionbar_prefix, "color": task.actionbar_color},
-            {"text": f"{task.title} - {task.author}", "color": "white"},
-        ],
-        separators=(",", ":"),
-        ensure_ascii=False,
-    )
 
     # handles dynamic actionbar showcasing (comment out 107-111 if too much)
     commands = [
         f"execute unless entity {listeners} run return fail",
     ]
-
-    # only every tick cooresponding to 1s
-    # TODO: this tick may not exist in the song
-    if (tick % 20) == 0:
-        commands = [
-            f"tag {listeners} add {options.new_in_range_tag}",
-            f"title {new_listeners} actionbar {actionbar}",
-            f"tag {current_listeners} add {options.in_range_tag}",
-            f"tag {no_longer_listeners} remove {options.in_range_tag}",
-            f"tag {current_listeners} remove {options.new_in_range_tag}",
-        ] + commands
 
     # we handle beats later outside
     if any(note.instrument == "BEAT" for note in notes):
@@ -138,7 +109,7 @@ def render_variant(
     commands.extend(
         [
             f"advancement grant {listeners} only {advancement}",
-            f"return run particle {options.particle} {listeners}",
+            "return 1",
         ]
     )
     return commands
