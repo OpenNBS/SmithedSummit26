@@ -107,7 +107,7 @@ class SoundResource:
     @property
     def sound_event(self) -> str:
         """Key in `nbs/sounds.json` → plays as `nbs:{sound_event}`."""
-        return self.pack_sound_path.replace("/", "_")
+        return self.pack_sound_path.replace("/", ".")
 
 
 @dataclass(frozen=True)
