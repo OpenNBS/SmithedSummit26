@@ -1,4 +1,8 @@
-"""Shared beet cache for song plugins, keyed by song-related pipeline inputs."""
+"""Shared beet cache for song plugins.
+
+One key (manifest + regions + speaker ranges) decides whether sounds and
+song-storage work can be skipped. ``beet cache --clear songs`` resets both.
+"""
 
 from __future__ import annotations
 
@@ -14,8 +18,12 @@ from beet.toolchain.generator import Draft, DraftCacheSignal
 from src.config import SONGS_PATH, RegionConfig
 
 SONGS_CACHE_NAME = "songs"
+
 _SOUNDS_DRAFT_KEY = "sounds_draft_key"
 _SOUNDS_RESOURCE_PACK = "sounds_resource_pack"
+_STORAGE_KEY = "storage_key"
+_PLAYSOUND_COUNTS = "playsound_counts"
+_PLAYSOUND_COUNTS_BY_REGION = "playsound_counts_by_region"
 
 
 def song_manifest_path(ctx: Context) -> Path:
@@ -23,11 +31,7 @@ def song_manifest_path(ctx: Context) -> Path:
 
 
 def songs_cache_key(ctx: Context) -> str:
-    """Return a cache identity for song plugins.
-
-    Incorporates the song manifest file contents plus ``regions`` and
-    ``speaker_ranges`` from context meta so config changes invalidate drafts.
-    """
+    """Cache identity: song manifest contents, regions, and speaker ranges."""
 
     regions = ctx.meta["regions"]
     regions_payload = {
@@ -50,12 +54,7 @@ def songs_cache(ctx: Context) -> Cache:
 
 
 def cache_sounds_draft(draft: Draft, cache: Cache, cache_key: str) -> None:
-    """Restore sounds into ``draft`` or arrange to save them after generation.
-
-    Mirrors :meth:`beet.toolchain.generator.Draft.cache` but stores artifacts
-    under the shared ``songs`` cache so ``beet cache --clear songs`` resets
-    both sounds and song-storage plugins.
-    """
+    """Like ``Draft.cache``, but stores under the shared ``songs`` cache."""
 
     cached_resource_pack = cache.directory / _SOUNDS_RESOURCE_PACK
     draft_key = f"sounds {cache_key}"
@@ -73,3 +72,32 @@ def cache_sounds_draft(draft: Draft, cache: Cache, cache_key: str) -> None:
         cache.json[_SOUNDS_DRAFT_KEY] = draft_key
 
     draft.exit_stack.enter_context(log_time_scope('Generate draft "songs" sounds.'))
+
+
+def load_cached_playsound_counts(
+    cache: Cache, cache_key: str
+) -> tuple[list[int], dict[str, list[int]]] | None:
+    """Return Bolt macro leaf sizes when the songs cache key matches."""
+
+    if cache.json.get(_STORAGE_KEY) != cache_key:
+        return None
+
+    counts = cache.json.get(_PLAYSOUND_COUNTS)
+    by_region = cache.json.get(_PLAYSOUND_COUNTS_BY_REGION)
+    if not isinstance(counts, list) or not isinstance(by_region, dict):
+        return None
+
+    return counts, by_region
+
+
+def save_cached_playsound_counts(
+    cache: Cache,
+    cache_key: str,
+    playsound_counts: list[int],
+    playsound_counts_by_region: dict[str, list[int]],
+) -> None:
+    """Remember the key and the small ``songs.bolt`` metadata after a render."""
+
+    cache.json[_STORAGE_KEY] = cache_key
+    cache.json[_PLAYSOUND_COUNTS] = playsound_counts
+    cache.json[_PLAYSOUND_COUNTS_BY_REGION] = playsound_counts_by_region
