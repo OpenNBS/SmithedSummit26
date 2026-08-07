@@ -62,7 +62,7 @@ class SoundResource:
     octave_offset: OctaveOffsetEnum
 
     @classmethod
-    def from_note(cls, song: pynbs.File, note: pynbs.Note) -> SoundResource:
+    def from_note(cls, song: pynbs.File, note: pynbs.Note) -> SoundResource | None:
         return map_note_to_sound_resource(song, note)
 
     @property
@@ -233,6 +233,11 @@ def generate_sounds(ctx: Context, sound_list: set[SoundResource]) -> None:
     vanilla = ctx.inject(Vanilla)
     release = vanilla.releases[ctx.minecraft_version]
     asset_index = release.object_mapping.files
+    if not isinstance(asset_index, AssetIndex):
+        raise TypeError(
+            "Expected AssetIndex from vanilla object mapping, "
+            f"got {type(asset_index).__name__}"
+        )
 
     sound_config: dict = {}
 

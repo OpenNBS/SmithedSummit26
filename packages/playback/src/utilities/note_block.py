@@ -86,7 +86,10 @@ class PlaysoundNote:
     panning: float = 0
 
     def play(
-        self, inner_range: float, outer_range: float, stereo_separation: float = None
+        self,
+        inner_range: float,
+        outer_range: float,
+        stereo_separation: float | None = None,
     ) -> str:
         """Play a sound that can be heard in a range by all players in range
 
@@ -314,6 +317,10 @@ def get_notes(song: pynbs.File) -> Iterator[tuple[int, list[PlaysoundNote]]]:
         if 0 <= note.instrument < len(NBS_ROLLOFF_INSTRUMENTS):
             return NBS_ROLLOFF_INSTRUMENTS[note.instrument]
         resource = SoundResource.from_note(song, note)
+        if resource is None:
+            raise ValueError(
+                f"No sound file assigned to instrument: {note.instrument}"
+            )
         stem = Path(resource.src_path).stem
         return _FILE_STEM_ALIASES.get(stem, stem)
 

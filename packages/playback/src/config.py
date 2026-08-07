@@ -59,6 +59,8 @@ class RegionConfig:
     title_color: str
 
     def __eq__(self, other: object) -> bool:
+        if not isinstance(other, RegionConfig):
+            return NotImplemented
         return self.name == other.name
 
     def __hash__(self) -> int:

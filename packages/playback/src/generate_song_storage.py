@@ -76,10 +76,16 @@ def beet_default(ctx: Context) -> Generator[None]:
             database.payload_for_region(region),
         )
         written_storages[storage_id] = output_path
+        output_directory = ctx.output_directory
+        logged_path = (
+            output_path.relative_to(output_directory)
+            if output_directory is not None
+            else output_path
+        )
         logger.info(
             "Wrote %s command storage companion artifact: %s",
             storage_id,
-            output_path.relative_to(ctx.output_directory),
+            logged_path,
         )
 
     copy_command_storages_to_linked_world(ctx, written_storages)

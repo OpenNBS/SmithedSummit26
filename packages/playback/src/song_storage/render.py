@@ -14,7 +14,7 @@ from concurrent.futures import (
 from dataclasses import dataclass
 from multiprocessing import get_context
 from pathlib import Path
-from typing import TypeAlias
+from typing import TypeAlias, cast
 
 import pynbs
 from beet import Context
@@ -79,23 +79,24 @@ class RenderedStorage:
         return self.root_payload["songs"]
 
     @property
-    def regions(self) -> dict[str, object]:
-        return self.root_payload["regions"]
+    def regions(self) -> dict[str, dict[str, str]]:
+        return cast(dict[str, dict[str, str]], self.root_payload["regions"])
 
     def payload_for_region(self, region: str) -> RootPayload:
         """Return an isolated database containing only one region's songs."""
 
         raw_index = self.regions.get(region)
-        if not isinstance(raw_index, dict):
+        if raw_index is None:
             raise KeyError(f"No rendered song index for region {region!r}")
 
-        region_songs: dict[str, object] = {}
-        for song_id in raw_index.values():
-            if not isinstance(song_id, str):
-                raise TypeError(f"Invalid song id in region {region!r}: {song_id!r}")
-            region_songs[song_id] = self.songs[song_id]
+        region_songs: dict[str, object] = {
+            song_id: self.songs[song_id] for song_id in raw_index.values()
+        }
 
-        return {"index": raw_index, "songs": region_songs}
+        return cast(
+            RootPayload,
+            {"index": raw_index, "songs": region_songs},
+        )
 
 
 def render_range_payload(
@@ -298,7 +299,7 @@ def render_database(tasks: Sequence[SongTask]) -> RenderedStorage:
                 raise
 
     songs: dict[str, object] = {}
-    regions: dict[str, object] = {}
+    regions: dict[str, dict[str, str]] = {}
     playsound_counts: set[int] = set()
     playsound_counts_by_region: dict[str, set[int]] = {}
     total_ticks = 0
@@ -308,8 +309,6 @@ def render_database(tasks: Sequence[SongTask]) -> RenderedStorage:
     for task in tasks:
         result = results[task.song_id]
         region_index = regions.setdefault(task.region, {})
-        if not isinstance(region_index, dict):
-            raise TypeError(f"Invalid region index for {task.region!r}")
         region_index[f"i{task.region_index}"] = task.song_id
 
         songs[task.song_id] = {
@@ -336,7 +335,7 @@ def render_database(tasks: Sequence[SongTask]) -> RenderedStorage:
         total_playsounds,
     )
     return RenderedStorage(
-        root_payload={"regions": regions, "songs": songs},
+        root_payload=cast(RootPayload, {"regions": regions, "songs": songs}),
         playsound_counts=tuple(sorted(count for count in playsound_counts if count)),
         playsound_counts_by_region={
             region: tuple(sorted(count for count in counts if count))
