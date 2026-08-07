@@ -12,6 +12,7 @@ from beet.contrib.vanilla import AssetIndex, Vanilla
 
 from nbs_shared.manifest import SongManifest
 from src.config import SONGS_PATH
+from src.utilities.parallel import map_as_completed
 
 logger = logging.getLogger(__name__)
 
@@ -101,6 +102,12 @@ class SoundResource:
         return self.pack_sound_path.replace("/", "_")
 
 
+@dataclass(frozen=True)
+class PitchShiftTask:
+    resource: SoundResource
+    ogg_bytes: bytes
+
+
 def map_note_to_sound_resource(
     song: pynbs.File, note: pynbs.Note
 ) -> SoundResource | None:
@@ -141,26 +148,38 @@ def get_song_custom_sounds(song: pynbs.File) -> set[SoundResource]:
     return sound_files
 
 
+def collect_song_sounds(song_id: str) -> frozenset[SoundResource]:
+    """Worker entrypoint: read one NBS file and collect its sound resources."""
+
+    song = pynbs.read(SONGS_PATH / f"{song_id}.nbs")
+    return frozenset(get_song_custom_sounds(song))
+
+
 def get_all_custom_sounds(song_manifest: SongManifest) -> set[SoundResource]:
     sound_files: set[SoundResource] = set()
+    song_ids: list[str] = []
 
-    logger.info(f"Processing custom sounds for {len(song_manifest)} songs")
+    logger.info("Processing custom sounds for %d songs", len(song_manifest))
 
     for song_data in song_manifest:
         song_id = song_data["id"]
-
         song_file = SONGS_PATH / f"{song_id}.nbs"
-
         if not song_file.exists():
-            logger.warning(f"Song file not found: {song_file}")
+            logger.warning("Song file not found: %s", song_file)
             continue
+        song_ids.append(song_id)
 
-        song = pynbs.read(song_file)
-        extra_sounds = get_song_custom_sounds(song)
+    for song_id, extra_sounds in map_as_completed(
+        collect_song_sounds,
+        song_ids,
+        item_id=str,
+        thread_name_prefix="sound-scanner",
+        failure_message="Failed to scan sounds for song: %s",
+    ):
         sound_files.update(extra_sounds)
-        logger.info(f"Added {len(extra_sounds)} custom sounds for song: {song_id}")
+        logger.info("Added %d custom sounds for song: %s", len(extra_sounds), song_id)
 
-    logger.info(f"Found {len(sound_files)} unique custom sounds")
+    logger.info("Found %d unique custom sounds", len(sound_files))
     return sound_files
 
 
@@ -204,10 +223,9 @@ def load_vanilla_ogg(asset_index: AssetIndex, resource: SoundResource) -> bytes 
         path = Path(asset_index[resource.resource_location])
     except KeyError:
         logger.warning(
-            f"Sound not found in vanilla assets: {resource.vanilla_sound_key}"
+            "Sound not found in vanilla assets: %s", resource.vanilla_sound_key
         )
-
-        return
+        return None
 
     ogg_bytes = path.read_bytes()
     if ogg_bytes.startswith(b"OggS"):
@@ -229,6 +247,17 @@ def load_vanilla_ogg(asset_index: AssetIndex, resource: SoundResource) -> bytes 
     return ogg_bytes
 
 
+def pitch_shift_task(task: PitchShiftTask) -> bytes:
+    """Worker entrypoint: pitch-shift one preloaded vanilla OGG."""
+
+    try:
+        return pitch_shift_ogg(task.ogg_bytes, task.resource.key_offset)
+    except sf.LibsndfileError as err:
+        raise ValueError(
+            f"Failed to decode vanilla sound: {task.resource.vanilla_sound_key}"
+        ) from err
+
+
 def generate_sounds(ctx: Context, sound_list: set[SoundResource]) -> None:
     vanilla = ctx.inject(Vanilla)
     release = vanilla.releases[ctx.minecraft_version]
@@ -240,10 +269,12 @@ def generate_sounds(ctx: Context, sound_list: set[SoundResource]) -> None:
         )
 
     sound_config: dict = {}
+    pitch_tasks: list[PitchShiftTask] = []
 
+    # Resolve vanilla samples on the main thread so AssetIndex cache repairs stay
+    # single-threaded. Only the CPU-bound pitch shift runs in the worker pool.
     for resource in sound_list:
         logger.debug("Generating sound for %s", resource.resource_location)
-
         event = resource.sound_event
 
         if resource.octave_offset is OctaveOffsetEnum.NONE:
@@ -256,14 +287,19 @@ def generate_sounds(ctx: Context, sound_list: set[SoundResource]) -> None:
         if (ogg_bytes := load_vanilla_ogg(asset_index, resource)) is None:
             continue
 
-        try:
-            shifted = pitch_shift_ogg(ogg_bytes, resource.key_offset)
-        except sf.LibsndfileError as err:
-            raise ValueError(
-                f"Failed to decode vanilla sound: {resource.vanilla_sound_key}"
-            ) from err
+        pitch_tasks.append(PitchShiftTask(resource, ogg_bytes))
+
+    # Beet pack containers aren't thread-safe. Merge completed samples here.
+    for task, shifted in map_as_completed(
+        pitch_shift_task,
+        pitch_tasks,
+        item_id=lambda task: task.resource.vanilla_sound_key,
+        thread_name_prefix="sound-pitcher",
+        failure_message="Failed to pitch-shift sound: %s",
+    ):
+        resource = task.resource
         ctx.assets["nbs"].sounds[resource.pack_sound_path] = Sound(shifted)
-        sound_config[event] = {
+        sound_config[resource.sound_event] = {
             "sounds": [resource.pack_sound_path],
             "subtitle": SUBTITLE,
         }
