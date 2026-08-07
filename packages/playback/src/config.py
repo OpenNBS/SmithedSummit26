@@ -1,9 +1,12 @@
 """Pre-populate the context with data to be processed by the remaining pipeline stages."""
 
 import json
+import logging
 
 from beet import Context
 from nbs_shared.project import SONGS_FILES_DIRECTORY
+
+logger = logging.getLogger(__name__)
 
 SONGS_PATH = SONGS_FILES_DIRECTORY
 
@@ -48,6 +51,12 @@ def load_speaker_ranges(ctx: Context):
     ctx.meta["speaker_ranges"] = SPEAKER_RANGES
     ctx.meta["anim_count"] = ANIM_COUNT
 
+    logger.info(
+        "Loaded %d speaker ranges: %s",
+        len(SPEAKER_RANGES),
+        ", ".join(speaker_type["name"] for speaker_type in SPEAKER_RANGES),
+    )
+
 
 def load_instruments(ctx: Context):
     ctx.meta["instruments"] = set()
@@ -65,6 +74,8 @@ def load_regions(ctx: Context):
 
     ctx.meta["regions"] = regions
     ctx.meta["region_counts"] = region_counts
+
+    logger.info("Loaded %d regions: %s", len(regions), ", ".join(regions))
 
 
 def beet_default(ctx: Context):
