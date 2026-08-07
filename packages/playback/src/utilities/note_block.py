@@ -5,7 +5,6 @@ __all__ = [
 ]
 
 
-import logging
 import math
 from dataclasses import dataclass
 from pathlib import Path
