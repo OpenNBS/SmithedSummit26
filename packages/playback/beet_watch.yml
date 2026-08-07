@@ -1,7 +1,7 @@
 # Beet config for used for live reload (development). Writes file directly to
 # filesystem instead of zipping.
 
-extend: beet_base.yml
+extend: beet.yml
 
 data_pack:
   zipped: false

@@ -1,6 +1,6 @@
 # Zipped build with test songs. Use for development and testing.
 
-extend: beet_base.yml
+extend: beet.yml
 
 data_pack:
   zipped: false

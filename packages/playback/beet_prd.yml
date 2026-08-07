@@ -1,9 +1,9 @@
 # Full production build with all songs. Use for generating the final pack.
 
-extend: beet_base.yml
+extend: beet.yml
 
 data_pack:
-  zipped: false
+  zipped: true
 
 resource_pack:
   zipped: true
