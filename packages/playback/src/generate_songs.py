@@ -198,7 +198,7 @@ def prepare_tasks(ctx: Context) -> list[SongTask]:
     speaker_ranges = tuple(
         SpeakerRange(
             name=speaker["name"],
-            outer=speaker["range"],
+            outer=speaker["outer_range"],
             inner=speaker["inner_range"],
         )
         for speaker in ctx.meta["speaker_ranges"]

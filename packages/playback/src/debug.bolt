@@ -23,7 +23,7 @@ append function ~/toggle:
 
 for data in ctx.meta["speaker_ranges"]:
     speaker_type = data["name"]
-    radius = data["range"]
+    radius = data["outer_range"]
 
     append function ~/show_debug_particles:
         execute as @e[type=item_display,tag=f"nbs.speaker.{speaker_type}"] at @s run function ~/../spawn_particles/{speaker_type}

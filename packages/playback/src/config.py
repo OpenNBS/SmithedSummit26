@@ -12,17 +12,17 @@ SONGS_PATH = SONGS_FILES_DIRECTORY
 SPEAKER_RANGES = [
     {
         "name": "short",
-        "range": 12,
+        "outer_range": 12,
         "inner_range": 9,
     },
     {
         "name": "mid",
-        "range": 20,
+        "outer_range": 20,
         "inner_range": 16,
     },
     {
         "name": "long",
-        "range": 32,
+        "outer_range": 32,
         "inner_range": 24,
     },
 ]

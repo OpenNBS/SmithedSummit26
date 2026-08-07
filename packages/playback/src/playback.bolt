@@ -108,7 +108,7 @@ for region in REGIONS:
         # display actionbar to nearby players (a bit laggy but very rare)
         for speaker in SPEAKER_RANGES:
             variant = speaker["name"]
-            range = speaker["range"]
+            range = speaker["outer_range"]
 
             append function ~/../title:
                 raw f'$execute at @e[type=item_display,tag=nbs.speaker.{region},tag=nbs.speaker.{variant}] run title @a[distance=..{range}] actionbar [{{"text":"🎵 Now Playing: ","color":"green"}},{{"text":"$(formatted_string)","color":"white"}}]'
