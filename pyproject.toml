@@ -21,6 +21,7 @@ dependencies = [
 [dependency-groups]
 dev = [
   "poethepoet>=0.37.0",
+  "ruff>=0.12.0",
   "snakeviz>=2.2.2",
   "tuna>=0.5.15",
 ]
@@ -100,3 +101,13 @@ help = "Download song files and update the submissions manifest"
 [tool.poe.tasks.create-thumbnails]
 cmd = "uv run scripts/create_thumbnail.py"
 help = "Generate booth thumbnails from remote song files"
+
+[tool.poe.tasks.lint]
+cmd = "ruff check ."
+help = "Lint the workspace with Ruff"
+
+[tool.ruff.lint]
+extend-select = ["I"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["_lib", "nbs_shared", "src"]

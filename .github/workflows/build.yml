@@ -14,11 +14,14 @@ jobs:
       - name: Set up Nix
         uses: JRMurr/direnv-nix-action@v4.2.0
 
-      - name: Build data and resource packs
-        run: |
-          uv sync
+      - name: Install dependencies
+        run: uv sync
 
-          beet build
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Build data and resource packs
+        run: beet build
 
       - name: Upload data and resource packs
         uses: actions/upload-artifact@v4
