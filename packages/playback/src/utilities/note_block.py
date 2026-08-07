@@ -216,8 +216,7 @@ class PlaysoundNote:
         selector: str = "@a",
     ):
         """Return the /playsound command to play the note for the given player."""
-
-        instrument = self.instrument.replace("/", "_")
+        instrument = self.instrument
 
         selector_arguments = []
         selector_arguments.append("tag=!nbs.nomusic")

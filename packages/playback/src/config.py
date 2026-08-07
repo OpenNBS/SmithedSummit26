@@ -87,10 +87,6 @@ def load_speaker_ranges(ctx: Context):
     )
 
 
-def load_instruments(ctx: Context):
-    ctx.meta["instruments"] = set()
-
-
 def load_song_storage_config(ctx: Context):
     max_playsounds = ctx.meta.setdefault(
         "max_playsounds_per_tick", DEFAULT_MAX_PLAYSOUNDS_PER_TICK
@@ -156,5 +152,4 @@ def beet_default(ctx: Context):
     load_song_manifest(ctx)
     load_speaker_ranges(ctx)
     load_song_storage_config(ctx)
-    load_instruments(ctx)
     load_regions(ctx)
