@@ -20,6 +20,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+  "basedpyright>=1.39.9",
   "poethepoet>=0.37.0",
   "ruff>=0.12.0",
   "snakeviz>=2.2.2",
@@ -106,8 +107,38 @@ help = "Generate booth thumbnails from remote song files"
 cmd = "ruff check ."
 help = "Lint the workspace with Ruff"
 
+[tool.poe.tasks.typecheck]
+cmd = "basedpyright"
+help = "Type-check the workspace with basedpyright"
+
 [tool.ruff.lint]
 extend-select = ["I"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["_lib", "nbs_shared", "src"]
+
+# Shared by basedpyright CLI and Pylance (reads [tool.pyright]).
+# Per-package executionEnvironments keep each package's `src` import root isolated.
+[tool.pyright]
+typeCheckingMode = "basic"
+pythonVersion = "3.14"
+include = [
+  "packages/booth",
+  "packages/playback",
+  "packages/shared",
+  "scripts",
+]
+exclude = [
+  "**/__pycache__",
+  "**/.beet_cache",
+  "**/dist",
+]
+executionEnvironments = [
+  { root = "packages/booth", extraPaths = ["packages/booth", "packages/shared"] },
+  { root = "packages/playback", extraPaths = [
+    "packages/playback",
+    "packages/shared",
+  ] },
+  { root = "packages/shared", extraPaths = ["packages/shared"] },
+  { root = "scripts", extraPaths = ["scripts"] },
+]
