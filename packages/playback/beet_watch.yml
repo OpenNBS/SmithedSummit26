@@ -13,4 +13,4 @@ output: dist
 
 meta:
   debug: true
-  song_manifest_path: "manifest_debug.json"
+  song_manifest_path: "manifest.json"
