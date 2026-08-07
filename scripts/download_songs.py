@@ -87,6 +87,7 @@ def extract_id_from_title(title: str) -> str:
         .split("Super Mario Bros Wonder")[-1]
         .split("Super Mario 3D Land")[-1]
         .split("Compressed")[0]
+        .split("Stardew Valley")[-1]
     )
 
     # Normalize '-' separators, then keep only the first part
