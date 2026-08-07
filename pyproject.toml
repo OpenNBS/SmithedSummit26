@@ -124,7 +124,7 @@ known-first-party = ["_lib", "nbs_shared", "src"]
 # Shared by basedpyright CLI and Pylance (reads [tool.pyright]).
 # Per-package executionEnvironments keep each package's `src` import root isolated.
 [tool.pyright]
-typeCheckingMode = "basic"
+typeCheckingMode = "standard"
 pythonVersion = "3.14"
 include = [
   "packages/booth",
