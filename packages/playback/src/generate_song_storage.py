@@ -5,6 +5,7 @@ The implementation is split across :mod:`src.song_storage`:
 * ``render`` handles NBS parsing and concurrent song rendering.
 * ``saved_data`` handles the Minecraft SavedData NBT envelope.
 * ``debug_functions`` emits optional, explicitly-called in-game loaders.
+* ``link_world`` copies companion artifacts into the ``beet link`` world.
 
 This plugin intentionally spans the Mecha stage. Before yielding, it renders
 the database and publishes the observed chord sizes for ``songs.bolt``. After
@@ -14,9 +15,11 @@ binary world-data artifact without making Mecha parse either representation.
 
 import logging
 from collections.abc import Generator
+from pathlib import Path
 
 from beet import Context
 from src.song_storage.debug_functions import emit_debug_load_functions
+from src.song_storage.link_world import copy_command_storages_to_linked_world
 from src.song_storage.render import RenderedStorage, prepare_tasks, render_database
 from src.song_storage.saved_data import (
     remove_legacy_global_storage,
@@ -63,6 +66,7 @@ def beet_default(ctx: Context) -> Generator[None]:
 
     remove_legacy_global_storage(ctx)
     storage_id_template = ctx.meta["song_storage_id_template"]
+    written_storages: dict[str, Path] = {}
     for region in database.regions:
         storage_id = storage_id_template.format(region=region)
         output_path = write_command_storage(
@@ -70,8 +74,11 @@ def beet_default(ctx: Context) -> Generator[None]:
             storage_id,
             database.payload_for_region(region),
         )
+        written_storages[storage_id] = output_path
         logger.info(
             "Wrote %s command storage companion artifact: %s",
             storage_id,
-            output_path,
+            output_path.relative_to(ctx.output_directory),
         )
+
+    copy_command_storages_to_linked_world(ctx, written_storages)
