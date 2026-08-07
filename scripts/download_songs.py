@@ -13,6 +13,7 @@ import json
 import re
 import sys
 import unicodedata
+from collections import OrderedDict
 from pathlib import Path
 
 from _lib.file_store import FileStore, ObjectNotFoundError
@@ -42,6 +43,22 @@ REGIONS = {
 }
 
 INVALID_FILENAME_CHARS = re.compile(r'[<>:"/\\|?*]')
+
+# Key order for every manifest entry written to JSON.
+MANIFEST_FIELD_ORDER = (
+    "id",
+    "title",
+    "region",
+    "author",
+    "url",
+    "beat_offset",
+    "beat_interval",
+    "tempo_factor",
+)
+
+
+def ordered_song_entry(data: SongManifestEntry) -> OrderedDict[str, object]:
+    return OrderedDict((key, data[key]) for key in MANIFEST_FIELD_ORDER if key in data)
 
 
 def detect_region(description: str) -> str | None:
@@ -130,8 +147,8 @@ def resolve_song_data(
     pass are still filled in when missing from the existing entry.
     """
     if existing_meta is None or OVERWRITE_METADATA:
-        return new_data
-    return {**new_data, **existing_meta}
+        return ordered_song_entry(new_data)
+    return ordered_song_entry({**new_data, **existing_meta})
 
 
 def process_song(
@@ -154,13 +171,15 @@ def process_song(
     if region_id is None:
         print(f"Warning: No region found in description for {title!r} ({public_id})")
 
-    song_data: SongManifestEntry = {
-        "id": song_id,
-        "title": title,
-        "region": region_id,
-        "author": author,
-        "url": public_id,
-    }
+    song_data = ordered_song_entry(
+        {
+            "id": song_id,
+            "title": title,
+            "region": region_id,
+            "author": author,
+            "url": public_id,
+        }
+    )
 
     return resolve_song_data(song_data, existing_meta)
 
@@ -196,8 +215,9 @@ def main() -> None:
         manifest_data.sort(key=lambda x: x["id"])
 
     validated = validate_song_manifest(manifest_data)
+    ordered = [ordered_song_entry(entry) for entry in validated]
     with open(MANIFEST_PATH, "w", encoding="utf-8") as f:
-        json.dump(validated, f, indent="\t", separators=(",", ": "))
+        json.dump(ordered, f, indent="\t", separators=(",", ": "))
 
 
 if __name__ == "__main__":
