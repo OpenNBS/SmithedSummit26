@@ -11,7 +11,8 @@
 		"title": "amarillo",
 		"region": "plateaus",
 		"author": "PianoPersona",
-		"url": "3gvpWPJp1S"
+		"url": "3gvpWPJp1S",
+		"beat_interval": 10
 	},
 	{
 		"id": "apex_tropicorum",
@@ -46,7 +47,8 @@
 		"title": "Canyon Layer (Donkey Kong Bananza)",
 		"region": "woodlands",
 		"author": "CreeperJuice",
-		"url": "MiYEEv4kU7"
+		"url": "MiYEEv4kU7",
+		"beat_interval": 8
 	},
 	{
 		"id": "cascade_unending",
@@ -60,7 +62,8 @@
 		"title": "Super Mario 3D Land - Clocktower",
 		"region": "woodlands",
 		"author": "stunningwheel94",
-		"url": "gBYTGbfqfK"
+		"url": "gBYTGbfqfK",
+		"beat_interval": 5
 	},
 	{
 		"id": "do_mechanical_bees_dream_of_skis",
@@ -95,14 +98,16 @@
 		"title": "Fun Fun Fun dayo, Lucky Star (Lucky Star)",
 		"region": "plateaus",
 		"author": "itikgamemix6908",
-		"url": "o8OfLrGOop"
+		"url": "o8OfLrGOop",
+		"beat_interval": 10
 	},
 	{
 		"id": "gensokyo_past_and_present_flower_land",
 		"title": "Gensokyo, Past and Present ~ Flower Land (Touhou 9: Phantasmagoria of Flower View)",
 		"region": "plateaus",
 		"author": "L0ndRzZz",
-		"url": "C36c5Rfexy"
+		"url": "C36c5Rfexy",
+		"beat_offset": 4
 	},
 	{
 		"id": "gravel_dirt_and_cobblestones",
@@ -130,14 +135,16 @@
 		"title": "In The Deep Woods (Stardew Valley)",
 		"region": "woodlands",
 		"author": "minesculptor",
-		"url": "f9e5Lb0YcJ"
+		"url": "f9e5Lb0YcJ",
+		"beat_interval": 12
 	},
 	{
 		"id": "johnny_core_conga",
 		"title": "Johnny Core Conga",
 		"region": "tropics",
 		"author": "superbaconbro",
-		"url": "EuY0qMDoDJ"
+		"url": "EuY0qMDoDJ",
+		"beat_interval": 12
 	},
 	{
 		"id": "like_broken_clockwork",
@@ -151,7 +158,8 @@
 		"title": "Machines Root for the Undergrowth",
 		"region": "woodlands",
 		"author": "QueasyQuery",
-		"url": "tFDamSfzGO"
+		"url": "tFDamSfzGO",
+		"beat_interval": 12
 	},
 	{
 		"id": "meltdown",
@@ -165,35 +173,41 @@
 		"title": "Nighttime on the Island (Tomodachi Life: Living the Dream)",
 		"region": "plateaus",
 		"author": "PScout",
-		"url": "lLgyRPgo8D"
+		"url": "lLgyRPgo8D",
+		"beat_interval": 8
 	},
 	{
 		"id": "nintendo_land_main_theme",
 		"title": "Nintendo Land Main Theme",
 		"region": "plateaus",
 		"author": "stunningwheel94",
-		"url": "9fEtvgfUpe"
+		"url": "9fEtvgfUpe",
+		"beat_offset": 1,
+		"beat_interval": 6
 	},
 	{
 		"id": "norwegian_woods",
 		"title": "Norwegian Woods",
 		"region": "woodlands",
 		"author": "raphaelbertges",
-		"url": "eeDEu7KsZI"
+		"url": "eeDEu7KsZI",
+		"beat_interval": 14
 	},
 	{
 		"id": "permafrost",
 		"title": "Permafrost",
 		"region": "woodlands",
 		"author": "BuilderAltWCF1",
-		"url": "2ESweEbBiP"
+		"url": "2ESweEbBiP",
+		"tempo_factor": 0.5
 	},
 	{
 		"id": "pipe_rock_plateau",
 		"title": "Pipe Rock Plateau (Super Mario Bros. Wonder)",
 		"region": "plateaus",
 		"author": "superbaconbro",
-		"url": "UHIpXKhVVQ"
+		"url": "UHIpXKhVVQ",
+		"beat_interval": 12
 	},
 	{
 		"id": "rainie_love",
@@ -214,7 +228,8 @@
 		"title": "scrumptiously rustic valves",
 		"region": "woodlands",
 		"author": "superbaconbro",
-		"url": "IN5LlK1xOI"
+		"url": "IN5LlK1xOI",
+		"beat_interval": 12
 	},
 	{
 		"id": "splitting_edges_of_the_universe",
@@ -277,7 +292,8 @@
 		"title": "There She Is (Portal 2)",
 		"region": "woodlands",
 		"author": "PScout",
-		"url": "zUBMrE4nAS"
+		"url": "zUBMrE4nAS",
+		"beat_interval": 8
 	},
 	{
 		"id": "theres_a_great_big_beautiful_tomorrow",
@@ -347,6 +363,7 @@
 		"title": "You've Got to be Modernistic (James P. Johnson)",
 		"region": "tropics",
 		"author": "stunningwheel94",
-		"url": "xFfrpXc7X5"
+		"url": "xFfrpXc7X5",
+		"beat_interval": 6
 	}
 ]
