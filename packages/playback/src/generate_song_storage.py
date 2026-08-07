@@ -23,9 +23,13 @@ from src.song_storage.debug_functions import emit_debug_load_functions
 from src.song_storage.link_world import copy_command_storages_to_linked_world
 from src.song_storage.render import RenderedStorage, prepare_tasks, render_database
 from src.song_storage.saved_data import (
+    CommandStorageWriteTask,
+    parse_storage_id,
     remove_legacy_global_storage,
-    write_command_storage,
+    resolve_output_path,
+    write_command_storage_file,
 )
+from src.utilities.parallel import map_as_completed
 
 logger = logging.getLogger(__name__)
 
@@ -67,16 +71,32 @@ def beet_default(ctx: Context) -> Generator[None]:
 
     remove_legacy_global_storage(ctx)
     storage_id_template = ctx.meta["song_storage_id_template"]
-    written_storages: dict[str, Path] = {}
+    data_version = ctx.meta["command_storage_data_version"]
+    output_directory = ctx.output_directory
+    write_tasks: list[CommandStorageWriteTask] = []
     for region in database.regions:
         storage_id = storage_id_template.format(region=region)
-        output_path = write_command_storage(
-            ctx,
-            storage_id,
-            database.payload_for_region(region),
+        namespace, _ = parse_storage_id(storage_id)
+        write_tasks.append(
+            CommandStorageWriteTask(
+                storage_id=storage_id,
+                root_payload=database.payload_for_region(region),
+                output_path=resolve_output_path(ctx, namespace),
+                data_version=data_version,
+            )
         )
-        written_storages[storage_id] = output_path
-        output_directory = ctx.output_directory
+
+    # Regions are independent: encode NBT and write each companion artifact
+    # concurrently, then merge paths on the main thread for logging / linking.
+    written_storages: dict[str, Path] = {}
+    for task, output_path in map_as_completed(
+        write_command_storage_file,
+        write_tasks,
+        item_id=lambda task: task.storage_id,
+        thread_name_prefix="storage-writer",
+        failure_message="Failed to write command storage: %s",
+    ):
+        written_storages[task.storage_id] = output_path
         logged_path = (
             output_path.relative_to(output_directory)
             if output_directory is not None
@@ -84,7 +104,7 @@ def beet_default(ctx: Context) -> Generator[None]:
         )
         logger.info(
             "Wrote %s command storage companion artifact: %s",
-            storage_id,
+            task.storage_id,
             logged_path,
         )
 

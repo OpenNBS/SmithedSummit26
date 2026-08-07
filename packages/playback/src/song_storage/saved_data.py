@@ -2,6 +2,7 @@
 
 import re
 from collections.abc import Mapping
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +12,16 @@ from nbtlib import Byte, Compound, File, Int, String
 from src.song_storage.render import RegionStoragePayload
 
 RESOURCE_LOCATION = re.compile(r"^(?P<namespace>[a-z0-9_.-]+):(?P<path>[a-z0-9/._-]+)$")
+
+
+@dataclass(frozen=True)
+class CommandStorageWriteTask:
+    """Picklable inputs for concurrent companion-artifact writers."""
+
+    storage_id: str
+    root_payload: RegionStoragePayload
+    output_path: Path
+    data_version: int
 
 
 def payload_to_nbt(value: Mapping[str, Any]) -> Compound:
@@ -72,26 +83,39 @@ def resolve_output_path(ctx: Context, namespace: str) -> Path:
     return output_directory / "world-data" / "data" / namespace / "command_storage.dat"
 
 
-def write_command_storage(
-    ctx: Context,
-    storage_id: str,
-    root_payload: RegionStoragePayload,
-) -> Path:
-    """Atomically write the world-data companion artifact."""
+def write_command_storage_file(task: CommandStorageWriteTask) -> Path:
+    """Atomically encode and write one world-data companion artifact."""
 
-    namespace, _ = parse_storage_id(storage_id)
-    output_path = resolve_output_path(ctx, namespace)
+    output_path = task.output_path
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     storage_file = create_command_storage_file(
-        storage_id,
-        root_payload,
-        ctx.meta["command_storage_data_version"],
+        task.storage_id,
+        task.root_payload,
+        task.data_version,
     )
     temporary_path = output_path.with_suffix(".dat.tmp")
     storage_file.save(temporary_path)
     temporary_path.replace(output_path)
     return output_path
+
+
+def write_command_storage(
+    ctx: Context,
+    storage_id: str,
+    root_payload: RegionStoragePayload,
+) -> Path:
+    """Resolve paths from the beet context, then write the companion artifact."""
+
+    namespace, _ = parse_storage_id(storage_id)
+    return write_command_storage_file(
+        CommandStorageWriteTask(
+            storage_id=storage_id,
+            root_payload=root_payload,
+            output_path=resolve_output_path(ctx, namespace),
+            data_version=ctx.meta["command_storage_data_version"],
+        )
+    )
 
 
 def remove_legacy_global_storage(ctx: Context) -> None:

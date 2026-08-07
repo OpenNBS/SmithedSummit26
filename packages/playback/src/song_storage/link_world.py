@@ -28,7 +28,7 @@ def copy_command_storages_to_linked_world(
 
     ``storages`` maps each command-storage id (for example
     ``nbs.woodlands:songs``) to the build-output file produced by
-    :func:`src.song_storage.saved_data.write_command_storage`.
+    :func:`src.song_storage.saved_data.write_command_storage_file`.
 
     When no world is configured in ``ctx.cache["link"]``, logs a warning and
     skips installation so generation still succeeds for plain builds.
