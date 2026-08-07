@@ -232,7 +232,7 @@ def prepare_tasks(ctx: Context) -> list[SongTask]:
 
 
 def beet_default(ctx: Context) -> None:
-    logger.info("Generating song note functions")
+    logger.info("Generating song note functions for %d songs", len(ctx.meta["song_manifest"]))
     tasks = prepare_tasks(ctx)
 
     if tasks:
