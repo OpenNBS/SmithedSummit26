@@ -43,6 +43,7 @@ class SongTask:
     author: str
     path: Path
     speaker_ranges: tuple[SpeakerRange, ...]
+    actionbar_color: str = "green"
     options: RenderOptions = RenderOptions()
 
 
@@ -97,7 +98,7 @@ def render_variant(
     )
     actionbar = json.dumps(
         [
-            {"text": options.actionbar_prefix, "color": "green"},
+            {"text": options.actionbar_prefix, "color": task.actionbar_color},
             {"text": f"{task.title} - {task.author}", "color": "white"},
         ],
         separators=(",", ":"),
@@ -205,9 +206,12 @@ def prepare_tasks(ctx: Context) -> list[SongTask]:
     )
     tasks: list[SongTask] = []
 
+    regions = ctx.meta["regions"]
+
     for song_data in ctx.meta["song_manifest"]:
         song_id = song_data["id"]
-        if song_data["region"] is None:
+        region_name = song_data["region"]
+        if region_name is None:
             logger.warning("Song %s has no region assigned; skipping", song_id)
             continue
 
@@ -225,6 +229,7 @@ def prepare_tasks(ctx: Context) -> list[SongTask]:
                 author=song_data["author"],
                 path=path,
                 speaker_ranges=speaker_ranges,
+                actionbar_color=regions[region_name].title_color,
             )
         )
 

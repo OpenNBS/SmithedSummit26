@@ -31,6 +31,12 @@ SPEAKER_RANGES = [
     },
 ]
 
+REGION_COLORS: dict[str, str] = {
+    "plateaus": "#DB6EFF",
+    "tropics": "#18F02E",
+    "woodlands": "#55FF55",
+}
+
 # Number of 'play' animation variants in the AJ speaker models
 ANIM_COUNT = 6
 
@@ -39,6 +45,7 @@ ANIM_COUNT = 6
 class RegionConfig:
     name: str
     song_count: int
+    title_color: str
 
     def __eq__(self, other: object) -> bool:
         return self.name == other.name
@@ -81,6 +88,13 @@ def load_regions(ctx: Context):
         region = song_data["region"]
         if region is None:
             continue
+
+        try:
+            region_color = REGION_COLORS[region]
+        except KeyError:
+            logger.warning("Warning: Region %s has no color assigned", region)
+            region_color = "#FFFFFF"
+
         region = RegionConfig(name=region, song_count=0, title_color=region_color)
         regions[region.name] = region
         regions[region.name].song_count += 1

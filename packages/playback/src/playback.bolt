@@ -112,8 +112,11 @@ for region in REGIONS:
             variant = speaker["name"]
             range = speaker["outer_range"]
 
+            region_config = REGIONS[region]
+            title_color = region_config.title_color
+
             append function ~/../title:
-                raw f'$execute at @e[type=item_display,tag=nbs.speaker.{region},tag=nbs.speaker.{variant}] run title @a[distance=..{range}] actionbar [{{"text":"🎵 Now Playing: ","color":"green"}},{{"text":"$(formatted_string)","color":"white"}}]'
+                raw f'$execute at @e[type=item_display,tag=nbs.speaker.{region},tag=nbs.speaker.{variant}] run title @a[distance=..{range}] actionbar [{{"text":"🎵 Now Playing: ","color":"{title_color}"}},{{"text":"$(formatted_string)","color":"white"}}]'
 
 
         #> Song Controls
