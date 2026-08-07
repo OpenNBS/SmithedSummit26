@@ -27,4 +27,4 @@ function ~/remove/nearest:
             run function f"summit_ambiance:speaker_{region}/remove/this"
 
 function ~/remove/all:
-    execute as @n[type=minecraft:item_display,tag=nbs.speaker] at @s run function ~/../nearest
+    execute as @e[type=minecraft:item_display,tag=nbs.speaker] at @s run function ~/../nearest
