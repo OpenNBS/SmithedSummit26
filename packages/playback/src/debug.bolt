@@ -24,6 +24,7 @@ append function ~/toggle:
 
     execute if score debug nbs matches 1 run function ~/../tick
 
+
 #> display
 
 for data in ctx.meta["speaker_ranges"]:
@@ -48,31 +49,27 @@ for data in ctx.meta["speaker_ranges"]:
             particle minecraft:block_marker{block_state:{Name:"minecraft:purple_stained_glass"}} f"~{x}" f"~{y}" f"~{z}" 0 0 0 0 1 force
 
 
-# function ~/place_speakers:
+#> place speakers
 
-#     # Keep a one-block gap between the largest speaker ranges.  This gives us
-#     # a simple grid that works for every speaker type without overlapping.
-#     grid_cell_size = 0
-#     for speaker_type in SPEAKER_RANGES:
-#         diameter = speaker_type["outer_range"] * 2 + 1
-#         if diameter > grid_cell_size:
-#             grid_cell_size = diameter
+function ~/place_speakers:
+    # Keep a one-block gap between the largest speaker ranges. This gives us
+    # a simple grid that works for every speaker type without overlapping.
+    grid_cell_size = 0
+    for speaker_type in SPEAKER_RANGES:
+        diameter = speaker_type["outer_range"] * 2 + 1
+        if diameter > grid_cell_size:
+            grid_cell_size = diameter
 
-#     #function nbs:speaker/remove/all
-
-#     row = 0
-
-#     for region in REGIONS:
-
-#         for speaker in SPEAKER_RANGES:
-#             speaker_type = speaker["name"]
-
-#             # Ten copies of each region/type, laid out in a row from X/Z 0,0.
-#             for placement in range(10):
-#                 x = placement * grid_cell_size
-#                 z = row * grid_cell_size
-#                 coords = f"{x} ~ {z}"
-#                 execute positioned coords run function f"nbs:speaker/place/{region}/{speaker_type}"
-#                 setblock coords minecraft:stone keep
-
-#             row += 1
+    col = -1
+    for region in REGIONS:
+        row = -1
+        col += 1
+        for speaker in SPEAKER_RANGES:
+            row += 1
+            speaker_type = speaker["name"]
+            x = col * grid_cell_size + grid_cell_size / 2
+            z = row * grid_cell_size + grid_cell_size / 2
+            coords = f"{x} ~ {z}"
+            execute positioned coords run function f"nbs:speaker/place/{region}/{speaker_type}"
+            execute positioned coords run setblock ~ ~-1 ~ minecraft:stone keep
+        
