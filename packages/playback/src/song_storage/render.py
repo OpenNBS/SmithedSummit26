@@ -14,7 +14,7 @@ from concurrent.futures import (
 from dataclasses import dataclass
 from multiprocessing import get_context
 from pathlib import Path
-from typing import TypeAlias, cast
+from typing import TypedDict
 
 import pynbs
 from beet import Context
@@ -28,12 +28,39 @@ logger = logging.getLogger(__name__)
 # segment without quoting. All current manifest ids satisfy this constraint.
 DATABASE_KEY = re.compile(r"^[a-z0-9_.+-]+$")
 
-ScalarPayload: TypeAlias = int | str
-RangePayload: TypeAlias = dict[str, ScalarPayload]
-TickPayload: TypeAlias = dict[str, RangePayload]
-TicksPayload: TypeAlias = dict[str, TickPayload]
-SongRecord: TypeAlias = dict[str, dict[str, ScalarPayload] | TicksPayload]
-RootPayload: TypeAlias = dict[str, dict[str, object]]
+type ScalarPayload = int | str
+type RangePayload = dict[str, ScalarPayload]
+type TickPayload = dict[str, RangePayload]
+type TicksPayload = dict[str, TickPayload]
+type IndexPayload = dict[str, str]
+
+
+class SongMetadata(TypedDict):
+    name: str
+    index: int
+    region: str
+    formatted_string: str
+    title: str
+    author: str
+
+
+class SongRecord(TypedDict):
+    metadata: SongMetadata
+    ticks: TicksPayload
+
+
+class SongDatabasePayload(TypedDict):
+    """Aggregate multi-region payload produced while rendering."""
+
+    regions: dict[str, IndexPayload]
+    songs: dict[str, SongRecord]
+
+
+class RegionStoragePayload(TypedDict):
+    """Per-region command-storage root written to world data."""
+
+    index: IndexPayload
+    songs: dict[str, SongRecord]
 
 
 @dataclass(frozen=True)
@@ -68,35 +95,33 @@ class SongResult:
 class RenderedStorage:
     """Complete payload plus the sparse template leaf set."""
 
-    root_payload: RootPayload
+    root_payload: SongDatabasePayload
     playsound_counts: tuple[int, ...]
     playsound_counts_by_region: dict[str, tuple[int, ...]]
     tick_count: int
     playsound_count: int
 
     @property
-    def songs(self) -> dict[str, object]:
+    def songs(self) -> dict[str, SongRecord]:
         return self.root_payload["songs"]
 
     @property
-    def regions(self) -> dict[str, dict[str, str]]:
-        return cast(dict[str, dict[str, str]], self.root_payload["regions"])
+    def regions(self) -> dict[str, IndexPayload]:
+        return self.root_payload["regions"]
 
-    def payload_for_region(self, region: str) -> RootPayload:
+    def payload_for_region(self, region: str) -> RegionStoragePayload:
         """Return an isolated database containing only one region's songs."""
 
         raw_index = self.regions.get(region)
         if raw_index is None:
             raise KeyError(f"No rendered song index for region {region!r}")
 
-        region_songs: dict[str, object] = {
-            song_id: self.songs[song_id] for song_id in raw_index.values()
+        return {
+            "index": raw_index,
+            "songs": {
+                song_id: self.songs[song_id] for song_id in raw_index.values()
+            },
         }
-
-        return cast(
-            RootPayload,
-            {"index": raw_index, "songs": region_songs},
-        )
 
 
 def render_range_payload(
@@ -298,8 +323,8 @@ def render_database(tasks: Sequence[SongTask]) -> RenderedStorage:
                 logger.exception("Failed to process song: %s", song_id)
                 raise
 
-    songs: dict[str, object] = {}
-    regions: dict[str, dict[str, str]] = {}
+    songs: dict[str, SongRecord] = {}
+    regions: dict[str, IndexPayload] = {}
     playsound_counts: set[int] = set()
     playsound_counts_by_region: dict[str, set[int]] = {}
     total_ticks = 0
@@ -335,7 +360,7 @@ def render_database(tasks: Sequence[SongTask]) -> RenderedStorage:
         total_playsounds,
     )
     return RenderedStorage(
-        root_payload=cast(RootPayload, {"regions": regions, "songs": songs}),
+        root_payload={"regions": regions, "songs": songs},
         playsound_counts=tuple(sorted(count for count in playsound_counts if count)),
         playsound_counts_by_region={
             region: tuple(sorted(count for count in counts if count))

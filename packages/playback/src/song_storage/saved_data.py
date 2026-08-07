@@ -3,16 +3,19 @@
 import re
 from collections.abc import Mapping
 from pathlib import Path
+from typing import Any
 
 from beet import Context
 from nbtlib import Byte, Compound, File, Int, String
+
+from src.song_storage.render import RegionStoragePayload
 
 RESOURCE_LOCATION = re.compile(
     r"^(?P<namespace>[a-z0-9_.-]+):(?P<path>[a-z0-9/._-]+)$"
 )
 
 
-def payload_to_nbt(value: Mapping[str, object]) -> Compound:
+def payload_to_nbt(value: Mapping[str, Any]) -> Compound:
     """Convert the Python database into explicit Java NBT tags."""
 
     compound = Compound()
@@ -39,7 +42,7 @@ def parse_storage_id(storage_id: str) -> tuple[str, str]:
 
 def create_command_storage_file(
     storage_id: str,
-    root_payload: Mapping[str, object],
+    root_payload: RegionStoragePayload,
     data_version: int,
 ) -> File:
     """Create the SavedData wrapper used by Minecraft Java 26.2."""
@@ -80,7 +83,7 @@ def resolve_output_path(ctx: Context, namespace: str) -> Path:
 def write_command_storage(
     ctx: Context,
     storage_id: str,
-    root_payload: Mapping[str, object],
+    root_payload: RegionStoragePayload,
 ) -> Path:
     """Atomically write the world-data companion artifact."""
 
