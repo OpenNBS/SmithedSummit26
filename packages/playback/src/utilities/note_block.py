@@ -250,8 +250,7 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["PlaysoundNote"]]]:
     """Yield all the notes from the given nbs file."""
 
     # Quantize notes to nearest tick (pigstep always exports at 20 t/s)
-    # Remove vanilla instrument notes outside the 6-octave range
-    # Remove custom instrument notes outside the 2-octave range
+    # Remove notes outside the 6-octave range (vanilla or custom)
 
     new_notes = []
 
