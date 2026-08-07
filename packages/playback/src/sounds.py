@@ -10,6 +10,8 @@ from beet import Context, Sound, SoundConfig
 from beet.contrib.vanilla import ClientJar, Vanilla
 from src.config import SONGS_PATH
 
+logger = logging.getLogger(__name__)
+
 DEFAULT_SOUNDS = [
     "minecraft/note/harp.ogg",
     "minecraft/note/bass.ogg",
@@ -139,22 +141,22 @@ def get_song_custom_sounds(song: pynbs.File) -> set[SoundResource]:
 def get_all_custom_sounds(song_manifest: dict) -> set[SoundResource]:
     sound_files: set[SoundResource] = set()
 
-    logging.info(f"Processing custom sounds for {len(song_manifest)} songs")
+    logger.info(f"Processing custom sounds for {len(song_manifest)} songs")
 
     for song_data in song_manifest:
         song_id = song_data["id"]
         song_file = SONGS_PATH / f"{song_id}.nbs"
 
         if not song_file.exists():
-            logging.warning(f"Song file not found: {song_file}")
+            logger.warning(f"Song file not found: {song_file}")
             continue
 
         song = pynbs.read(song_file)
         extra_sounds = get_song_custom_sounds(song)
         sound_files.update(extra_sounds)
-        logging.info(f"Added {len(extra_sounds)} custom sounds for song: {song_id}")
+        logger.info(f"Added {len(extra_sounds)} custom sounds for song: {song_id}")
 
-    logging.info(f"Found {len(sound_files)} unique custom sounds")
+    logger.info(f"Found {len(sound_files)} unique custom sounds")
     return sound_files
 
 
@@ -189,7 +191,7 @@ def load_vanilla_ogg(jar: ClientJar, resource: SoundResource) -> bytes | None:
     try:
         sound = jar.assets["minecraft"].sounds[resource.vanilla_sound_key]
     except KeyError:
-        logging.warning(
+        logger.warning(
             f"Sound not found in vanilla assets: {resource.vanilla_sound_key}"
         )
 
@@ -205,7 +207,7 @@ def generate_sounds(ctx: Context, sound_list: set[SoundResource]) -> None:
     sound_config: dict = {}
 
     for resource in sound_list:
-        logging.debug(f"Generating sound for {resource.resource_location}")
+        logger.debug("Generating sound for %s", resource.resource_location)
 
         event = resource.sound_event
 
@@ -227,11 +229,11 @@ def generate_sounds(ctx: Context, sound_list: set[SoundResource]) -> None:
         }
 
     ctx.assets["nbs"].sound_config = SoundConfig(sound_config)
-    logging.info(f"Registered {len(sound_config)} sound events under nbs")
+    logger.info("Registered %d sound events under nbs", len(sound_config))
 
 
 def beet_default(ctx: Context):
     song_manifest = ctx.meta["song_manifest"]
     sound_resources = get_all_custom_sounds(song_manifest)
-    logging.info("Adding custom sounds to sound config")
+    logger.info("Adding custom sounds to sound config")
     generate_sounds(ctx, sound_resources)

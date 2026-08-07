@@ -6,8 +6,10 @@ from src.config import SPEAKER_RANGES
 from ./const import REGIONS, PLAYBACK, TEMP, SONG_MANIFEST, SONG_INDICES, REGION_COUNTS
 from ./advancements import generate_song_advancement
 
-logging.info("Generating playback functions")
 
+logger = logging.getLogger(__name__)
+
+logger.info("Generating playback functions")
 
 
 #> setup

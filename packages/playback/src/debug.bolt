@@ -5,7 +5,10 @@ from src.config import SONGS_PATH
 
 DELAY_TICKS = 80
 
-logging.info("Generating debug functions")
+
+logger = logging.getLogger(__name__)
+
+logger.info("Generating debug functions")
 
 #> setup
 
