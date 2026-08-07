@@ -1,13 +1,3 @@
-# /// script
-# requires-python = ">=3.14,<4"
-# dependencies = [
-#     "boto3>=1.38.0,<2",
-#     "pillow>=12.0.0,<13",
-#     "pynbs>=1.1.0,<2",
-#     "python-dotenv>=1.1.0,<2",
-# ]
-# ///
-
 """Generate note-block pixel-art thumbnails from summit songs stored in Backblaze B2.
 
 Reads thumbnail metadata from data/source/thumbnails.json, downloads each song, and
@@ -16,10 +6,8 @@ saves a PNG to data/generated/thumbnails/{author}.png.
 Expects a .env file (see scripts/download_songs.py) with B2 credentials.
 """
 
-import json
 import sys
 from io import BytesIO
-from pathlib import Path
 
 import pynbs
 from PIL import Image
@@ -28,11 +16,19 @@ from _lib.file_store import (
     FileStore,
     ObjectNotFoundError,
 )
+from nbs_shared.project import (
+    REPOSITORY_ROOT,
+    THUMBNAILS_DIRECTORY,
+    THUMBNAILS_JSON_PATH,
+)
+from nbs_shared.thumbnails import (
+    ThumbnailEntry,
+    ThumbnailRenderData,
+    load_thumbnail_catalog,
+)
 
-REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
-DATA_DIRECTORY = REPOSITORY_ROOT / "data"
-THUMBNAILS_JSON = DATA_DIRECTORY / "source" / "thumbnails.json"
-OUTPUT_DIR = DATA_DIRECTORY / "generated" / "thumbnails"
+THUMBNAILS_JSON = THUMBNAILS_JSON_PATH
+OUTPUT_DIR = THUMBNAILS_DIRECTORY
 
 DEFAULT_ZOOM_LEVEL = 3
 MIN_ZOOM_LEVEL = 1
@@ -91,7 +87,9 @@ def instrument_color(instrument: int, default_instruments: int) -> tuple[int, in
     return parse_hex_color(INSTRUMENT_COLORS[color_index % len(INSTRUMENT_COLORS)])
 
 
-def generate_thumbnail(song: pynbs.File, thumbnail_data: dict) -> Image.Image:
+def generate_thumbnail(
+    song: pynbs.File, thumbnail_data: ThumbnailRenderData
+) -> Image.Image:
     zoom_level = thumbnail_data.get("zoomLevel", DEFAULT_ZOOM_LEVEL)
     start_tick = thumbnail_data["startTick"]
     start_layer = thumbnail_data["startLayer"]
@@ -117,7 +115,7 @@ def generate_thumbnail(song: pynbs.File, thumbnail_data: dict) -> Image.Image:
     return img
 
 
-def process_thumbnail(store: FileStore, entry: dict) -> None:
+def process_thumbnail(store: FileStore, entry: ThumbnailEntry) -> None:
     song_id = entry["url"]
     thumbnail_data = entry["thumbnailData"]
     object_key = f"songs/{song_id}.nbs"
@@ -144,12 +142,11 @@ def main() -> None:
     if not THUMBNAILS_JSON.is_file():
         raise SystemExit(f"Thumbnails JSON not found: {THUMBNAILS_JSON}")
 
-    with THUMBNAILS_JSON.open(encoding="utf-8") as json_file:
-        entries = json.load(json_file)
+    entries = load_thumbnail_catalog(THUMBNAILS_JSON)
 
     if len(sys.argv) > 1:
         requested_ids = set(sys.argv[1:])
-        entries = [entry for entry in entries if entry["id"] in requested_ids]
+        entries = [entry for entry in entries if entry["url"] in requested_ids]
         if not entries:
             raise SystemExit(
                 "No matching thumbnails found in JSON for the given song IDs"

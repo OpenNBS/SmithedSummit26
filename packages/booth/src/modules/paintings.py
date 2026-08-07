@@ -1,5 +1,6 @@
 from beet import Context
 
+from nbs_shared.paintings import validate_painting_catalog
 from src.utilities import resource
 from src.utilities.dialog import DialogHelper
 from src.utilities.painting import get_painting_variant
@@ -21,16 +22,13 @@ def generate_paintings(ctx: Context) -> None:
         extra={"columns": 1},
     )
 
-    painting_data = read_resource("source/paintings.json")
+    painting_data = validate_painting_catalog(read_resource("source/paintings.json"))
 
     for painting in painting_data:
         author = painting["author"]
         title = painting["title"]
         url = painting["url"]
-        size = None
-
-        if "size" in painting:
-            size = painting["size"]
+        size = painting.get("size")
 
         label = f"{title} by {author}"
 

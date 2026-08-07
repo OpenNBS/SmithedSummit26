@@ -1,5 +1,6 @@
 from beet import Context
 
+from nbs_shared.thumbnails import validate_thumbnail_catalog
 from src.utilities import resource
 from src.utilities.dialog import DialogHelper
 from src.utilities.model import create_model, create_tinted_item_model
@@ -16,7 +17,9 @@ def generate_thumbnails(ctx: Context) -> None:
         extra={"columns": 1},
     )
 
-    thumbnail_data = read_resource("source/thumbnails.json")
+    thumbnail_data = validate_thumbnail_catalog(
+        read_resource("source/thumbnails.json")
+    )
 
     thumbnail_texture_resource = resource.get_texture(TextureType.BLOCK, "thumbnails")
     thumbnail_asset_resource = resource.get_asset("thumbnails")
