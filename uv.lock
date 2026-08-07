@@ -351,12 +351,14 @@ version = "0.1.0"
 source = { editable = "packages/shared" }
 dependencies = [
     { name = "pillow" },
+    { name = "pydantic" },
     { name = "pyoxipng" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "pillow", specifier = ">=12.0.0,<13" },
+    { name = "pydantic", specifier = ">=2.12.0,<3" },
     { name = "pyoxipng", specifier = ">=9.1.1,<10" },
 ]
 
