@@ -112,6 +112,14 @@ help = "Generate booth thumbnails from remote song files"
 cmd = "ruff check ."
 help = "Lint the workspace with Ruff"
 
+[tool.poe.tasks.format]
+cmd = "ruff format ."
+help = "Format the workspace with Ruff"
+
+[tool.poe.tasks.format-check]
+cmd = "ruff format --check ."
+help = "Check that the workspace is formatted with Ruff"
+
 [tool.poe.tasks.typecheck]
 cmd = "basedpyright"
 help = "Type-check the workspace with basedpyright"
