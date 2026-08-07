@@ -230,6 +230,7 @@ def prepare_tasks(ctx: Context) -> list[SongTask]:
             logger.warning("Song file not found: %s", path)
             continue
 
+        logger.debug("Processing: %s", song_id)
         index = region_indices.setdefault(region, 0)
         region_indices[region] += 1
         tasks.append(
@@ -302,9 +303,9 @@ def render_database(tasks: Sequence[SongTask]) -> RenderedStorage:
         total_playsounds += result.playsound_count
 
     logger.info(
-        "Rendered %d song ticks containing %d playsounds",
-        total_ticks,
-        total_playsounds,
+        "Rendered %s song ticks containing %s /playsound commands",
+        f"{total_ticks:,}",
+        f"{total_playsounds:,}",
     )
     return RenderedStorage(
         root_payload={"regions": regions, "songs": songs},

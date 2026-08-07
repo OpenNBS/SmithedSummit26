@@ -190,7 +190,7 @@ def prepare_tasks(ctx: Context) -> list[SongTask]:
             logger.warning("Song file not found: %s", path)
             continue
 
-        logger.info("Processing: %s", song_id)
+        logger.debug("Processing: %s", song_id)
         tasks.append(
             SongTask(
                 song_id=song_id,

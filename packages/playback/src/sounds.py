@@ -177,7 +177,7 @@ def get_all_custom_sounds(song_manifest: SongManifest) -> set[SoundResource]:
         failure_message="Failed to scan sounds for song: %s",
     ):
         sound_files.update(extra_sounds)
-        logger.info("Added %d custom sounds for song: %s", len(extra_sounds), song_id)
+        logger.debug("Added %d custom sounds for song: %s", len(extra_sounds), song_id)
 
     logger.info("Found %d unique custom sounds", len(sound_files))
     return sound_files
@@ -274,7 +274,7 @@ def generate_sounds(ctx: Context, sound_list: set[SoundResource]) -> None:
     # Resolve vanilla samples on the main thread so AssetIndex cache repairs stay
     # single-threaded. Only the CPU-bound pitch shift runs in the worker pool.
     for resource in sound_list:
-        logger.debug("Generating sound for %s", resource.resource_location)
+        logger.debug("Generating sound for %s", resource.pack_sound_path)
         event = resource.sound_event
 
         if resource.octave_offset is OctaveOffsetEnum.NONE:
