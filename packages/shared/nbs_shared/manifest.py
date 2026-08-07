@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from collections import Counter
 from pathlib import Path
-from typing import TypedDict
+from typing import NotRequired, TypedDict
 
 from pydantic import TypeAdapter, ValidationError
 
@@ -19,6 +19,9 @@ class SongManifestEntry(TypedDict):
     author: str
     region: str | None
     url: str
+    beat_interval: NotRequired[int]
+    beat_offset: NotRequired[int]
+    tempo_factor: NotRequired[float]
 
 
 type SongManifest = list[SongManifestEntry]

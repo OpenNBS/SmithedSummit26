@@ -3,7 +3,7 @@
 import logging
 import re
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TypedDict
 
@@ -11,7 +11,12 @@ import pynbs
 from beet import Context
 
 from src.config import SONGS_PATH
-from src.utilities.note_block import PlaysoundNote, get_notes
+from src.utilities.note_block import (
+    PlaysoundNote,
+    TimingSettings,
+    get_notes,
+    timing_settings_from_manifest,
+)
 from src.utilities.parallel import map_as_completed
 
 logger = logging.getLogger(__name__)
@@ -72,6 +77,7 @@ class SongTask:
     path: Path
     speaker_ranges: tuple[SpeakerRange, ...]
     max_playsounds_per_tick: int
+    timing_settings: TimingSettings = field(default_factory=lambda: TimingSettings())
 
 
 @dataclass(frozen=True)
@@ -153,7 +159,7 @@ def render_song(task: SongTask) -> SongResult:
     last_tick: int | None = None
     total_playsounds = 0
 
-    for tick, notes in get_notes(song):
+    for tick, notes in get_notes(song, task.timing_settings):
         last_tick = tick
         playable_notes = tuple(note for note in notes if note.instrument != "BEAT")
         note_count = len(playable_notes)
@@ -243,6 +249,7 @@ def prepare_tasks(ctx: Context) -> list[SongTask]:
                 path=path,
                 speaker_ranges=speaker_ranges,
                 max_playsounds_per_tick=ctx.meta["max_playsounds_per_tick"],
+                timing_settings=timing_settings_from_manifest(song_data),
             )
         )
     return tasks

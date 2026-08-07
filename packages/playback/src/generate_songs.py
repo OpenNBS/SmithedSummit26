@@ -2,14 +2,19 @@
 
 import logging
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import pynbs
 from beet import Context, Function
 
 from src.config import SONGS_PATH
-from src.utilities.note_block import PlaysoundNote, get_notes
+from src.utilities.note_block import (
+    PlaysoundNote,
+    TimingSettings,
+    get_notes,
+    timing_settings_from_manifest,
+)
 from src.utilities.parallel import map_as_completed
 
 logger = logging.getLogger(__name__)
@@ -38,6 +43,7 @@ class SongTask:
     speaker_ranges: tuple[SpeakerRange, ...]
     actionbar_color: str = "green"
     options: RenderOptions = RenderOptions()
+    timing_settings: TimingSettings = field(default_factory=lambda: TimingSettings())
 
 
 @dataclass
@@ -146,7 +152,7 @@ def render_song(task: SongTask) -> SongResult:
     functions: dict[str, list[str]] = {}
     last_tick: int | None = None
 
-    for tick, notes in get_notes(song):
+    for tick, notes in get_notes(song, task.timing_settings):
         last_tick = tick
         functions.update(render_chord(task, tick, notes))
 
@@ -199,6 +205,7 @@ def prepare_tasks(ctx: Context) -> list[SongTask]:
                 path=path,
                 speaker_ranges=speaker_ranges,
                 actionbar_color=regions[region_name].title_color,
+                timing_settings=timing_settings_from_manifest(song_data),
             )
         )
 

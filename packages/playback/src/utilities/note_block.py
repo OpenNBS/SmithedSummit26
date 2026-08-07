@@ -1,7 +1,9 @@
 __all__ = [
+    "TimingSettings",
     "PlaysoundNote",
     "get_notes",
     "get_pitch",
+    "timing_settings_from_manifest",
 ]
 
 
@@ -9,11 +11,34 @@ import math
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 import pynbs
 
 from src.sounds import TWO_OCTAVE_HIGH, TWO_OCTAVE_LOW, SoundResource
+
+
+class TimingSettings(TypedDict, total=False):
+    """Optional per-song timing overrides from the song manifest."""
+
+    beat_interval: int
+    beat_offset: int
+    tempo_factor: float
+
+
+def timing_settings_from_manifest(
+    entry: dict[str, Any],
+) -> TimingSettings:
+    """Extract timing overrides from a manifest entry."""
+    timing_settings: TimingSettings = {}
+    if "beat_interval" in entry:
+        timing_settings["beat_interval"] = entry["beat_interval"]
+    if "beat_offset" in entry:
+        timing_settings["beat_offset"] = entry["beat_offset"]
+    if "tempo_factor" in entry:
+        timing_settings["tempo_factor"] = entry["tempo_factor"]
+    return timing_settings
+
 
 # Logical instrument names for distance rolloff (indexed like NBS default instruments)
 NBS_ROLLOFF_INSTRUMENTS = [
@@ -249,12 +274,22 @@ def get_empty_instrument_ids(song: pynbs.File) -> list[int]:
     ]
 
 
-def get_notes(song: pynbs.File) -> Iterator[tuple[int, list[PlaysoundNote]]]:
-    """Yield all the notes from the given nbs file."""
+def get_notes(
+    song: pynbs.File,
+    timing_settings: TimingSettings | None = None,
+) -> Iterator[tuple[int, list[PlaysoundNote]]]:
+    """Yield all the notes from the given nbs file.
+
+    Args:
+        song: The NBS file to read notes from.
+        timing_settings: Optional per-song timing overrides from the manifest
+            (`beat_interval`, `beat_offset`, `tempo_factor`).
+    """
 
     # Quantize notes to nearest tick (pigstep always exports at 20 t/s)
     # Remove notes outside the 6-octave range (vanilla or custom)
 
+    timing_settings = timing_settings or {}
     new_notes = []
 
     # Add special notes to mark the beats
@@ -263,7 +298,13 @@ def get_notes(song: pynbs.File) -> Iterator[tuple[int, list[PlaysoundNote]]]:
     if song.header.tempo >= 15:
         beat_interval_ticks = 8
 
-    for tick in range(0, song.header.song_length, beat_interval_ticks):
+    # override default settings if present
+    if "beat_interval" in timing_settings:
+        beat_interval_ticks = timing_settings["beat_interval"]
+
+    beat_offset = timing_settings.get("beat_offset", 0)
+
+    for tick in range(beat_offset, song.header.song_length, beat_interval_ticks):
         song.notes.append(
             pynbs.Note(
                 tick=tick,
@@ -276,11 +317,9 @@ def get_notes(song: pynbs.File) -> Iterator[tuple[int, list[PlaysoundNote]]]:
     # Songs with tempo greater than 20 t/s are slowed down so they can be played in Minecraft
     effective_tempo = song.header.tempo
 
-    # Special case: 'expanded' songs that only use even ticks (effectively half the tempo)
-    # In Summit '26, 'Permafrost' is the only song that uses this.
-    expansion_factor = 1
-    if effective_tempo >= 30:
-        expansion_factor = 0.5
+    # Some songs are authored at an 'expanded' resolution (e.g. only even ticks,
+    # effectively half tempo). Use the manifest `tempo_factor` when present.
+    expansion_factor = timing_settings.get("tempo_factor", 1)
     effective_tempo *= expansion_factor
 
     effective_tempo = min(effective_tempo, 20)
