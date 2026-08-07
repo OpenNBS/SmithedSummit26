@@ -2,6 +2,8 @@ from src.utilities.sphere import sphere
 import logging
 from src.config import SONGS_PATH
 
+from ./const import REGIONS, SPEAKER_RANGES
+
 
 DELAY_TICKS = 80
 
@@ -44,3 +46,32 @@ for data in ctx.meta["speaker_ranges"]:
             z = point[2]
 
             particle minecraft:block_marker{block_state:{Name:"minecraft:purple_stained_glass"}} f"~{x}" f"~{y}" f"~{z}" 0 0 0 0 1 force
+
+
+function ~/place_speakers:
+
+    # The largest speaker range determines the grid cell size
+    grid_cell_size = 0
+    for speaker_type in SPEAKER_RANGES:
+        if speaker_type["outer_range"] > grid_cell_size:
+            grid_cell_size = speaker_type["outer_range"]
+
+    #function nbs:speaker/remove/all
+
+    offset_x = grid_cell_size // 2
+    offset_z = grid_cell_size // 2
+
+    for region in REGIONS:
+
+        for speaker in SPEAKER_RANGES:
+            speaker_type = speaker["name"]
+            radius = speaker["outer_range"]
+
+            coords = f"~{offset_x} ~ ~{offset_z}"
+            execute positioned coords run function f"nbs:speaker/place/{region}/{speaker_type}/{radius}"
+            setblock coords minecraft:stone keep
+            offset_x += grid_cell_size
+
+        # Reset offset_x for the next region
+        offset_x = grid_cell_size // 2
+        offset_z += grid_cell_size
