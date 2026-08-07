@@ -36,7 +36,7 @@ def create_executor(
     available_workers = min(task_count, os.process_cpu_count() or 1)
     if sys._is_gil_enabled():
         # Large results make IPC the bottleneck beyond a small process pool.
-        max_workers = min(available_workers, 4)
+        max_workers = min(available_workers, 8)
         try:
             return (
                 ProcessPoolExecutor(
