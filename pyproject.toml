@@ -26,9 +26,13 @@ dev = [
   "snakeviz>=2.2.2",
   "tuna>=0.5.15",
 ]
+scripts = [
+  "boto3>=1.38.0,<2",
+  "python-dotenv>=1.1.0,<2",
+]
 
 [tool.uv]
-default-groups = ["dev"]
+default-groups = ["dev", "scripts"]
 
 [tool.uv.sources]
 nbs-summit26-booth = {workspace = true}
