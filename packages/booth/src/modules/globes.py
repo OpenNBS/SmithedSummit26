@@ -1,6 +1,7 @@
 from typing import TypedDict
 
 from beet import Context
+
 from src.utilities import resource
 from src.utilities.dialog import DialogHelper
 

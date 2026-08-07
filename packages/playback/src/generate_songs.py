@@ -11,6 +11,7 @@ from pathlib import Path
 
 import pynbs
 from beet import Context, Function
+
 from src.config import SONGS_PATH
 from src.utilities.note_block import PlaysoundNote, get_notes
 

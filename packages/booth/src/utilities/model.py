@@ -1,9 +1,10 @@
 import warnings
-from typing import Tuple, TypedDict
+from typing import TypedDict
 
 from beet import Context, Model
 from beet.library.resource_pack import ItemModel
 from pydantic.config import JsonDict
+
 from src.utilities.resource import Resource
 
 NO_SHADE_TINT = {
@@ -114,7 +115,7 @@ def create_item_model(
 
 def get_variants(
     ctx: Context, texture_resource: Resource, unused_variants: list[str] = []
-) -> list[Tuple[str, str]]:
+) -> list[tuple[str, str]]:
     variant_texture_resources = list(
         filter(
             lambda path: path.startswith(texture_resource.value), ctx.assets.textures

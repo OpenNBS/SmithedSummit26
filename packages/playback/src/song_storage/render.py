@@ -18,6 +18,7 @@ from typing import TypeAlias
 
 import pynbs
 from beet import Context
+
 from src.config import SONGS_PATH
 from src.utilities.note_block import PlaysoundNote, get_notes
 

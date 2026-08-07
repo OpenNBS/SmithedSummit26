@@ -5,6 +5,7 @@ import logging
 from dataclasses import dataclass
 
 from beet import Context
+
 from nbs_shared.project import SONGS_FILES_DIRECTORY
 
 logger = logging.getLogger(__name__)

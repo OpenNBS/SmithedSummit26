@@ -9,6 +9,7 @@ import samplerate
 import soundfile as sf
 from beet import Context, Sound, SoundConfig
 from beet.contrib.vanilla import AssetIndex, Vanilla
+
 from src.config import SONGS_PATH
 
 logger = logging.getLogger(__name__)
@@ -61,7 +62,7 @@ class SoundResource:
     octave_offset: OctaveOffsetEnum
 
     @classmethod
-    def from_note(cls, song: pynbs.File, note: pynbs.Note) -> "SoundResource":
+    def from_note(cls, song: pynbs.File, note: pynbs.Note) -> SoundResource:
         return map_note_to_sound_resource(song, note)
 
     @property

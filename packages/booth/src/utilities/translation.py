@@ -2,6 +2,7 @@ import warnings
 
 from beet import Context, Language
 from beet.core.utils import JsonDict
+
 from src.utilities.resource import NAMESPACE, Resource
 
 

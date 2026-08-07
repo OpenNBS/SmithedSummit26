@@ -6,11 +6,13 @@ __all__ = [
 
 
 import math
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterator, List, Tuple
+from typing import Any
 
 import pynbs
+
 from src.sounds import TWO_OCTAVE_HIGH, TWO_OCTAVE_LOW, SoundResource
 
 # Logical instrument names for distance rolloff (indexed like NBS default instruments)
@@ -245,7 +247,7 @@ def get_empty_instrument_ids(song: pynbs.File) -> list[int]:
     ]
 
 
-def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["PlaysoundNote"]]]:
+def get_notes(song: pynbs.File) -> Iterator[tuple[int, list[PlaysoundNote]]]:
     """Yield all the notes from the given nbs file."""
 
     # Quantize notes to nearest tick (pigstep always exports at 20 t/s)
@@ -279,8 +281,7 @@ def get_notes(song: pynbs.File) -> Iterator[Tuple[int, List["PlaysoundNote"]]]:
         expansion_factor = 0.5
     effective_tempo *= expansion_factor
 
-    if effective_tempo > 20:
-        effective_tempo = 20
+    effective_tempo = min(effective_tempo, 20)
 
     empty_instrument_ids = get_empty_instrument_ids(song)
 

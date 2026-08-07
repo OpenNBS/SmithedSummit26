@@ -1,4 +1,5 @@
 from beet import Context
+
 from src.utilities import resource
 from src.utilities.dialog import DialogHelper
 from src.utilities.painting import get_painting_variant

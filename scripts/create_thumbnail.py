@@ -23,6 +23,7 @@ from pathlib import Path
 
 import pynbs
 from PIL import Image
+
 from _lib.file_store import (
     FileStore,
     ObjectNotFoundError,

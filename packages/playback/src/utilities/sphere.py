@@ -1,8 +1,8 @@
 import math
-from typing import Iterator, Tuple
+from collections.abc import Iterator
 
 
-def sphere(radius: float, density: float = 1.0) -> Iterator[Tuple[float, float, float]]:
+def sphere(radius: float, density: float = 1.0) -> Iterator[tuple[float, float, float]]:
     """Yield evenly distributed points on a sphere's surface.
 
     ``density`` is points per unit of surface area. The default of 1 yields

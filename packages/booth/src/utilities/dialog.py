@@ -1,6 +1,7 @@
-import src.utilities.resource as resource
 from beet import Context, Dialog
 from beet.core.utils import JsonDict
+
+from src.utilities import resource
 from src.utilities.resource import Resource, TranslationType
 from src.utilities.translation import create_translation
 

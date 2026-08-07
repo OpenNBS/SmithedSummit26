@@ -5,6 +5,7 @@ from collections.abc import Mapping
 from concurrent.futures import as_completed
 
 from beet import Context, Function, FunctionTag
+
 from src.song_storage.render import RenderedStorage, create_executor
 from src.song_storage.saved_data import payload_to_nbt
 
