@@ -56,12 +56,12 @@ def copy_command_storages_to_linked_world(
         return
 
     logger.info(
-        "Installing %d command-storage artifact(s) into linked world %s. "
-        "Stop the server / close the world first; Minecraft does not load "
+        "Installing %d command-storage artifact(s) into linked world. "
+        "Stop the server or close the world first; Minecraft won't load "
         "these files on /reload.",
         len(storages),
-        world_path,
     )
+    logger.info("Linked world path: %s", world_path)
 
     for storage_id, source_path in storages.items():
         if not source_path.is_file():
@@ -81,5 +81,5 @@ def copy_command_storages_to_linked_world(
         logger.info(
             "Copied %s command storage to linked world: %s",
             storage_id,
-            destination,
+            destination.relative_to(world_path),
         )
