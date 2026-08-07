@@ -118,9 +118,7 @@ class RenderedStorage:
 
         return {
             "index": raw_index,
-            "songs": {
-                song_id: self.songs[song_id] for song_id in raw_index.values()
-            },
+            "songs": {song_id: self.songs[song_id] for song_id in raw_index.values()},
         }
 
 
@@ -276,7 +274,7 @@ def create_executor(task_count: int) -> tuple[Executor, int, str]:
                 max_workers,
                 "processes",
             )
-        except (OSError, PermissionError):
+        except OSError, PermissionError:
             logger.warning(
                 "Process workers unavailable; falling back to regular threads"
             )

@@ -125,7 +125,7 @@ cmd = "basedpyright"
 help = "Type-check the workspace with basedpyright"
 
 [tool.ruff.lint]
-extend-select = ["I"]
+select = ["E4", "E7", "E9", "F", "I"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["_lib", "nbs_shared", "src"]

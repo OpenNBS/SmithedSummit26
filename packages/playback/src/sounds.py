@@ -197,9 +197,7 @@ def pitch_shift_ogg(ogg_bytes: bytes, semitones: int) -> bytes:
     return out.getvalue()
 
 
-def load_vanilla_ogg(
-    asset_index: AssetIndex, resource: SoundResource
-) -> bytes | None:
+def load_vanilla_ogg(asset_index: AssetIndex, resource: SoundResource) -> bytes | None:
     """Fetch a vanilla OGG, retrying once if its cached object is corrupt."""
 
     try:

@@ -318,9 +318,7 @@ def get_notes(song: pynbs.File) -> Iterator[tuple[int, list[PlaysoundNote]]]:
             return NBS_ROLLOFF_INSTRUMENTS[note.instrument]
         resource = SoundResource.from_note(song, note)
         if resource is None:
-            raise ValueError(
-                f"No sound file assigned to instrument: {note.instrument}"
-            )
+            raise ValueError(f"No sound file assigned to instrument: {note.instrument}")
         stem = Path(resource.src_path).stem
         return _FILE_STEM_ALIASES.get(stem, stem)
 

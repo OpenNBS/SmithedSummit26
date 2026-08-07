@@ -10,9 +10,7 @@ from nbtlib import Byte, Compound, File, Int, String
 
 from src.song_storage.render import RegionStoragePayload
 
-RESOURCE_LOCATION = re.compile(
-    r"^(?P<namespace>[a-z0-9_.-]+):(?P<path>[a-z0-9/._-]+)$"
-)
+RESOURCE_LOCATION = re.compile(r"^(?P<namespace>[a-z0-9_.-]+):(?P<path>[a-z0-9/._-]+)$")
 
 
 def payload_to_nbt(value: Mapping[str, Any]) -> Compound:
@@ -71,13 +69,7 @@ def resolve_output_path(ctx: Context, namespace: str) -> Path:
         return output_path
 
     output_directory = ctx.output_directory or ctx.directory / "dist"
-    return (
-        output_directory
-        / "world-data"
-        / "data"
-        / namespace
-        / "command_storage.dat"
-    )
+    return output_directory / "world-data" / "data" / namespace / "command_storage.dat"
 
 
 def write_command_storage(
