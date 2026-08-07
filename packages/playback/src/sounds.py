@@ -10,6 +10,7 @@ import soundfile as sf
 from beet import Context, Sound, SoundConfig
 from beet.contrib.vanilla import AssetIndex, Vanilla
 
+from nbs_shared.manifest import SongManifest
 from src.config import SONGS_PATH
 
 logger = logging.getLogger(__name__)
@@ -140,13 +141,14 @@ def get_song_custom_sounds(song: pynbs.File) -> set[SoundResource]:
     return sound_files
 
 
-def get_all_custom_sounds(song_manifest: dict) -> set[SoundResource]:
+def get_all_custom_sounds(song_manifest: SongManifest) -> set[SoundResource]:
     sound_files: set[SoundResource] = set()
 
     logger.info(f"Processing custom sounds for {len(song_manifest)} songs")
 
     for song_data in song_manifest:
         song_id = song_data["id"]
+
         song_file = SONGS_PATH / f"{song_id}.nbs"
 
         if not song_file.exists():

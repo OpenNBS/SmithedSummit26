@@ -1,11 +1,11 @@
 """Pre-populate the context with data to be processed by the remaining pipeline stages."""
 
-import json
 import logging
 from dataclasses import dataclass
 
 from beet import Context
 
+from nbs_shared.manifest import load_song_manifest as read_song_manifest
 from nbs_shared.project import SONGS_FILES_DIRECTORY
 
 logger = logging.getLogger(__name__)
@@ -67,17 +67,13 @@ class RegionConfig:
         return hash(self.name)
 
 
-def load_song_manifest(ctx: Context):
+def load_song_manifest(ctx: Context) -> None:
     song_manifest_path = SONGS_PATH.parent / ctx.meta["song_manifest_path"]
 
-    SONG_DATA = SONGS_PATH.parent / song_manifest_path
+    if not song_manifest_path.exists():
+        raise FileNotFoundError(f"Song manifest file not found: {song_manifest_path}")
 
-    if not SONG_DATA.exists():
-        raise FileNotFoundError(f"Song manifest file not found: {SONG_DATA}")
-
-    with open(SONG_DATA, "r", encoding="utf-8") as f:
-        song_manifest = json.load(f)
-        ctx.meta["song_manifest"] = song_manifest
+    ctx.meta["song_manifest"] = read_song_manifest(song_manifest_path)
 
 
 def load_speaker_ranges(ctx: Context):

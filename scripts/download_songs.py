@@ -1,11 +1,3 @@
-# /// script
-# requires-python = ">=3.14,<4"
-# dependencies = [
-#     "boto3>=1.38.0,<2",
-#     "python-dotenv>=1.1.0,<2",
-# ]
-# ///
-
 """Download summit songs from Backblaze B2.
 
 Expects a .env file in the repository root with:
@@ -24,15 +16,21 @@ import unicodedata
 from pathlib import Path
 
 from _lib.file_store import FileStore, ObjectNotFoundError
+from nbs_shared.manifest import (
+    SongManifest,
+    SongManifestEntry,
+    load_song_manifest,
+    validate_song_manifest,
+)
+from nbs_shared.project import SONGS_FILES_DIRECTORY, SONGS_MANIFEST_PATH
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIRECTORY = REPOSITORY_ROOT / "data"
 SOURCE_DIRECTORY = DATA_DIRECTORY / "source"
-GENERATED_DIRECTORY = DATA_DIRECTORY / "generated"
 
 CSV_PATH = SOURCE_DIRECTORY / "songs.csv"
-MANIFEST_PATH = GENERATED_DIRECTORY / "songs" / "manifest.json"
-SONGS_DIR = GENERATED_DIRECTORY / "songs" / "files"
+MANIFEST_PATH = SONGS_MANIFEST_PATH
+SONGS_DIR = SONGS_FILES_DIRECTORY
 
 # When False, keep existing songs.json fields for songs already present (manual edits).
 OVERWRITE_METADATA = False
@@ -114,20 +112,17 @@ def ensure_file_download(store: FileStore, object_key: str, destination: Path):
         print(f"Could not download {object_key}: object not found in bucket")
 
 
-def load_existing_manifest() -> dict[str, dict]:
+def load_existing_manifest() -> dict[str, SongManifestEntry]:
     if not MANIFEST_PATH.is_file():
         return {}
 
-    with open(MANIFEST_PATH, encoding="utf-8") as f:
-        entries = json.load(f)
-
-    return {entry["id"]: entry for entry in entries if "id" in entry}
+    return {entry["id"]: entry for entry in load_song_manifest(MANIFEST_PATH)}
 
 
 def resolve_song_data(
-    new_data: dict[str, str | None],
-    existing_meta: dict | None,
-) -> dict:
+    new_data: SongManifestEntry,
+    existing_meta: SongManifestEntry | None,
+) -> SongManifestEntry:
     """Return the metadata to write for a song.
 
     When OVERWRITE_METADATA is False and the song already exists in the manifest,
@@ -143,8 +138,8 @@ def process_song(
     store: FileStore,
     row: dict[str, str],
     song_id: str,
-    existing_meta: dict | None = None,
-) -> dict | None:
+    existing_meta: SongManifestEntry | None = None,
+) -> SongManifestEntry:
     public_id = row["publicId"]
     title = row["title"]
     author = row["uploader"]
@@ -159,7 +154,7 @@ def process_song(
     if region_id is None:
         print(f"Warning: No region found in description for {title!r} ({public_id})")
 
-    song_data = {
+    song_data: SongManifestEntry = {
         "id": song_id,
         "title": title,
         "region": region_id,
@@ -191,18 +186,18 @@ def main() -> None:
 
     existing_by_id = load_existing_manifest()
 
-    manifest_data = []
+    manifest_data: SongManifest = []
     for row in rows:
         song_id = extract_id_from_title(row["title"])
         existing_meta = existing_by_id.get(song_id)
         song_data = process_song(store, row, song_id, existing_meta)
-        if song_data:
-            manifest_data.append(song_data)
+        manifest_data.append(song_data)
 
         manifest_data.sort(key=lambda x: x["id"])
 
+    validated = validate_song_manifest(manifest_data)
     with open(MANIFEST_PATH, "w", encoding="utf-8") as f:
-        json.dump(manifest_data, f, indent="\t", separators=(",", ": "))
+        json.dump(validated, f, indent="\t", separators=(",", ": "))
 
 
 if __name__ == "__main__":

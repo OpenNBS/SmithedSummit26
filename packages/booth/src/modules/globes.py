@@ -2,6 +2,7 @@ from typing import TypedDict
 
 from beet import Context
 
+from nbs_shared.manifest import validate_song_manifest
 from src.utilities import resource
 from src.utilities.dialog import DialogHelper
 
@@ -21,7 +22,9 @@ REGIONS: list[Region] = [
 def generate_globes(ctx: Context) -> None:
     dialog_base_asset = resource.get_asset("credits")
 
-    songs_data = resource.read_resource("generated/songs/manifest.json")
+    songs_data = validate_song_manifest(
+        resource.read_resource("generated/songs/manifest.json")
+    )
 
     for region in REGIONS:
         dialog_asset = dialog_base_asset.append(region["id"])
