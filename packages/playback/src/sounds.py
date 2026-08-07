@@ -92,14 +92,17 @@ class SoundResource:
         return self._relative_stem
 
     @property
-    def vanilla_sound_name(self) -> str:
-        """`sounds.json` file reference for the unpitched vanilla sample."""
-        return f"minecraft:{self.vanilla_sound_key}"
-
-    @property
     def pack_sound_path(self) -> str:
         """Path under `assets/nbs/sounds/` (no .ogg)."""
         return f"{self._relative_stem}{self.octave_offset.value.suffix}"
+
+    @property
+    def sound_name(self) -> str:
+        """`sounds.json` file reference with the correct namespace."""
+        namespace = (
+            "minecraft" if self.octave_offset is OctaveOffsetEnum.NONE else "nbs"
+        )
+        return f"{namespace}:{self.pack_sound_path}"
 
     @property
     def sound_event(self) -> str:
@@ -286,7 +289,7 @@ def generate_sounds(
 
         if resource.octave_offset is OctaveOffsetEnum.NONE:
             sound_config[event] = {
-                "sounds": [resource.vanilla_sound_name],
+                "sounds": [resource.sound_name],
                 "subtitle": SUBTITLE,
             }
             continue
@@ -307,7 +310,7 @@ def generate_sounds(
         resource = task.resource
         assets["nbs"].sounds[resource.pack_sound_path] = Sound(shifted)
         sound_config[resource.sound_event] = {
-            "sounds": [resource.pack_sound_path],
+            "sounds": [resource.sound_name],
             "subtitle": SUBTITLE,
         }
 
