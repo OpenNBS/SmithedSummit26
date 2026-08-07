@@ -2,12 +2,13 @@ import logging
 from dataclasses import dataclass
 from enum import Enum
 from io import BytesIO
+from pathlib import Path
 
 import pynbs
 import samplerate
 import soundfile as sf
 from beet import Context, Sound, SoundConfig
-from beet.contrib.vanilla import ClientJar, Vanilla
+from beet.contrib.vanilla import AssetIndex, Vanilla
 from src.config import SONGS_PATH
 
 logger = logging.getLogger(__name__)
@@ -193,11 +194,13 @@ def pitch_shift_ogg(ogg_bytes: bytes, semitones: int) -> bytes:
     return out.getvalue()
 
 
-def load_vanilla_ogg(jar: ClientJar, resource: SoundResource) -> bytes | None:
-    """Fetch raw ogg bytes for a vanilla sound via the asset index."""
+def load_vanilla_ogg(
+    asset_index: AssetIndex, resource: SoundResource
+) -> bytes | None:
+    """Fetch a vanilla OGG, retrying once if its cached object is corrupt."""
 
     try:
-        sound = jar.assets["minecraft"].sounds[resource.vanilla_sound_key]
+        path = Path(asset_index[resource.resource_location])
     except KeyError:
         logger.warning(
             f"Sound not found in vanilla assets: {resource.vanilla_sound_key}"
@@ -205,12 +208,30 @@ def load_vanilla_ogg(jar: ClientJar, resource: SoundResource) -> bytes | None:
 
         return
 
-    return sound.get_content()
+    ogg_bytes = path.read_bytes()
+    if ogg_bytes.startswith(b"OggS"):
+        return ogg_bytes
+
+    logger.warning(
+        "Invalid cached vanilla sound, downloading it again: %s",
+        resource.vanilla_sound_key,
+    )
+    path.unlink(missing_ok=True)
+    path = Path(asset_index.missing(resource.resource_location))
+    ogg_bytes = path.read_bytes()
+
+    if not ogg_bytes.startswith(b"OggS"):
+        raise ValueError(
+            f"Vanilla sound is not a valid OGG: {resource.vanilla_sound_key}"
+        )
+
+    return ogg_bytes
 
 
 def generate_sounds(ctx: Context, sound_list: set[SoundResource]) -> None:
     vanilla = ctx.inject(Vanilla)
-    jar = vanilla.releases[ctx.minecraft_version].mount(fetch_objects=True)
+    release = vanilla.releases[ctx.minecraft_version]
+    asset_index = release.object_mapping.files
 
     sound_config: dict = {}
 
@@ -226,10 +247,15 @@ def generate_sounds(ctx: Context, sound_list: set[SoundResource]) -> None:
             }
             continue
 
-        if (ogg_bytes := load_vanilla_ogg(jar, resource)) is None:
+        if (ogg_bytes := load_vanilla_ogg(asset_index, resource)) is None:
             continue
 
-        shifted = pitch_shift_ogg(ogg_bytes, resource.key_offset)
+        try:
+            shifted = pitch_shift_ogg(ogg_bytes, resource.key_offset)
+        except sf.LibsndfileError as err:
+            raise ValueError(
+                f"Failed to decode vanilla sound: {resource.vanilla_sound_key}"
+            ) from err
         ctx.assets["nbs"].sounds[resource.pack_sound_path] = Sound(shifted)
         sound_config[event] = {
             "sounds": [resource.pack_sound_path],
