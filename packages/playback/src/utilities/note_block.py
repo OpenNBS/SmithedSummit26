@@ -292,11 +292,22 @@ def get_notes(
     timing_settings = timing_settings or {}
     new_notes = []
 
+    effective_tempo = song.header.tempo
+
+    # Some songs are authored at an 'expanded' resolution (e.g. only even ticks,
+    # effectively half tempo). Use the manifest `tempo_factor` when present.
+    expansion_factor = timing_settings.get("tempo_factor", 1)
+    effective_tempo *= expansion_factor
+
+    # Songs with tempo greater than 20 t/s are slowed down so they can be played in Minecraft
+    effective_tempo = min(effective_tempo, 20)
+
     # Add special notes to mark the beats
     # (we'll quantize the song afterwards so doing it later on would be out of sync)
     beat_interval_ticks = 4
-    if song.header.tempo >= 15:
+    if effective_tempo >= 15:
         beat_interval_ticks = 8
+    beat_interval_ticks = int(beat_interval_ticks / expansion_factor)
 
     # override default settings if present
     if "beat_interval" in timing_settings:
@@ -313,16 +324,6 @@ def get_notes(
                 instrument=-1,
             )
         )
-
-    # Songs with tempo greater than 20 t/s are slowed down so they can be played in Minecraft
-    effective_tempo = song.header.tempo
-
-    # Some songs are authored at an 'expanded' resolution (e.g. only even ticks,
-    # effectively half tempo). Use the manifest `tempo_factor` when present.
-    expansion_factor = timing_settings.get("tempo_factor", 1)
-    effective_tempo *= expansion_factor
-
-    effective_tempo = min(effective_tempo, 20)
 
     empty_instrument_ids = get_empty_instrument_ids(song)
 
