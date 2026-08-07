@@ -98,7 +98,7 @@ for region in REGIONS:
 
         #> Effects
         # display AJ text
-        function ~/{region}/title:
+        function ~/title:
             raw f'$execute \
                 as @e[type=item_display,tag=nbs.speaker.{region}] \
                 on passengers \
