@@ -24,7 +24,7 @@ class RenderOptions:
 
     in_range_tag: str = "nbs.in_range"
     new_in_range_tag: str = "nbs.in_range.new"
-    actionbar_prefix: str = "🎵 Now Listening: "
+    actionbar_prefix: str = "🎵 Now Playing: "
     advancement_template: str = "nbs:song/{song_id}"
     particle: str = "minecraft:note ~ ~1.25 ~ 0 0 0 1 1 normal"
 
