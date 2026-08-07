@@ -1,8 +1,17 @@
 {
+  "ruff.configurationPreference": "filesystemFirst",
+  "ruff.importStrategy": "fromEnvironment",
+  "ruff.nativeServer": "on",
+  "ruff.organizeImports": true,
+  "ruff.fixAll": true,
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
+      // Disable generic providers
+      "source.organizeImports": "never",
+      "source.fixAll": "never",
+      // Only Ruff should fix/sort on save
       "source.fixAll.ruff": "explicit",
       "source.organizeImports.ruff": "explicit"
     }
