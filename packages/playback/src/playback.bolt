@@ -58,11 +58,10 @@ for region in REGIONS:
         function ~/tick:
             # grab playback info
             if score f"{region}.playing" nbs matches 1 run scoreboard players add f"{region}.songtime" nbs 1
-            store result storage PLAYBACK[region] f"playing.tick" int 1 run scoreboard players get f"{region}.songtime" nbs
+            store result storage PLAYBACK[region] playing.tick int 1 run scoreboard players get f"{region}.songtime" nbs
             
             # these should cache nicely as it's only 6 states during a songs runtime
-            data modify storage TEMP[region] input.song set from storage PLAYBACK[region] playing.name
-            store result storage TEMP[region] input.random int 1 run random value 1..6
+            store result storage PLAYBACK[region] playing.random int 1 run random value 1..6
 
             for speaker_range in SPEAKER_RANGES:
                 execute function ~/{speaker_range.name}:
@@ -77,12 +76,12 @@ for region in REGIONS:
 
                     # advance
                     execute if data storage TEMP[region] payload{advance:1b} run function ~/../../advance
-                    
+
                     execute
                         as @e[type=item_display,tag=f"nbs.speaker.{region}",tag=f"nbs.speaker.{speaker_range.name}"]
                         at @s
                         if entity @a[distance=(0, speaker_range.outer_range), limit=1]
-                        run function ~/speaker_{speaker_range.name} with storage TEMP[region] input:
+                        run function ~/speaker with storage PLAYBACK[region] playing:
                             # run the beat, also this macro cache should be consistent
                             raw f"$execute \
                                 if data storage {TEMP[region]} payload{{beat:1b}} \
@@ -90,7 +89,8 @@ for region in REGIONS:
 
                             raw f"$advancement grant @a[distance=..{speaker_range.outer_range}] only nbs:song/$(name)"
 
-                            function f"nbs:songs/dispatch/{region}"
+                            with storage TEMP[region] payload:
+                                raw f"$function nbs:songs/template/$(count) with storage {TEMP[region]} payload"
 
         # Song selection is a two-step hash lookup. The first macro turns the
         # scoreboard index into a string-keyed song id (`i0`, `i1`, ...). The
@@ -133,7 +133,9 @@ for region in REGIONS:
             title_color = region_config.title_color
 
             append function ~/../title:
-                raw f'$execute at @e[type=item_display,tag=nbs.speaker.{region},tag=nbs.speaker.{variant}] run title @a[distance=..{range}] actionbar [{{"text":"🎵 Now Playing: ","color":"{title_color}"}},{{"text":"$(formatted_string)","color":"white"}}]'
+                raw f'$execute \
+                    at @e[type=item_display,tag=nbs.speaker.{region},tag=nbs.speaker.{variant}] \
+                    run title @a[distance=..{range}] actionbar [{{"text":"🎵 Now Playing: ","color":"{title_color}"}},{{"text":"$(formatted_string)","color":"white"}}]'
 
 
         #> Song Controls
