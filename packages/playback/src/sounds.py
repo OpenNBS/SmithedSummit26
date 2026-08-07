@@ -165,9 +165,17 @@ def get_all_custom_sounds(song_manifest: dict) -> set[SoundResource]:
 OGG_WRITE_FRAMES = 4096
 
 
+def to_mono(data):
+    """Average multi-channel audio to a single channel. Expects shape (frames, channels)."""
+    if data.shape[1] == 1:
+        return data
+    return data.mean(axis=1, keepdims=True)
+
+
 def pitch_shift_ogg(ogg_bytes: bytes, semitones: int) -> bytes:
     """Varispeed pitch shift: raise/lower pitch and shorten/lengthen duration together."""
     data, sr = sf.read(BytesIO(ogg_bytes), dtype="float32", always_2d=True)
+    data = to_mono(data)
     factor = 2 ** (semitones / 12)
     shifted = samplerate.resample(data, 1 / factor, "sinc_best")
 
@@ -176,7 +184,7 @@ def pitch_shift_ogg(ogg_bytes: bytes, semitones: int) -> bytes:
         out,
         mode="w",
         samplerate=sr,
-        channels=shifted.shape[1],
+        channels=1,
         format="OGG",
         subtype="VORBIS",
     ) as sound_file:
