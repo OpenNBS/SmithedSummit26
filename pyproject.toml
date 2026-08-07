@@ -62,9 +62,12 @@ cwd = "packages/booth"
 help = "Watch and rebuild the booth package"
 
 [tool.poe.tasks.playback]
-cmd = "beet --project beet_prd.yml --log INFO"
 cwd = "packages/playback"
 help = "Build the playback package for production"
+sequence = [
+  {cmd = "beet cache --clear songs"},
+  {cmd = "beet --project beet_prd.yml --log INFO"},
+]
 
 [tool.poe.tasks.playback-debug]
 cmd = "beet --project beet_dev.yml --log DEBUG"

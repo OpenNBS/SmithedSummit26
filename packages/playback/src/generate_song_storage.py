@@ -19,6 +19,10 @@ from pathlib import Path
 
 from beet import Context
 
+from src.song_storage.cache import (
+    load_cached_playsound_counts,
+    save_cached_playsound_counts,
+)
 from src.song_storage.debug_functions import emit_debug_load_functions
 from src.song_storage.link_world import copy_command_storages_to_linked_world
 from src.song_storage.render import RenderedStorage, prepare_tasks, render_database
@@ -30,6 +34,7 @@ from src.song_storage.saved_data import (
     write_command_storage_file,
 )
 from src.utilities.parallel import map_as_completed
+from src.utilities.songs_cache import songs_cache, songs_cache_key
 
 logger = logging.getLogger(__name__)
 
@@ -41,33 +46,72 @@ REGION_PLAYSOUND_COUNTS_META_KEY = "song_storage_playsound_counts_by_region"
 def beet_default(ctx: Context) -> Generator[None]:
     """Prepare macro metadata, then emit artifacts after Mecha finishes."""
 
-    logger.info(
-        "Generating regional song databases (hard cap %d playsounds/tick)",
-        ctx.meta["max_playsounds_per_tick"],
-    )
-    database = render_database(prepare_tasks(ctx))
+    cache = songs_cache(ctx)
+    cache_key = songs_cache_key(ctx)
+    cached_counts = load_cached_playsound_counts(cache, cache_key)
+    storage_cache_hit = cached_counts is not None
+    database: RenderedStorage | None = None
+
+    if cached_counts is not None:
+        playsound_counts, playsound_counts_by_region = cached_counts
+        logger.info(
+            "Using cached song-storage metadata (hard cap %d playsounds/tick)",
+            ctx.meta["max_playsounds_per_tick"],
+        )
+    else:
+        logger.info(
+            "Generating regional song databases (hard cap %d playsounds/tick)",
+            ctx.meta["max_playsounds_per_tick"],
+        )
+        database = render_database(prepare_tasks(ctx))
+        playsound_counts = list(database.playsound_counts)
+        playsound_counts_by_region = {
+            region: list(counts)
+            for region, counts in database.playsound_counts_by_region.items()
+        }
+        save_cached_playsound_counts(
+            cache, cache_key, playsound_counts, playsound_counts_by_region
+        )
+
+    # Debug loaders need the full rendered database in the freshly built pack.
+    if ctx.meta["generate_storage_load_functions"] and database is None:
+        logger.info("Rendering song databases for storage load debug functions")
+        database = render_database(prepare_tasks(ctx))
+
     ctx.meta[DATABASE_META_KEY] = database
-    ctx.meta[PLAYSOUND_COUNTS_META_KEY] = list(database.playsound_counts)
-    ctx.meta[REGION_PLAYSOUND_COUNTS_META_KEY] = {
-        region: list(counts)
-        for region, counts in database.playsound_counts_by_region.items()
-    }
+    ctx.meta[PLAYSOUND_COUNTS_META_KEY] = playsound_counts
+    ctx.meta[REGION_PLAYSOUND_COUNTS_META_KEY] = playsound_counts_by_region
 
     logger.info(
         "Observed %d non-empty chord sizes: %s",
-        len(database.playsound_counts),
-        ", ".join(map(str, database.playsound_counts)),
+        len(playsound_counts),
+        ", ".join(map(str, playsound_counts)),
     )
 
     # Let the remaining pipeline run. songs.bolt consumes the leaf set above.
     yield
 
     database = ctx.meta.pop(DATABASE_META_KEY)
-    if not isinstance(database, RenderedStorage):
+    if database is not None and not isinstance(database, RenderedStorage):
         raise TypeError("Internal song storage database was replaced during build")
 
     if ctx.meta["generate_storage_load_functions"]:
+        if database is None:
+            raise RuntimeError(
+                "Song storage database required for debug load functions"
+            )
         emit_debug_load_functions(ctx, database)
+
+    if storage_cache_hit:
+        # Assume dist/world command-storage artifacts from a prior build are
+        # still correct when the songs cache key matches.
+        logger.info(
+            "Skipping command-storage write/copy; songs cache hit for current inputs"
+        )
+        return
+
+    if database is None:
+        raise RuntimeError("Song storage database missing after cache miss")
 
     remove_legacy_global_storage(ctx)
     storage_id_template = ctx.meta["song_storage_id_template"]
