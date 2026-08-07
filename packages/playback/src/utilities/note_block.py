@@ -192,7 +192,7 @@ class PlaysoundNote:
         # Since it's very common to use lower layer volumes, some songs are 'capped' and
         # end up not reaching the speaker's full range. At the same time, we don't want to
         # completely ignore the note volume as that would kill the song's dynamics.
-        note_volume_factor = 0.5 + self.volume * 0.5
+        note_volume_factor = self.volume
         volume = (silence_distance / 16) * note_volume_factor
         radius = decay_range
 
