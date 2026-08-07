@@ -1,18 +1,9 @@
 """Parse NBS files and assemble the indexed song database."""
 
 import logging
-import os
 import re
-import sys
 from collections.abc import Sequence
-from concurrent.futures import (
-    Executor,
-    ProcessPoolExecutor,
-    ThreadPoolExecutor,
-    as_completed,
-)
 from dataclasses import dataclass
-from multiprocessing import get_context
 from pathlib import Path
 from typing import TypedDict
 
@@ -21,6 +12,7 @@ from beet import Context
 
 from src.config import SONGS_PATH
 from src.utilities.note_block import PlaysoundNote, get_notes
+from src.utilities.parallel import map_as_completed
 
 logger = logging.getLogger(__name__)
 
@@ -255,41 +247,6 @@ def prepare_tasks(ctx: Context) -> list[SongTask]:
     return tasks
 
 
-def create_executor(task_count: int) -> tuple[Executor, int, str]:
-    """Choose the same concurrency strategy as the original generator.
-
-    Restricted environments can deny process semaphore inspection. Falling
-    back to threads keeps local/test builds usable without changing output.
-    """
-
-    available_workers = min(task_count, os.process_cpu_count() or 1)
-    if sys._is_gil_enabled():
-        max_workers = min(available_workers, 4)
-        try:
-            return (
-                ProcessPoolExecutor(
-                    max_workers=max_workers,
-                    mp_context=get_context("spawn"),
-                ),
-                max_workers,
-                "processes",
-            )
-        except OSError, PermissionError:
-            logger.warning(
-                "Process workers unavailable; falling back to regular threads"
-            )
-
-    max_workers = min(available_workers, 10)
-    return (
-        ThreadPoolExecutor(
-            max_workers=max_workers,
-            thread_name_prefix="song-storage-generator",
-        ),
-        max_workers,
-        "threads",
-    )
-
-
 def render_database(tasks: Sequence[SongTask]) -> RenderedStorage:
     """Render songs concurrently and assemble O(1) compound-key indices."""
 
@@ -302,24 +259,16 @@ def render_database(tasks: Sequence[SongTask]) -> RenderedStorage:
             playsound_count=0,
         )
 
-    executor, max_workers, executor_kind = create_executor(len(tasks))
-    logger.info(
-        "Rendering %d storage-backed songs with %d %s",
-        len(tasks),
-        max_workers,
-        executor_kind,
-    )
-    results: dict[str, SongResult] = {}
-
-    with executor:
-        futures = {executor.submit(render_song, task): task.song_id for task in tasks}
-        for future in as_completed(futures):
-            song_id = futures[future]
-            try:
-                results[song_id] = future.result()
-            except Exception:
-                logger.exception("Failed to process song: %s", song_id)
-                raise
+    results: dict[str, SongResult] = {
+        task.song_id: result
+        for task, result in map_as_completed(
+            render_song,
+            tasks,
+            item_id=lambda task: task.song_id,
+            thread_name_prefix="song-storage-generator",
+            failure_message="Failed to process song: %s",
+        )
+    }
 
     songs: dict[str, SongRecord] = {}
     regions: dict[str, IndexPayload] = {}

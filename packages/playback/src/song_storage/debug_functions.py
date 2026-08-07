@@ -1,12 +1,12 @@
 """Generate opt-in in-game loaders for debugging command storage."""
 
 import logging
-from concurrent.futures import as_completed
 
 from beet import Context, Function, FunctionTag
 
-from src.song_storage.render import RenderedStorage, SongRecord, create_executor
+from src.song_storage.render import RenderedStorage, SongRecord
 from src.song_storage.saved_data import payload_to_nbt
+from src.utilities.parallel import map_as_completed
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +86,6 @@ def emit_debug_load_functions(ctx: Context, database: RenderedStorage) -> None:
     storage_id_template = ctx.meta["song_storage_id_template"]
     command_limit = ctx.meta["debug_storage_command_limit"]
     all_commands = []
-    song_commands: dict[str, list[str]] = {}
     song_tasks: list[tuple[str, str, SongRecord]] = []
 
     for region, raw_index in database.regions.items():
@@ -94,32 +93,17 @@ def emit_debug_load_functions(ctx: Context, database: RenderedStorage) -> None:
         for song_id in raw_index.values():
             song_tasks.append((storage_id, song_id, database.songs[song_id]))
 
-    if song_tasks:
-        executor, max_workers, executor_kind = create_executor(len(song_tasks))
-        logger.info(
-            "Generating %d debug song loaders with %d %s",
-            len(song_tasks),
-            max_workers,
-            executor_kind,
+    song_commands = {
+        task[1]: commands
+        for task, commands in map_as_completed(
+            song_load_commands,
+            song_tasks,
+            item_id=lambda task: task[1],
+            args=lambda task: (*task, command_limit),
+            thread_name_prefix="song-storage-generator",
+            failure_message="Failed to generate debug loader: %s",
         )
-        with executor:
-            futures = {
-                executor.submit(
-                    song_load_commands,
-                    storage_id,
-                    song_id,
-                    raw_song,
-                    command_limit,
-                ): song_id
-                for storage_id, song_id, raw_song in song_tasks
-            }
-            for future in as_completed(futures):
-                song_id = futures[future]
-                try:
-                    song_commands[song_id] = future.result()
-                except Exception:
-                    logger.exception("Failed to generate debug loader: %s", song_id)
-                    raise
+    }
 
     for region, raw_index in database.regions.items():
         storage_id = storage_id_template.format(region=region)

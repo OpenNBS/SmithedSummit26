@@ -1,12 +1,8 @@
 """Generate per-song, per-tick speaker note functions from NBS files."""
 
 import logging
-import os
-import sys
 from collections.abc import Sequence
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
-from multiprocessing import get_context
 from pathlib import Path
 
 import pynbs
@@ -14,6 +10,7 @@ from beet import Context, Function
 
 from src.config import SONGS_PATH
 from src.utilities.note_block import PlaysoundNote, get_notes
+from src.utilities.parallel import map_as_completed
 
 logger = logging.getLogger(__name__)
 
@@ -214,50 +211,18 @@ def beet_default(ctx: Context) -> None:
     )
     tasks = prepare_tasks(ctx)
 
-    if tasks:
-        available_workers = min(len(tasks), os.process_cpu_count() or 1)
-
-        if sys._is_gil_enabled():
-            # Large results make IPC the bottleneck beyond a small process pool.
-            max_workers = min(available_workers, 4)
-            executor = ProcessPoolExecutor(
-                max_workers=max_workers,
-                mp_context=get_context("spawn"),
-            )
-            executor_kind = "processes"
-        else:
-            max_workers = min(available_workers, 10)
-            executor = ThreadPoolExecutor(
-                max_workers=max_workers,
-                thread_name_prefix="song-generator",
-            )
-            executor_kind = "free-threaded threads"
-
-        logger.info(
-            "Rendering %d songs with %d %s",
-            len(tasks),
-            max_workers,
-            executor_kind,
-        )
-
-        with executor:
-            futures = {
-                executor.submit(render_song, task): task.song_id for task in tasks
-            }
-
-            # Beet's pack containers aren't thread-safe. Merge completed songs on the
-            # main thread while the remaining workers continue rendering.
-            for future in as_completed(futures):
-                song_id = futures.pop(future)
-                try:
-                    result = future.result()
-                except Exception:
-                    logger.exception("Failed to process song: %s", song_id)
-                    raise
-
-                for path, lines in result.functions.items():
-                    # Store serialized text so the finished pack doesn't retain
-                    # millions of individual command strings and list entries.
-                    ctx.data.functions[path] = Function("\n".join(lines) + "\n")
+    # Beet's pack containers aren't thread-safe. Merge completed songs on the
+    # main thread while the remaining workers continue rendering.
+    for _task, result in map_as_completed(
+        render_song,
+        tasks,
+        item_id=lambda task: task.song_id,
+        thread_name_prefix="song-generator",
+        failure_message="Failed to process song: %s",
+    ):
+        for path, lines in result.functions.items():
+            # Store serialized text so the finished pack doesn't retain
+            # millions of individual command strings and list entries.
+            ctx.data.functions[path] = Function("\n".join(lines) + "\n")
 
     logger.info("🎉 Song note generation complete!")
