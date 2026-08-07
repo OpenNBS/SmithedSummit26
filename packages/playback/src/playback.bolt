@@ -114,15 +114,6 @@ for region in REGIONS:
                 raw f'$execute at @e[type=item_display,tag=nbs.speaker.{region},tag=nbs.speaker.{variant}] run title @a[distance=..{range}] actionbar [{{"text":"🎵 Now Playing: ","color":"green"}},{{"text":"$(formatted_string)","color":"white"}}]'
 
 
-        #> Spawn Speakers
-
-        function ~/speaker/place/{region}/{variant}:
-            execute positioned ~ ~ ~ rotated ~ 0 run function f"summit_ambiance:speaker_{region}/summon" {args: {}}
-            tag @n[type=item_display,distance=..1,tag=f"summit_ambiance.speaker_{region}.root"] add f"nbs.speaker"
-            tag @n[type=item_display,distance=..1,tag=f"summit_ambiance.speaker_{region}.root"] add f"nbs.speaker.{region}"
-            tag @n[type=item_display,distance=..1,tag=f"summit_ambiance.speaker_{region}.root"] add f"nbs.speaker.{variant}"
-
-
         #> Song Controls
 
         song_count = REGION_COUNTS[region]
@@ -165,10 +156,3 @@ for region in REGIONS:
             merge function_tag (~/) {"values": [(~/)]}
             if score shuffle nbs matches 0 run function ~/../next
             if score shuffle nbs matches 1 run function ~/../shuffle
-
-
-function ~/speaker/remove/nearest:
-    for region in REGIONS:
-        execute 
-            as @n[distance=..1,type=minecraft:item_display,tag=f"summit_ambiance.speaker_{region}.root"]
-            run function f"summit_ambiance:speaker_{region}/remove/this"

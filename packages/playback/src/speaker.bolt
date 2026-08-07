@@ -1,0 +1,27 @@
+import logging
+
+from ./const import REGIONS, SPEAKER_RANGES
+
+
+logger = logging.getLogger(__name__)
+
+logger.info("Generating speaker functions")
+
+
+#> Place Speakers
+for region in REGIONS:
+    for speaker_type in SPEAKER_RANGES:
+        variant = speaker_type["name"]
+
+        append function ~/place/{region}/{variant}:
+            execute positioned ~ ~ ~ rotated ~ 0 run function f"summit_ambiance:speaker_{region}/summon" {args: {}}
+            tag @n[type=item_display,distance=..1,tag=f"summit_ambiance.speaker_{region}.root"] add f"nbs.speaker"
+            tag @n[type=item_display,distance=..1,tag=f"summit_ambiance.speaker_{region}.root"] add f"nbs.speaker.{region}"
+            tag @n[type=item_display,distance=..1,tag=f"summit_ambiance.speaker_{region}.root"] add f"nbs.speaker.{variant}"
+
+#> Remove Speakers
+function ~/remove/nearest:
+    for region in REGIONS:
+        execute     
+            as @n[distance=..1,type=minecraft:item_display,tag=f"summit_ambiance.speaker_{region}.root"]
+            run function f"summit_ambiance:speaker_{region}/remove/this"
