@@ -250,7 +250,8 @@
 		"title": "Summer - Nature's Crescendo (Stardew Valley)",
 		"region": "tropics",
 		"author": "u3002",
-		"url": "Or5TlUK2HM"
+		"url": "Or5TlUK2HM",
+		"beat_interval": 10
 	},
 	{
 		"id": "summer_dew",
