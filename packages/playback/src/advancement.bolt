@@ -1,3 +1,5 @@
+import re
+
 from ./const import REGIONS, SONG_MANIFEST
 
 REGION_ICONS = {
@@ -37,6 +39,11 @@ DISCS = [
 
 HEAR_ALL_SONGS = "nbs:playback/hear_all_songs"
 HEARD_ALL_SONGS_STICKER = "nbs:stickers/heard_all_songs"
+
+
+def remove_parentheses(title: str) -> str:
+    # Remove everything between the first and last parentheses, including the parentheses
+    return re.sub(r"\(.*?\)", "", title, flags=re.DOTALL)
 
 
 advancement f"nbs:playback/root" {
@@ -94,7 +101,7 @@ def generate_song_advancement(region: str, song_id: str, song: str, author: str)
                 # Deterministic random item from DISCS
                 "id": DISCS[hash(song_id) % len(DISCS)]
             },
-            "title": song,
+            "title": remove_parentheses(song),
             "description": f"by {author}",
             "show_toast": false,
             "announce_to_chat": false
