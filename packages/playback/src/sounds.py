@@ -97,12 +97,22 @@ class SoundResource:
         return f"{self._relative_stem}{self.octave_offset.value.suffix}"
 
     @property
+    def mono_pack_sound_path(self) -> str:
+        """Path under `assets/nbs/sounds/` for a forced-mono copy (no .ogg)."""
+        return f"{self.pack_sound_path}_mono"
+
+    @property
     def sound_name(self) -> str:
         """`sounds.json` file reference with the correct namespace."""
         namespace = (
             "minecraft" if self.octave_offset is OctaveOffsetEnum.NONE else "nbs"
         )
         return f"{namespace}:{self.pack_sound_path}"
+
+    @property
+    def mono_sound_name(self) -> str:
+        """`sounds.json` file reference for a forced-mono copy under `nbs`."""
+        return f"nbs:{self.mono_pack_sound_path}"
 
     @property
     def sound_event(self) -> str:
@@ -112,6 +122,12 @@ class SoundResource:
 
 @dataclass(frozen=True)
 class PitchShiftTask:
+    resource: SoundResource
+    ogg_bytes: bytes
+
+
+@dataclass(frozen=True)
+class MonoConvertTask:
     resource: SoundResource
     ogg_bytes: bytes
 
@@ -205,13 +221,13 @@ def to_mono(data):
     return data.mean(axis=1, keepdims=True)
 
 
-def pitch_shift_ogg(ogg_bytes: bytes, semitones: int) -> bytes:
-    """Varispeed pitch shift: raise/lower pitch and shorten/lengthen duration together."""
-    data, sr = sf.read(BytesIO(ogg_bytes), dtype="float32", always_2d=True)
-    data = to_mono(data)
-    factor = 2 ** (semitones / 12)
-    shifted = samplerate.resample(data, 1 / factor, "sinc_best")
+def is_mono_ogg(ogg_bytes: bytes) -> bool:
+    """Return True if the OGG already has a single channel."""
+    return sf.info(BytesIO(ogg_bytes)).channels == 1
 
+
+def write_mono_ogg(data, sr: int) -> bytes:
+    """Encode mono float32 frames as OGG/Vorbis."""
     out = BytesIO()
     with sf.SoundFile(
         out,
@@ -221,9 +237,24 @@ def pitch_shift_ogg(ogg_bytes: bytes, semitones: int) -> bytes:
         format="OGG",
         subtype="VORBIS",
     ) as sound_file:
-        for start in range(0, len(shifted), OGG_WRITE_FRAMES):
-            sound_file.write(shifted[start : start + OGG_WRITE_FRAMES])
+        for start in range(0, len(data), OGG_WRITE_FRAMES):
+            sound_file.write(data[start : start + OGG_WRITE_FRAMES])
     return out.getvalue()
+
+
+def to_mono_ogg(ogg_bytes: bytes) -> bytes:
+    """Decode an OGG and re-encode it as mono without changing pitch or duration."""
+    data, sr = sf.read(BytesIO(ogg_bytes), dtype="float32", always_2d=True)
+    return write_mono_ogg(to_mono(data), sr)
+
+
+def pitch_shift_ogg(ogg_bytes: bytes, semitones: int) -> bytes:
+    """Varispeed pitch shift: raise/lower pitch and shorten/lengthen duration together."""
+    data, sr = sf.read(BytesIO(ogg_bytes), dtype="float32", always_2d=True)
+    data = to_mono(data)
+    factor = 2 ** (semitones / 12)
+    shifted = samplerate.resample(data, 1 / factor, "sinc_best")
+    return write_mono_ogg(shifted, sr)
 
 
 def load_vanilla_ogg(asset_index: AssetIndex, resource: SoundResource) -> bytes | None:
@@ -268,6 +299,17 @@ def pitch_shift_task(task: PitchShiftTask) -> bytes:
         ) from err
 
 
+def convert_to_mono_task(task: MonoConvertTask) -> bytes:
+    """Worker entrypoint: re-encode one preloaded vanilla OGG as mono."""
+
+    try:
+        return to_mono_ogg(task.ogg_bytes)
+    except sf.LibsndfileError as err:
+        raise ValueError(
+            f"Failed to decode vanilla sound: {task.resource.vanilla_sound_key}"
+        ) from err
+
+
 def generate_sounds(
     ctx: Context, assets: ResourcePack, sound_list: set[SoundResource]
 ) -> None:
@@ -282,18 +324,35 @@ def generate_sounds(
 
     sound_config: dict = {}
     pitch_tasks: list[PitchShiftTask] = []
+    mono_tasks: list[MonoConvertTask] = []
 
     # Resolve vanilla samples on the main thread so AssetIndex cache repairs stay
-    # single-threaded. Only the CPU-bound pitch shift runs in the worker pool.
+    # single-threaded. Only the CPU-bound encode steps run in the worker pool.
     for resource in sound_list:
         logger.debug("Generating sound for %s", resource.pack_sound_path)
         event = resource.sound_event
 
         if resource.octave_offset is OctaveOffsetEnum.NONE:
-            sound_config[event] = {
-                "sounds": [resource.sound_name],
-                "subtitle": SUBTITLE,
-            }
+            # Keep playsound as nbs:<sound_event>. Point at vanilla when already
+            # mono; otherwise ship an nbs:*_mono copy and alias the same event.
+            if (ogg_bytes := load_vanilla_ogg(asset_index, resource)) is None:
+                sound_config[event] = {
+                    "sounds": [resource.sound_name],
+                    "subtitle": SUBTITLE,
+                }
+                continue
+
+            if is_mono_ogg(ogg_bytes):
+                sound_config[event] = {
+                    "sounds": [resource.sound_name],
+                    "subtitle": SUBTITLE,
+                }
+            else:
+                logger.info(
+                    "Vanilla sound is stereo; converting to mono: %s",
+                    resource.vanilla_sound_key,
+                )
+                mono_tasks.append(MonoConvertTask(resource, ogg_bytes))
             continue
 
         if (ogg_bytes := load_vanilla_ogg(asset_index, resource)) is None:
@@ -302,6 +361,20 @@ def generate_sounds(
         pitch_tasks.append(PitchShiftTask(resource, ogg_bytes))
 
     # Beet pack containers aren't thread-safe. Merge completed samples here.
+    for task, mono_bytes in map_as_completed(
+        convert_to_mono_task,
+        mono_tasks,
+        item_id=lambda task: task.resource.vanilla_sound_key,
+        thread_name_prefix="sound-mono",
+        failure_message="Failed to mono-convert sound: %s",
+    ):
+        resource = task.resource
+        assets["nbs"].sounds[resource.mono_pack_sound_path] = Sound(mono_bytes)
+        sound_config[resource.sound_event] = {
+            "sounds": [resource.mono_sound_name],
+            "subtitle": SUBTITLE,
+        }
+
     for task, shifted in map_as_completed(
         pitch_shift_task,
         pitch_tasks,
