@@ -1,16 +1,39 @@
 from ./const import REGIONS
 
+REGION_ICONS = {
+    plateaus: "summit_icons:patched_plateaus",
+    tropics: "summit_icons:textured_tropics",
+    woodlands: "summit_icons:welded_woodlands",
+}
 
-def icon(region: str):
-    if region == "plateaus":
-        return "summit_icons:patched_plateaus"
-    
-    if region == "tropics":
-        return "summit_icons:textured_tropics"
-    
-    if region == "woodlands":
-        return "summit_icons:welded_woodlands"
+REGION_NAMES = {
+    plateaus: "Patched Plateaus",
+    tropics: "Textured Tropics",
+    woodlands: "Welded Woodlands",
+}
 
+DISCS = [
+    "minecraft:music_disc_13",
+    "minecraft:music_disc_5",
+    "minecraft:music_disc_blocks",
+    "minecraft:music_disc_bounce",
+    "minecraft:music_disc_chirp",
+    "minecraft:music_disc_creator",
+    "minecraft:music_disc_creator_music_box",
+    "minecraft:music_disc_far",
+    "minecraft:music_disc_lava_chicken",
+    "minecraft:music_disc_mall",
+    "minecraft:music_disc_mellohi",
+    "minecraft:music_disc_otherside",
+    "minecraft:music_disc_pigstep",
+    "minecraft:music_disc_precipice",
+    "minecraft:music_disc_relic",
+    "minecraft:music_disc_stal",
+    "minecraft:music_disc_strad",
+    "minecraft:music_disc_tears",
+    "minecraft:music_disc_wait",
+    "minecraft:music_disc_ward",
+]
 
 advancement f"nbs:playback/root" {
     "display": {
@@ -37,12 +60,12 @@ for region in REGIONS:
             "icon": {
                 "id": "minecraft:poisonous_potato",
                 "components": {
-                    "minecraft:item_model": icon(region)
+                    "minecraft:item_model": REGION_ICONS[region]
                 }
             },
-            "title": "Patched Plateaus Songs",
+            "title": f"{REGION_NAMES[region]} Songs",
             "description": "",
-            "show_toast": false,
+            "show_toast": true,
             "announce_to_chat": false
         },
         "parent": f"nbs:playback/root",
@@ -62,10 +85,11 @@ def generate_song_advancement(region: str, song_id: str, song: str, author: str)
     advancement adv_path {
         "display": {
             "icon": {
-                "id": "minecraft:note_block"
+                # Deterministic random item from DISCS
+                "id": DISCS[hash(song_id) % len(DISCS)]
             },
             "title": song,
-            "description": author,
+            "description": f"by {author}",
             "show_toast": false,
             "announce_to_chat": false
         },
@@ -87,10 +111,10 @@ def end_cap():
                 "icon": {
                     "id": "minecraft:poisonous_potato",
                     "components": {
-                        "minecraft:item_model": icon(region)
+                        "minecraft:item_model": REGION_ICONS[region]
                     }
                 },
-                "title": "Patched Plateaus Songs",
+                "title": f"{REGION_NAMES[region]} Songs",
                 "description": "",
                 "show_toast": false,
                 "announce_to_chat": false
