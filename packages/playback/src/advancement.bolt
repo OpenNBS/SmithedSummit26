@@ -1,4 +1,4 @@
-from ./const import REGIONS
+from ./const import REGIONS, SONG_MANIFEST
 
 REGION_ICONS = {
     plateaus: "summit_icons:patched_plateaus",
@@ -34,6 +34,10 @@ DISCS = [
     "minecraft:music_disc_wait",
     "minecraft:music_disc_ward",
 ]
+
+HEAR_ALL_SONGS = "nbs:playback/hear_all_songs"
+HEARD_ALL_SONGS_STICKER = "nbs:stickers/heard_all_songs"
+
 
 advancement f"nbs:playback/root" {
     "display": {
@@ -82,6 +86,8 @@ for region in REGIONS:
 def generate_song_advancement(region: str, song_id: str, song: str, author: str):
     global LAST_SONG_PARENT
     adv_path = f"nbs:song/{song_id}"
+    progress_function = f"nbs:playback/hear_all_songs/{song_id}"
+
     advancement adv_path {
         "display": {
             "icon": {
@@ -98,9 +104,16 @@ def generate_song_advancement(region: str, song_id: str, song: str, author: str)
             "song": {
                 "trigger": "minecraft:impossible"
             }
+        },
+        # Progress the collector once when this song is first heard.
+        "rewards": {
+            "function": progress_function
         }
     }
     LAST_SONG_PARENT[region] = adv_path
+
+    function progress_function:
+        raw f"advancement grant @s only {HEAR_ALL_SONGS} {song_id}"
 
 
 @defer
@@ -126,6 +139,21 @@ def end_cap():
                 }
             }
         }
+
+    # Adventuring Time-style collector: one criterion per nbs:song/* advancement.
+    # Hidden/technical — sticker UI lives in the event sticker book.
+    song_criteria = {}
+    for song in SONG_MANIFEST:
+        if song.get("region") is None:
+            continue
+        song_criteria[song["id"]] = {"trigger": "minecraft:impossible"}
+
+    advancement HEAR_ALL_SONGS {
+        "criteria": song_criteria,
+        "rewards": {
+            "function": HEARD_ALL_SONGS_STICKER
+        }
+    }
 
 function ~/base:
     merge function_tag summit:api/on_join {"values": [(~/)]}
