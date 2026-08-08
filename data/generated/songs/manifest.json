@@ -29,6 +29,13 @@
 		"url": "Vom8RJneOC"
 	},
 	{
+		"id": "beat_block_galaxy",
+		"title": "Beat Block Galaxy (Super Mario Galaxy 2)",
+		"region": "woodlands",
+		"author": "Bentroen",
+		"url": "TBD"
+	},
+	{
 		"id": "bedraggled",
 		"title": "Bedraggled",
 		"region": "plateaus",
@@ -85,6 +92,14 @@
 		"region": "tropics",
 		"author": "L0ndRzZz",
 		"url": "zv7U78vyPa"
+	},
+	{
+		"id": "first_steps",
+		"title": "First Steps (Celeste)",
+		"region": "woodlands",
+		"author": "Bentroen",
+		"url": "TBD",
+		"beat_interval": 8
 	},
 	{
 		"id": "forest_layer_eggshell_hotel",
