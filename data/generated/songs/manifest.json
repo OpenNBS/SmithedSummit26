@@ -32,7 +32,7 @@
 		"id": "bedraggled",
 		"title": "Bedraggled",
 		"region": "plateaus",
-		"author": "techity",
+		"author": "Techity",
 		"url": "KOsyMsYF3M"
 	},
 	{
@@ -54,14 +54,14 @@
 		"id": "cascade_unending",
 		"title": "Cascade Unending",
 		"region": "woodlands",
-		"author": "overlordvizeon",
+		"author": "Vizeon",
 		"url": "anBPTvsIYj"
 	},
 	{
 		"id": "clocktower",
 		"title": "Clocktower (Super Mario 3D Land)",
 		"region": "woodlands",
-		"author": "stunningwheel94",
+		"author": "StunningWheel94",
 		"url": "gBYTGbfqfK",
 		"beat_interval": 5
 	},
@@ -127,7 +127,7 @@
 		"id": "in_flighty_steps",
 		"title": "In Flighty Steps",
 		"region": "tropics",
-		"author": "kaliumi",
+		"author": "KaliumI",
 		"url": "twZvNGQd4Z"
 	},
 	{
@@ -150,7 +150,7 @@
 		"id": "like_broken_clockwork",
 		"title": "Like Broken Clockwork",
 		"region": "woodlands",
-		"author": "kaliumi",
+		"author": "KaliumI",
 		"url": "Qw4h70EKw7"
 	},
 	{
@@ -180,7 +180,7 @@
 		"id": "nintendo_land_main_theme",
 		"title": "Nintendo Land Main Theme",
 		"region": "plateaus",
-		"author": "stunningwheel94",
+		"author": "StunningWheel94",
 		"url": "9fEtvgfUpe",
 		"beat_offset": 1,
 		"beat_interval": 6
@@ -189,7 +189,7 @@
 		"id": "norwegian_woods",
 		"title": "Norwegian Woods",
 		"region": "woodlands",
-		"author": "raphaelbertges",
+		"author": "Raphael Bertges",
 		"url": "eeDEu7KsZI",
 		"beat_interval": 14
 	},
@@ -220,7 +220,7 @@
 		"id": "run_bongy_run",
 		"title": "Run Bongy, Run (Limbus Company)",
 		"region": "plateaus",
-		"author": "kaliumi",
+		"author": "KaliumI",
 		"url": "v75IJ5vx4c"
 	},
 	{
@@ -313,7 +313,7 @@
 		"id": "through_the_field",
 		"title": "Through the Field",
 		"region": "plateaus",
-		"author": "kaliumi",
+		"author": "KaliumI",
 		"url": "CHydZWXQZw"
 	},
 	{
@@ -369,7 +369,7 @@
 		"id": "youve_got_to_be_modernistic",
 		"title": "You've Got to be Modernistic (James P. Johnson)",
 		"region": "tropics",
-		"author": "stunningwheel94",
+		"author": "StunningWheel94",
 		"url": "xFfrpXc7X5",
 		"beat_interval": 6
 	}
