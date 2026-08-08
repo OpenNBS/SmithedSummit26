@@ -350,7 +350,8 @@
 		"title": "Wintry Woods",
 		"region": "woodlands",
 		"author": "Tzunamy",
-		"url": "ZhqmXKLrlf"
+		"url": "ZhqmXKLrlf",
+		"beat_interval": 12
 	},
 	{
 		"id": "with_hands_raised_to_the_sky",
