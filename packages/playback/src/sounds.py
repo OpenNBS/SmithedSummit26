@@ -121,8 +121,10 @@ def map_note_to_sound_resource(
 ) -> SoundResource | None:
     """Map a note to a sound file and octave variant. Single source of truth for RP + playsound."""
 
-    is_higher = note.key > TWO_OCTAVE_HIGH
-    is_lower = note.key < TWO_OCTAVE_LOW
+    pitch = note.key + note.pitch / 100
+
+    is_higher = pitch > TWO_OCTAVE_HIGH
+    is_lower = pitch < TWO_OCTAVE_LOW
     is_custom_instrument = note.instrument >= song.header.default_instruments
 
     if is_custom_instrument:
