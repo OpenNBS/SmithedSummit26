@@ -70,9 +70,12 @@ sequence = [
 ]
 
 [tool.poe.tasks.playback-debug]
-cmd = "beet --project beet_dev.yml --log DEBUG"
 cwd = "packages/playback"
 help = "Build the playback package for development"
+sequence = [
+  {cmd = "beet cache --clear songs"},
+  {cmd = "beet --project beet_dev.yml --log DEBUG"},
+]
 
 [tool.poe.tasks.playback-watch]
 cmd = "beet --project beet_watch.yml watch --reload"
