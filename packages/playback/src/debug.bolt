@@ -69,7 +69,7 @@ function ~/place_speakers:
             speaker_type = speaker["name"]
             x = col * grid_cell_size + grid_cell_size / 2
             z = row * grid_cell_size + grid_cell_size / 2
-            coords = f"{x} ~ {z}"
+            coords = f"~{x} ~ ~{z}"
             execute positioned coords run function f"nbs:speaker/place/{region}/{speaker_type}"
             execute positioned coords run setblock ~ ~-1 ~ minecraft:stone keep
         
