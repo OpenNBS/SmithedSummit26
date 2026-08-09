@@ -30,6 +30,7 @@ append function ~/toggle:
 for data in ctx.meta["speaker_ranges"]:
     speaker_type = data["name"]
     radius = data["outer_range"]
+    inner_radius = data["inner_range"]
 
     append function ~/show_debug_particles:
         execute as @e[type=item_display,tag=f"nbs.speaker.{speaker_type}"] at @s run function ~/../spawn_particles/{speaker_type}
@@ -47,6 +48,13 @@ for data in ctx.meta["speaker_ranges"]:
             z = point[2]
 
             particle minecraft:block_marker{block_state:{Name:"minecraft:purple_stained_glass"}} f"~{x}" f"~{y}" f"~{z}" 0 0 0 0 1 force
+
+        for point in sphere(radius=inner_radius, density=0.03):
+            x = point[0]
+            y = point[1]
+            z = point[2]
+
+            particle minecraft:block_marker{block_state:{Name:"minecraft:cyan_stained_glass"}} f"~{x}" f"~{y}" f"~{z}" 0 0 0 0 1 force
 
 
 #> place speakers
