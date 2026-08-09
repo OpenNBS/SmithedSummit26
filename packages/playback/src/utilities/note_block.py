@@ -377,10 +377,7 @@ def get_notes(
         source = f"nbs:{resource.sound_event}"
 
         note_pitch = note.key + (note.pitch / 100)
-        layer_volume = layer.volume / 100
-        note_volume = note.velocity / 100
-        volume = layer_volume * note_volume
-
+        volume = get_volume(note, layer)
         falloff = get_rolloff_factor(note_pitch, rolloff_instrument_name(note))
         panning = get_panning(note, layer)
         pitch = get_pitch(note)
@@ -423,6 +420,10 @@ def get_notes(
     for tick, notes in output.items():
         yield tick, notes
 
+
+def get_volume(note: Any, layer: Any) -> float:
+    """Get volume for a given nbs note."""
+    return layer.volume * note.velocity / 100
 
 def get_panning(note: Any, layer: Any) -> float:
     """Get panning for a given nbs note."""
