@@ -1,7 +1,7 @@
 # Beet config for used for live reload (development). Writes file directly to
 # filesystem instead of zipping.
 
-extend: beet.yml
+extend: beet_dev.yml
 
 data_pack:
   zipped: false
@@ -10,7 +10,3 @@ resource_pack:
   zipped: false
 
 output: dist
-
-meta:
-  debug: true
-  song_manifest_path: "manifest.json"
