@@ -1,4 +1,5 @@
 # Full production build with all songs. Use for generating the final pack.
+# This build does not ship the data and assets for speakers as they are part of the Summit's core pack.
 
 extend: beet.yml
 

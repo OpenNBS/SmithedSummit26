@@ -1,12 +1,17 @@
 # Zipped build with test songs. Use for development and testing.
+# Includes data and assets for speakers for full functionality without the Summit core pack.
 
 extend: beet.yml
 
 data_pack:
   zipped: true
+  load:
+    - ../../vendor/speaker/summit-speaker-dp.zip
 
 resource_pack:
   zipped: true
+  load:
+    - ../../vendor/speaker/summit-speaker-rp.zip
 
 output: dist
 
