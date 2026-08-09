@@ -86,7 +86,7 @@ help = "Watch and rebuild the playback package"
 cwd = "packages/playback"
 help = "Profile the playback package build with cProfile (writes playback.prof)"
 sequence = [
-  {cmd = "beet cache --clear mecha"},
+  {cmd = "beet cache --clear mecha songs"},
   {cmd = "python -m cProfile -o playback.prof -m beet --project beet.yml --log DEBUG"},
 ]
 
