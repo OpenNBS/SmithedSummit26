@@ -400,23 +400,6 @@ def get_notes(
             output[tick] = []
         output[tick].extend(get_playsound_note(note) for note in chord)
 
-    # Normalize so the loudest note (layer.volume × note.velocity) reaches full range
-    max_volume = max(
-        (
-            note.volume * 100
-            for notes in output.values()
-            for note in notes
-            if note.instrument != "BEAT"
-        ),
-        default=0,
-    )
-    if max_volume > 0:
-        scale = 100 / max_volume
-        for notes in output.values():
-            for note in notes:
-                if note.instrument != "BEAT":
-                    note.volume *= scale
-
     for tick, notes in output.items():
         yield tick, notes
 
