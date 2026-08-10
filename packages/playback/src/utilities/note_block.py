@@ -343,6 +343,15 @@ def get_notes(
             # No sound file assigned to instrument; ignore this note
             continue
 
+        # Remove silent notes (volume resolves to 0)
+        try:
+            layer = song.layers[note.layer]
+        except IndexError:
+            layer = pynbs.Layer(id=note.layer)
+        volume = get_volume(note, layer)
+        if volume == 0:
+            continue
+        
         new_notes.append(note)
 
     song.notes = new_notes
