@@ -415,7 +415,7 @@ def get_notes(
 
 def get_volume(note: Any, layer: Any) -> float:
     """Get volume for a given nbs note."""
-    return layer.volume * note.velocity / 100
+    return (layer.volume / 100) * (note.velocity / 100)
 
 def get_panning(note: Any, layer: Any) -> float:
     """Get panning for a given nbs note."""
