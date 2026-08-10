@@ -9,7 +9,7 @@ data_pack:
     - ../../vendor/speaker/summit-speaker-dp.zip
 
 resource_pack:
-  zipped: true
+  zipped: false
   load:
     - ../../vendor/speaker/summit-speaker-rp.zip
 
