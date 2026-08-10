@@ -22,13 +22,13 @@ SPEAKER_RANGES = [
     },
     {
         "name": "mid",
-        "outer_range": 24,
-        "inner_range": 20,
+        "outer_range": 20,
+        "inner_range": 16,
     },
     {
         "name": "long",
-        "outer_range": 40,
-        "inner_range": 32,
+        "outer_range": 32,
+        "inner_range": 24,
     },
 ]
 
