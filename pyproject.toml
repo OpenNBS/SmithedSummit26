@@ -62,20 +62,14 @@ cwd = "packages/booth"
 help = "Watch and rebuild the booth package"
 
 [tool.poe.tasks.playback]
+cmd = "beet --project beet_prd.yml --log INFO"
 cwd = "packages/playback"
 help = "Build the playback package for production"
-sequence = [
-  {cmd = "beet cache --clear songs"},
-  {cmd = "beet --project beet_prd.yml --log INFO"},
-]
 
 [tool.poe.tasks.playback-debug]
+cmd = "beet --project beet_dev.yml --log DEBUG"
 cwd = "packages/playback"
 help = "Build the playback package for development"
-sequence = [
-  {cmd = "beet cache --clear songs"},
-  {cmd = "beet --project beet_dev.yml --log DEBUG"},
-]
 
 [tool.poe.tasks.playback-watch]
 cmd = "beet --project beet_watch.yml watch --reload"
@@ -86,7 +80,7 @@ help = "Watch and rebuild the playback package"
 cwd = "packages/playback"
 help = "Profile the playback package build with cProfile (writes playback.prof)"
 sequence = [
-  {cmd = "beet cache --clear mecha songs"},
+  {cmd = "beet cache --clear mecha"},
   {cmd = "python -m cProfile -o playback.prof -m beet --project beet.yml --log DEBUG"},
 ]
 

@@ -11,10 +11,6 @@ This plugin intentionally spans the Mecha stage. Before yielding, it renders
 the database and publishes the observed chord sizes for ``songs.bolt``. After
 Mecha has compiled Bolt, it injects the large raw debug commands and writes the
 binary world-data artifact without making Mecha parse either representation.
-
-When the shared songs cache key matches a previous build, render/write/copy and
-debug loaders are skipped. Only the small playsound-count lists are restored so
-``songs.bolt`` can rebuild its macros; dist/world storage is assumed unchanged.
 """
 
 import logging
@@ -34,12 +30,6 @@ from src.song_storage.saved_data import (
     write_command_storage_file,
 )
 from src.utilities.parallel import map_as_completed
-from src.utilities.songs_cache import (
-    load_cached_playsound_counts,
-    save_cached_playsound_counts,
-    songs_cache,
-    songs_cache_key,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -51,49 +41,22 @@ REGION_PLAYSOUND_COUNTS_META_KEY = "song_storage_playsound_counts_by_region"
 def beet_default(ctx: Context) -> Generator[None]:
     """Prepare macro metadata, then emit artifacts after Mecha finishes."""
 
-    cache = songs_cache(ctx)
-    cache_key = songs_cache_key(ctx)
-    cached_counts = load_cached_playsound_counts(cache, cache_key)
-
-    if cached_counts is not None:
-        playsound_counts, playsound_counts_by_region = cached_counts
-        logger.info(
-            "Songs cache hit; skipping song-storage render/write/copy "
-            "(hard cap %d playsounds/tick)",
-            ctx.meta["max_playsounds_per_tick"],
-        )
-        ctx.meta[PLAYSOUND_COUNTS_META_KEY] = playsound_counts
-        ctx.meta[REGION_PLAYSOUND_COUNTS_META_KEY] = playsound_counts_by_region
-        logger.info(
-            "Observed %d non-empty chord sizes: %s",
-            len(playsound_counts),
-            ", ".join(map(str, playsound_counts)),
-        )
-        yield
-        return
-
     logger.info(
         "Generating regional song databases (hard cap %d playsounds/tick)",
         ctx.meta["max_playsounds_per_tick"],
     )
     database = render_database(prepare_tasks(ctx))
-    playsound_counts = list(database.playsound_counts)
-    playsound_counts_by_region = {
+    ctx.meta[DATABASE_META_KEY] = database
+    ctx.meta[PLAYSOUND_COUNTS_META_KEY] = list(database.playsound_counts)
+    ctx.meta[REGION_PLAYSOUND_COUNTS_META_KEY] = {
         region: list(counts)
         for region, counts in database.playsound_counts_by_region.items()
     }
-    save_cached_playsound_counts(
-        cache, cache_key, playsound_counts, playsound_counts_by_region
-    )
-
-    ctx.meta[DATABASE_META_KEY] = database
-    ctx.meta[PLAYSOUND_COUNTS_META_KEY] = playsound_counts
-    ctx.meta[REGION_PLAYSOUND_COUNTS_META_KEY] = playsound_counts_by_region
 
     logger.info(
         "Observed %d non-empty chord sizes: %s",
-        len(playsound_counts),
-        ", ".join(map(str, playsound_counts)),
+        len(database.playsound_counts),
+        ", ".join(map(str, database.playsound_counts)),
     )
 
     # Let the remaining pipeline run. songs.bolt consumes the leaf set above.

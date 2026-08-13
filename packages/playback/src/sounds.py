@@ -7,18 +7,13 @@ from pathlib import Path
 import pynbs
 import samplerate
 import soundfile as sf
-from beet import Context, ResourcePack, Sound, SoundConfig
+from beet import Context, Sound, SoundConfig
 from beet.contrib.vanilla import AssetIndex, Vanilla
 
 from nbs_shared.manifest import SongManifest
 from src.config import SONGS_PATH
 from src.utilities.instrument import get_compensated_key, get_instrument
 from src.utilities.parallel import map_as_completed
-from src.utilities.songs_cache import (
-    cache_sounds_draft,
-    songs_cache,
-    songs_cache_key,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -312,9 +307,7 @@ def convert_to_mono_task(task: MonoConvertTask) -> bytes:
         ) from err
 
 
-def generate_sounds(
-    ctx: Context, assets: ResourcePack, sound_list: set[SoundResource]
-) -> None:
+def generate_sounds(ctx: Context, sound_list: set[SoundResource]) -> None:
     vanilla = ctx.inject(Vanilla)
     release = vanilla.releases[ctx.minecraft_version]
     asset_index = release.object_mapping.files
@@ -371,7 +364,7 @@ def generate_sounds(
         failure_message="Failed to mono-convert sound: %s",
     ):
         resource = task.resource
-        assets["nbs"].sounds[resource.mono_pack_sound_path] = Sound(mono_bytes)
+        ctx.assets["nbs"].sounds[resource.mono_pack_sound_path] = Sound(mono_bytes)
         sound_config[resource.sound_event] = {
             "sounds": [resource.mono_sound_name],
             "subtitle": SUBTITLE,
@@ -385,22 +378,18 @@ def generate_sounds(
         failure_message="Failed to pitch-shift sound: %s",
     ):
         resource = task.resource
-        assets["nbs"].sounds[resource.pack_sound_path] = Sound(shifted)
+        ctx.assets["nbs"].sounds[resource.pack_sound_path] = Sound(shifted)
         sound_config[resource.sound_event] = {
             "sounds": [resource.sound_name],
             "subtitle": SUBTITLE,
         }
 
-    assets["nbs"].sound_config = SoundConfig(sound_config)
+    ctx.assets["nbs"].sound_config = SoundConfig(sound_config)
     logger.info("Registered %d sound events under nbs", len(sound_config))
 
 
 def beet_default(ctx: Context):
     song_manifest = ctx.meta["song_manifest"]
-    cache_key = songs_cache_key(ctx)
-
-    with ctx.generate.draft() as draft:
-        cache_sounds_draft(draft, songs_cache(ctx), cache_key)
-        sound_resources = get_all_custom_sounds(song_manifest)
-        logger.info("Adding custom sounds to sound config")
-        generate_sounds(ctx, draft.assets, sound_resources)
+    sound_resources = get_all_custom_sounds(song_manifest)
+    logger.info("Adding custom sounds to sound config")
+    generate_sounds(ctx, sound_resources)
