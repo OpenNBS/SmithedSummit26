@@ -40,6 +40,9 @@ def generate_globes(ctx: Context) -> None:
         region_songs_data = filter(
             lambda song_data: song_data["region"] == region["id"], songs_data
         )
+        region_songs_data = sorted(
+            region_songs_data, key=lambda x: (x["author"], x["title"])
+        )
 
         for region_song_data in region_songs_data:
             id = region_song_data["id"]
