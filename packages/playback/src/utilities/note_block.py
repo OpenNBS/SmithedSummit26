@@ -225,7 +225,7 @@ class PlaysoundNote:
             radius=radius,
             volume=volume,
             position=position,
-            min_volume=self.volume * 0.50
+            min_volume=self.volume * 0.50,
         )
 
     def get_playsound_command(
@@ -350,7 +350,7 @@ def get_notes(
         volume = get_volume(note, layer)
         if volume == 0:
             continue
-        
+
         new_notes.append(note)
 
     song.notes = new_notes
@@ -416,6 +416,7 @@ def get_notes(
 def get_volume(note: Any, layer: Any) -> float:
     """Get volume for a given nbs note."""
     return (layer.volume / 100) * (note.velocity / 100)
+
 
 def get_panning(note: Any, layer: Any) -> float:
     """Get panning for a given nbs note."""
