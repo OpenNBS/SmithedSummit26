@@ -6,6 +6,7 @@ requires-python = ">=3.14, <4"
 members = [
     "nbs-summit26",
     "nbs-summit26-booth",
+    "nbs-summit26-event",
     "nbs-summit26-playback",
     "nbs-summit26-shared",
 ]
@@ -306,6 +307,7 @@ dependencies = [
     { name = "beet" },
     { name = "bolt" },
     { name = "nbs-summit26-booth" },
+    { name = "nbs-summit26-event" },
     { name = "nbs-summit26-playback" },
     { name = "nbs-summit26-shared" },
 ]
@@ -329,6 +331,7 @@ requires-dist = [
     { name = "beet", specifier = ">=0.115.0,<0.116" },
     { name = "bolt", specifier = ">=0.50.1,<0.51" },
     { name = "nbs-summit26-booth", virtual = "packages/booth" },
+    { name = "nbs-summit26-event", virtual = "packages/event" },
     { name = "nbs-summit26-playback", virtual = "packages/playback" },
     { name = "nbs-summit26-shared", editable = "packages/shared" },
 ]
@@ -359,6 +362,21 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "bolt-selectors", specifier = ">=0.4.0" },
+    { name = "nbs-summit26-shared", editable = "packages/shared" },
+]
+
+[[package]]
+name = "nbs-summit26-event"
+version = "0.1.0"
+source = { virtual = "packages/event" }
+dependencies = [
+    { name = "nbs-summit26-playback" },
+    { name = "nbs-summit26-shared" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "nbs-summit26-playback", virtual = "packages/playback" },
     { name = "nbs-summit26-shared", editable = "packages/shared" },
 ]
 

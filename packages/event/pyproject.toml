@@ -1,0 +1,21 @@
+[project]
+name = "nbs-summit26-event"
+version = "0.1.0"
+description = "Note Block Studio event showcase for Smithed Summit 2026"
+authors = [{ name = "Bentroen" }]
+requires-python = ">=3.14,<4"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "nbs-summit26-playback",
+    "nbs-summit26-shared",
+]
+
+[tool.uv.sources]
+nbs-summit26-playback = { workspace = true }
+nbs-summit26-shared = { workspace = true }
+
+[tool.uv]
+package = false

@@ -36,6 +36,7 @@ REGION_COLORS: dict[str, str] = {
     "plateaus": "#DB6EFF",
     "tropics": "#18F02E",
     "woodlands": "#55FF55",
+    "event": "#9A45FF",
 }
 
 # Number of 'play' animation variants in the AJ speaker models

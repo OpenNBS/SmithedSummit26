@@ -14,6 +14,7 @@ dependencies = [
   "beet>=0.115.0,<0.116",
   "bolt>=0.50.1,<0.51",
   "nbs-summit26-booth",
+  "nbs-summit26-event",
   "nbs-summit26-playback",
   "nbs-summit26-shared",
 ]
@@ -37,6 +38,7 @@ default-groups = ["dev", "scripts"]
 
 [tool.uv.sources]
 nbs-summit26-booth = {workspace = true}
+nbs-summit26-event = {workspace = true}
 nbs-summit26-playback = {workspace = true}
 nbs-summit26-shared = {workspace = true}
 
@@ -60,6 +62,19 @@ help = "Build the booth package"
 cmd = "beet watch --reload"
 cwd = "packages/booth"
 help = "Watch and rebuild the booth package"
+
+[tool.poe.tasks.event]
+cwd = "packages/event"
+help = "Build the event showcase playback variant (Figurigamma)"
+sequence = [
+  {cmd = "beet cache --clear songs"},
+  {cmd = "beet --project beet_prd.yml --log INFO"},
+]
+
+[tool.poe.tasks.event-debug]
+cwd = "packages/event"
+help = "Build the event showcase playback variant for development"
+cmd = "beet --project beet_dev.yml --log DEBUG"
 
 [tool.poe.tasks.playback]
 cmd = "beet --project beet_prd.yml --log INFO"
@@ -137,6 +152,7 @@ typeCheckingMode = "standard"
 pythonVersion = "3.14"
 include = [
   "packages/booth",
+  "packages/event",
   "packages/playback",
   "packages/shared",
   "scripts",

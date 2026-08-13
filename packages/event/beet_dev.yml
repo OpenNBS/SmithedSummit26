@@ -1,0 +1,20 @@
+# Unzipped development build. `directory` must be repeated: beet keeps the
+# extending config's directory, which would otherwise snap back to
+# packages/event and break playback imports.
+#
+# `extend` is resolved after `directory`, so the path is relative to
+# packages/playback.
+
+directory: "../playback"
+extend: "../event/beet.yml"
+
+data_pack:
+  zipped: false
+
+resource_pack:
+  zipped: false
+
+output: "../event/dist"
+
+meta:
+  debug: true

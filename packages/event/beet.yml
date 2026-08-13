@@ -1,0 +1,25 @@
+# Base configuration. Do not use directly; use one of the extended configs.
+#
+# `directory` moves the project root to packages/playback so `src.*` imports
+# resolve. `extend: beet.yml` is then loaded from that directory (playback's
+# base config). Event-specific pack names and meta overlay on top.
+
+id: nbs-summit26-event
+
+directory: "../playback"
+extend: beet.yml
+
+data_pack:
+  name: nbs-summit26-event-dp
+  description: "Animated note block music performance\nby OpenNBS"
+
+resource_pack:
+  name: nbs-summit26-event-rp
+  description: "Animated note block music performance\nby OpenNBS"
+
+# Resolved from packages/playback → packages/event/dist
+output: "../event/dist"
+
+meta:
+  include_advancements: false
+  song_manifest_path: "manifest_event.json"
