@@ -1,4 +1,4 @@
-from ./const import REGIONS, SONG_MANIFEST
+from ./const import INCLUDE_ADVANCEMENTS, REGIONS, SONG_MANIFEST
 
 REGION_ICONS = {
     plateaus: "summit_icons:patched_plateaus",
@@ -57,50 +57,6 @@ def get_description(title: str, author: str) -> str:
         return f"by {author}"
 
 
-advancement f"nbs:playback/root" {
-    "display": {
-        "icon": {
-            "id": "minecraft:jukebox"
-        },
-        "title": "Note Block Studio Songs",
-        "description": "All of the songs at Smithed Summit!",
-        "background": "minecraft:block/note_block",
-        "show_toast": false,
-        "announce_to_chat": false
-    },
-    "criteria": {
-        "song": {
-            "trigger": "minecraft:impossible"
-        }
-    }
-}
-
-LAST_SONG_PARENT = {}
-for region in REGIONS:
-    advancement f"nbs:playback/{region}" {
-        "display": {
-            "icon": {
-                "id": "minecraft:poisonous_potato",
-                "components": {
-                    "minecraft:item_model": REGION_ICONS[region]
-                }
-            },
-            "title": f"{REGION_NAMES[region]} Songs",
-            "description": "",
-            "show_toast": true,
-            "announce_to_chat": false
-        },
-        "parent": f"nbs:playback/root",
-        "criteria": {
-            "region": {
-                "trigger": "minecraft:impossible"
-            }
-        }
-    }
-
-    LAST_SONG_PARENT[region] = f"nbs:playback/{region}"
-
-
 def generate_song_advancement(region: str, song_id: str, song: str, author: str):
     global LAST_SONG_PARENT
     adv_path = f"nbs:song/{song_id}"
@@ -134,10 +90,28 @@ def generate_song_advancement(region: str, song_id: str, song: str, author: str)
         raw f"advancement grant @s only {HEAR_ALL_SONGS} {song_id}"
 
 
-@defer
-def end_cap():
+if INCLUDE_ADVANCEMENTS:
+    advancement f"nbs:playback/root" {
+        "display": {
+            "icon": {
+                "id": "minecraft:jukebox"
+            },
+            "title": "Note Block Studio Songs",
+            "description": "All of the songs at Smithed Summit!",
+            "background": "minecraft:block/note_block",
+            "show_toast": false,
+            "announce_to_chat": false
+        },
+        "criteria": {
+            "song": {
+                "trigger": "minecraft:impossible"
+            }
+        }
+    }
+
+    LAST_SONG_PARENT = {}
     for region in REGIONS:
-        advancement f"nbs:playback/{region}/end" {
+        advancement f"nbs:playback/{region}" {
             "display": {
                 "icon": {
                     "id": "minecraft:poisonous_potato",
@@ -147,10 +121,10 @@ def end_cap():
                 },
                 "title": f"{REGION_NAMES[region]} Songs",
                 "description": "",
-                "show_toast": false,
+                "show_toast": true,
                 "announce_to_chat": false
             },
-            "parent": LAST_SONG_PARENT[region],
+            "parent": f"nbs:playback/root",
             "criteria": {
                 "region": {
                     "trigger": "minecraft:impossible"
@@ -158,26 +132,58 @@ def end_cap():
             }
         }
 
-    # Adventuring Time-style collector: one criterion per nbs:song/* advancement.
-    # Hidden/technical — sticker UI lives in the event sticker book.
-    song_criteria = {}
+        LAST_SONG_PARENT[region] = f"nbs:playback/{region}"
+
+    # Song advancements are build-time data (same as the region tree above).
     for song in SONG_MANIFEST:
-        if song.get("region") is None:
-            continue
-        song_criteria[song["id"]] = {"trigger": "minecraft:impossible"}
+        region = song["region"]
+        if region is not None:
+            generate_song_advancement(region, song["id"], song["title"], song["author"])
 
-    advancement HEAR_ALL_SONGS {
-        "criteria": song_criteria,
-        "rewards": {
-            "function": HEARD_ALL_SONGS_STICKER
+    @defer
+    def end_cap():
+        for region in REGIONS:
+            advancement f"nbs:playback/{region}/end" {
+                "display": {
+                    "icon": {
+                        "id": "minecraft:poisonous_potato",
+                        "components": {
+                            "minecraft:item_model": REGION_ICONS[region]
+                        }
+                    },
+                    "title": f"{REGION_NAMES[region]} Songs",
+                    "description": "",
+                    "show_toast": false,
+                    "announce_to_chat": false
+                },
+                "parent": LAST_SONG_PARENT[region],
+                "criteria": {
+                    "region": {
+                        "trigger": "minecraft:impossible"
+                    }
+                }
+            }
+
+        # Adventuring Time-style collector: one criterion per nbs:song/* advancement.
+        # Hidden/technical — sticker UI lives in the event sticker book.
+        song_criteria = {}
+        for song in SONG_MANIFEST:
+            if song.get("region") is None:
+                continue
+            song_criteria[song["id"]] = {"trigger": "minecraft:impossible"}
+
+        advancement HEAR_ALL_SONGS {
+            "criteria": song_criteria,
+            "rewards": {
+                "function": HEARD_ALL_SONGS_STICKER
+            }
         }
-    }
 
-function ~/base:
-    merge function_tag summit:api/on_join {"values": [(~/)]}
+    function ~/base:
+        merge function_tag summit:api/on_join {"values": [(~/)]}
 
-    advancement grant @s only nbs:playback/root
+        advancement grant @s only nbs:playback/root
 
-    for region in REGIONS:
-        advancement grant @s only f"nbs:playback/{region}"
-        advancement grant @s only f"nbs:playback/{region}/end"
+        for region in REGIONS:
+            advancement grant @s only f"nbs:playback/{region}"
+            advancement grant @s only f"nbs:playback/{region}/end"

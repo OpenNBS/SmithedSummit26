@@ -32,5 +32,6 @@ meta:
     entrypoint: "nbs:main"
 
   bake_entity_uuids: false
+  include_advancements: true
 
 output: dist
