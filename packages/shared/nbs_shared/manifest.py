@@ -9,9 +9,6 @@ from typing import NotRequired, TypedDict
 
 from pydantic import TypeAdapter, ValidationError
 
-# Region ids stored in the generated manifest (not the display names).
-SONG_REGION_IDS = frozenset({"plateaus", "tropics", "woodlands"})
-
 
 class SongManifestEntry(TypedDict):
     id: str
@@ -51,14 +48,6 @@ def validate_song_manifest(data: object) -> SongManifest:
         raise SongManifestError(
             f"Duplicate song id(s) in manifest: {', '.join(duplicates)}"
         )
-
-    for entry in manifest:
-        region = entry["region"]
-        if region is not None and region not in SONG_REGION_IDS:
-            raise SongManifestError(
-                f"Song {entry['id']!r} has unknown region {region!r}; "
-                f"expected one of {sorted(SONG_REGION_IDS)} or null"
-            )
 
     return manifest
 
