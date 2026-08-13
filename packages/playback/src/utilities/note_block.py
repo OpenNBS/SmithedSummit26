@@ -16,6 +16,7 @@ from typing import Any, TypedDict
 import pynbs
 
 from src.sounds import TWO_OCTAVE_HIGH, TWO_OCTAVE_LOW, SoundResource
+from src.utilities.instrument import get_compensated_key, get_instrument
 
 
 class TimingSettings(TypedDict, total=False):
@@ -327,7 +328,8 @@ def get_notes(
     for note in song.notes:
         new_tick = round(note.tick * expansion_factor * 20 / effective_tempo)
         note.tick = new_tick
-        note_pitch = note.key + note.pitch / 100
+        instrument = get_instrument(song, note)
+        note_pitch = get_compensated_key(note, instrument)
         is_6_octave = SIX_OCTAVE_MIN <= note_pitch <= SIX_OCTAVE_MAX
 
         if not is_6_octave:
@@ -371,6 +373,7 @@ def get_notes(
         """Get an intermediary note for /playsound based on a pynbs note."""
 
         layer = song.layers[note.layer]
+        instrument = get_instrument(song, note)
 
         if note.instrument < 0:
             return PlaysoundNote(instrument="BEAT")
@@ -382,11 +385,11 @@ def get_notes(
 
         source = f"nbs:{resource.sound_event}"
 
-        note_pitch = note.key + (note.pitch / 100)
+        note_key = get_compensated_key(note, instrument)
         volume = get_volume(note, layer)
-        falloff = get_rolloff_factor(note_pitch, rolloff_instrument_name(note))
+        falloff = get_rolloff_factor(note_key, rolloff_instrument_name(note))
         panning = get_panning(note, layer)
-        pitch = get_pitch(note)
+        pitch = get_pitch(note, instrument)
 
         return PlaysoundNote(
             instrument=source,
@@ -424,9 +427,10 @@ def get_panning(note: Any, layer: Any) -> float:
     return pan
 
 
-def get_pitch(note: Any) -> float:
-    """Get pitch for a given nbs note."""
-    key = note.key + note.pitch / 100
+def get_pitch(note: Any, instrument: pynbs.Instrument) -> float:
+    """Get pitch for a given nbs note, compensated to the 2-octave range."""
+
+    key = get_compensated_key(note, instrument)
 
     if key < TWO_OCTAVE_MIN:
         key -= 9

@@ -12,6 +12,7 @@ from beet.contrib.vanilla import AssetIndex, Vanilla
 
 from nbs_shared.manifest import SongManifest
 from src.config import SONGS_PATH
+from src.utilities.instrument import get_compensated_key, get_instrument
 from src.utilities.parallel import map_as_completed
 from src.utilities.songs_cache import (
     cache_sounds_draft,
@@ -137,7 +138,8 @@ def map_note_to_sound_resource(
 ) -> SoundResource | None:
     """Map a note to a sound file and octave variant. Single source of truth for RP + playsound."""
 
-    pitch = note.key + note.pitch / 100
+    instrument = get_instrument(song, note)
+    pitch = get_compensated_key(note, instrument)
 
     is_higher = pitch > TWO_OCTAVE_HIGH
     is_lower = pitch < TWO_OCTAVE_LOW
