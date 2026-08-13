@@ -4,7 +4,7 @@
 extend: beet.yml
 
 data_pack:
-  zipped: true
+  zipped: false
   load:
     - ../../vendor/speaker/summit-speaker-dp.zip
 
