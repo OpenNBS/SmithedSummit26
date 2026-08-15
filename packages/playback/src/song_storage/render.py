@@ -65,6 +65,7 @@ class SpeakerRange:
     name: str
     outer: int
     inner: int
+    stereo_separation: int
 
 
 @dataclass(frozen=True)
@@ -132,8 +133,8 @@ def render_range_payload(
 ) -> RangePayload:
     """Render the macro arguments for one speaker range.
 
-    ``sound_N`` is exactly ``note.play(inner, outer)``. The leading
-    ``playsound`` token lives in the corresponding Bolt template.
+    ``sound_N`` is exactly ``note.play(inner, outer, stereo_separation)``. The
+    leading ``playsound`` token lives in the corresponding Bolt template.
     """
 
     # Keep tick lifecycle flags beside each range payload. Playback caches the
@@ -147,7 +148,11 @@ def render_range_payload(
     }
     payload.update(
         {
-            f"sound_{index}": note.play(speaker.inner, speaker.outer)
+            f"sound_{index}": note.play(
+                speaker.inner,
+                speaker.outer,
+                speaker.stereo_separation,
+            )
             for index, note in enumerate(playable_notes)
         }
     )
@@ -218,6 +223,7 @@ def prepare_tasks(ctx: Context) -> list[SongTask]:
             name=speaker["name"],
             outer=speaker["outer_range"],
             inner=speaker["inner_range"],
+            stereo_separation=speaker["stereo_separation"],
         )
         for speaker in ctx.meta["speaker_ranges"]
     )
