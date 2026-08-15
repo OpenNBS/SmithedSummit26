@@ -64,7 +64,7 @@ for region in REGIONS:
             store result storage PLAYBACK[region] playing.tick int 1 run scoreboard players get f"{region}.songtime" nbs
             
             # these should cache nicely as it's only 6 states during a songs runtime
-            store result storage PLAYBACK[region] playing.random int 1 run random value 1..6
+            store result storage PLAYBACK[region] playing.random int 1 run random value 1..(SPEAKER_ANIM_VARIANT_COUNT)
 
             for speaker_range in SPEAKER_RANGES:
                 execute function ~/{speaker_range.name}:

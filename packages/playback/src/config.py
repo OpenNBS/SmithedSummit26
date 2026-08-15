@@ -12,9 +12,6 @@ logger = logging.getLogger(__name__)
 
 SONGS_PATH = SONGS_FILES_DIRECTORY
 
-# Number of 'play' animation variants in the AJ speaker models
-ANIM_COUNT = 6
-
 # Storage-backed song playback. Minecraft 26.2 uses DataVersion 4903 and the
 # namespaced world-data path data/<namespace>/command_storage.dat.
 # This is a validation ceiling, not the number of generated templates. The
@@ -62,7 +59,12 @@ def load_speaker_ranges(ctx: Context):
             if key not in speaker:
                 raise ValueError(f"meta.speaker_ranges[{index}] missing {key!r}")
 
-    ctx.meta.setdefault("anim_count", ANIM_COUNT)
+    anim_variant_count = ctx.meta.get("speaker_anim_variant_count", 6)
+    if isinstance(anim_variant_count, bool) or not isinstance(anim_variant_count, int):
+        raise TypeError("meta.speaker_anim_variant_count must be an integer")
+    if anim_variant_count < 1:
+        raise ValueError("meta.speaker_anim_variant_count must be at least 1")
+    ctx.meta["speaker_anim_variant_count"] = anim_variant_count
 
     logger.info(
         "Loaded %d speaker ranges: %s",

@@ -49,6 +49,9 @@ meta:
       outer_range: 32
       inner_range: 24
 
+  # Number of 'play' animation variants in the AJ speaker models
+  speaker_anim_variant_count: 6
+
   region_colors:
     plateaus: "#DB6EFF"
     tropics: "#18F02E"
