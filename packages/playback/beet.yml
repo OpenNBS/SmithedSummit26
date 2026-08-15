@@ -49,4 +49,10 @@ meta:
       outer_range: 32
       inner_range: 24
 
+  region_colors:
+    plateaus: "#DB6EFF"
+    tropics: "#18F02E"
+    woodlands: "#55FF55"
+    event: "#9A45FF"
+
 output: dist

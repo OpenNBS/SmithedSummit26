@@ -12,13 +12,6 @@ logger = logging.getLogger(__name__)
 
 SONGS_PATH = SONGS_FILES_DIRECTORY
 
-REGION_COLORS: dict[str, str] = {
-    "plateaus": "#DB6EFF",
-    "tropics": "#18F02E",
-    "woodlands": "#55FF55",
-    "event": "#9A45FF",
-}
-
 # Number of 'play' animation variants in the AJ speaker models
 ANIM_COUNT = 6
 
@@ -110,15 +103,18 @@ def load_song_storage_config(ctx: Context):
 
 
 def load_regions(ctx: Context):
+    region_colors = ctx.meta.get("region_colors", {})
+    if not isinstance(region_colors, dict):
+        raise TypeError("meta.region_colors must be a mapping")
+
     regions: dict[str, RegionConfig] = {}
     for song_data in ctx.meta["song_manifest"]:
         region = song_data["region"]
         if region is None:
             continue
 
-        try:
-            region_color = REGION_COLORS[region]
-        except KeyError:
+        region_color = region_colors.get(region)
+        if region_color is None:
             logger.warning("Warning: Region %s has no color assigned", region)
             region_color = "#FFFFFF"
 
