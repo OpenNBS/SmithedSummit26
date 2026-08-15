@@ -173,7 +173,7 @@ for region in REGIONS:
         function ~/shuffle:
             merge function_tag (~/) {"values": [(~/)]}
 
-            scoreboard players operation f"{region}.prevsong" nbs = sf"{region}.songindex" nbs
+            scoreboard players operation f"{region}.prevsong" nbs = f"{region}.songindex" nbs
             store result score f"{region}.songindex" nbs run random value (0, song_count - 1)
             if score f"{region}.songindex" nbs = f"{region}.prevsong" nbs run function ~/../next
             function ~/../change_song
