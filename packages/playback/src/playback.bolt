@@ -8,6 +8,7 @@ from ./const import (
     REGIONS,
     SHUFFLE_SONGS,
     SONG_STORAGE,
+    SPEAKER_ANIM_VARIANT_COUNT,
     TEMP,
 )
 

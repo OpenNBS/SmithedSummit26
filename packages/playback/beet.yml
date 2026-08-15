@@ -36,4 +36,17 @@ meta:
   autoadvance_delay_seconds: 2.0
   shuffle_songs: false
 
+  # range: distance from the speaker to where the song starts being audible
+  # inner_range: distance from the speaker to where the song is fully audible
+  speaker_ranges:
+    - name: short
+      outer_range: 12
+      inner_range: 9
+    - name: mid
+      outer_range: 20
+      inner_range: 16
+    - name: long
+      outer_range: 32
+      inner_range: 24
+
 output: dist

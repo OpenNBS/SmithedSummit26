@@ -12,26 +12,6 @@ logger = logging.getLogger(__name__)
 
 SONGS_PATH = SONGS_FILES_DIRECTORY
 
-# range: distance from the speaker to where the song starts being audible
-# inner_range: distance from the speaker to where the song is fully audible
-SPEAKER_RANGES = [
-    {
-        "name": "short",
-        "outer_range": 12,
-        "inner_range": 9,
-    },
-    {
-        "name": "mid",
-        "outer_range": 20,
-        "inner_range": 16,
-    },
-    {
-        "name": "long",
-        "outer_range": 32,
-        "inner_range": 24,
-    },
-]
-
 REGION_COLORS: dict[str, str] = {
     "plateaus": "#DB6EFF",
     "tropics": "#18F02E",
@@ -78,13 +58,23 @@ def load_song_manifest(ctx: Context) -> None:
 
 
 def load_speaker_ranges(ctx: Context):
-    ctx.meta["speaker_ranges"] = SPEAKER_RANGES
-    ctx.meta["anim_count"] = ANIM_COUNT
+    speaker_ranges = ctx.meta.get("speaker_ranges")
+    if not isinstance(speaker_ranges, list) or not speaker_ranges:
+        raise ValueError("meta.speaker_ranges must be a non-empty list")
+
+    for index, speaker in enumerate(speaker_ranges):
+        if not isinstance(speaker, dict):
+            raise TypeError(f"meta.speaker_ranges[{index}] must be a mapping")
+        for key in ("name", "outer_range", "inner_range"):
+            if key not in speaker:
+                raise ValueError(f"meta.speaker_ranges[{index}] missing {key!r}")
+
+    ctx.meta.setdefault("anim_count", ANIM_COUNT)
 
     logger.info(
         "Loaded %d speaker ranges: %s",
-        len(SPEAKER_RANGES),
-        ", ".join(speaker_type["name"] for speaker_type in SPEAKER_RANGES),
+        len(speaker_ranges),
+        ", ".join(speaker["name"] for speaker in speaker_ranges),
     )
 
 
