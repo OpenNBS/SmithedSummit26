@@ -55,7 +55,7 @@ def load_speaker_ranges(ctx: Context):
     for index, speaker in enumerate(speaker_ranges):
         if not isinstance(speaker, dict):
             raise TypeError(f"meta.speaker_ranges[{index}] must be a mapping")
-        for key in ("name", "outer_range", "inner_range", "stereo_separation"):
+        for key in ("name", "outer_range", "inner_range", "stereo_separation", "decay_volume"):
             if key not in speaker:
                 raise ValueError(f"meta.speaker_ranges[{index}] missing {key!r}")
 

@@ -116,6 +116,7 @@ class PlaysoundNote:
         inner_range: float,
         outer_range: float,
         stereo_separation: float | None = None,
+        decay_volume: float = 0.5,
     ) -> str:
         """Play a sound that can be heard in a range by all players in range
 
@@ -123,23 +124,26 @@ class PlaysoundNote:
             `inner_range`: The range (in blocks) at which all frequencies of the sound will be audible at full volume.
             `outer_range`: The range (in blocks) at which all frequencies of the sound will be inaudible.
             `stereo_separation`: The separation (in blocks) between the two stereo audio channels.
+            `decay_volume`: Fraction of note volume used as playsound minVolume for players outside the note's regular audible range.
 
         Returns:
             The `/playsound` command to play the note for the given player.
         """
 
-        play_function = (
-            self.play_short_range if outer_range <= 16 else self.play_long_range
-        )
-
-        if stereo_separation is None:  # use the function's default stereo separation
-            return play_function(full_range=inner_range, decay_range=outer_range)
-        else:
-            return play_function(
-                full_range=inner_range,
-                decay_range=outer_range,
-                stereo_separation=stereo_separation,
+        if outer_range <= 16:
+            kwargs = {}
+            if stereo_separation is not None:
+                kwargs["stereo_separation"] = stereo_separation
+            return self.play_short_range(
+                full_range=inner_range, decay_range=outer_range, **kwargs
             )
+
+        kwargs = {"decay_volume": decay_volume}
+        if stereo_separation is not None:
+            kwargs["stereo_separation"] = stereo_separation
+        return self.play_long_range(
+            full_range=inner_range, decay_range=outer_range, **kwargs
+        )
 
     def play_short_range(
         self,
@@ -193,6 +197,7 @@ class PlaysoundNote:
         full_range: float = 32,
         decay_range: float = 48,
         stereo_separation: float = 8,
+        decay_volume: float = 0.5,
     ) -> str:
         """
         Play a sound that can be heard in a large radius by all players in range.
@@ -225,7 +230,7 @@ class PlaysoundNote:
             radius=radius,
             volume=volume,
             position=position,
-            min_volume=self.volume * 0.50,
+            min_volume=self.volume * decay_volume,
         )
 
     def get_playsound_command(

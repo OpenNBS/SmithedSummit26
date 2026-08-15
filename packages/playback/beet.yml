@@ -39,19 +39,23 @@ meta:
   # range: distance from the speaker to where the song starts being audible
   # inner_range: distance from the speaker to where the song is fully audible
   # stereo_separation: distance between the left/right stereo channels
+  # decay_volume: minVolume factor for players outside a note's regular audible range
   speaker_ranges:
     - name: short
       outer_range: 12
       inner_range: 9
       stereo_separation: 4
+      decay_volume: 0.5
     - name: mid
       outer_range: 20
       inner_range: 16
       stereo_separation: 8
+      decay_volume: 0.5
     - name: long
       outer_range: 32
       inner_range: 24
       stereo_separation: 8
+      decay_volume: 0.5
 
   # Number of 'play' animation variants in the AJ speaker models
   speaker_anim_variant_count: 6
