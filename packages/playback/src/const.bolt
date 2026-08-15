@@ -7,6 +7,7 @@ REGIONS = ctx.meta["regions"]
 SONG_MANIFEST = ctx.meta["song_manifest"]
 INCLUDE_ADVANCEMENTS = ctx.meta.get("include_advancements", True)
 SHUFFLE_SONGS = ctx.meta.get("shuffle_songs", False)
+AUTOSTART_PLAYBACK = ctx.meta.get("autostart_playback", True)
 SPEAKER_ANIM_VARIANT_COUNT = ctx.meta["speaker_anim_variant_count"]
 SONG_STORAGE = {}
 

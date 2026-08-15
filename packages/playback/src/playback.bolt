@@ -1,6 +1,6 @@
 import logging
 
-from ./const import INCLUDE_ADVANCEMENTS, PLAYBACK, REGIONS, SHUFFLE_SONGS, SONG_STORAGE, SPEAKER_ANIM_VARIANT_COUNT, SPEAKER_RANGES, TEMP
+from ./const import AUTOSTART_PLAYBACK, INCLUDE_ADVANCEMENTS, PLAYBACK, REGIONS, SHUFFLE_SONGS, SONG_STORAGE, SPEAKER_ANIM_VARIANT_COUNT, SPEAKER_RANGES, TEMP
 
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,8 @@ append function ~/load:
         # load current song into storage if it's the first time loading the region
         function ~/../{region}/change_song
 
-    function #nbs:playback/play
+    if AUTOSTART_PLAYBACK:
+        function #nbs:playback/play
 
 
 append function ~/tick:
