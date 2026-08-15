@@ -31,7 +31,7 @@ def payload_to_nbt(value: Mapping[str, Any]) -> Compound:
     for key, item in value.items():
         if isinstance(item, Mapping):
             compound[key] = payload_to_nbt(item)
-        elif key in {"beat", "advance"}:
+        elif key in {"beat", "advance", "stop"}:
             compound[key] = Byte(item)
         elif isinstance(item, int):
             compound[key] = Int(item)

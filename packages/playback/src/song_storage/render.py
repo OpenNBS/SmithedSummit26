@@ -77,6 +77,8 @@ class SongTask:
     path: Path
     speaker_ranges: tuple[SpeakerRange, ...]
     max_playsounds_per_tick: int
+    autoadvance: bool
+    end_delay_ticks: int
     timing_settings: TimingSettings = field(default_factory=lambda: TimingSettings())
 
 
@@ -126,6 +128,7 @@ def render_range_payload(
     *,
     beat: bool = False,
     advance: bool = False,
+    stop: bool = False,
 ) -> RangePayload:
     """Render the macro arguments for one speaker range.
 
@@ -140,6 +143,7 @@ def render_range_payload(
         "count": len(playable_notes),
         "beat": int(beat),
         "advance": int(advance),
+        "stop": int(stop),
     }
     payload.update(
         {
@@ -183,9 +187,15 @@ def render_song(task: SongTask) -> SongResult:
         ticks[f"t{tick}"] = tick_payload
 
     if last_tick is not None:
-        end_tick = last_tick + 40
+        # After the last note, wait then either advance to the next song or stop.
+        end_tick = last_tick + task.end_delay_ticks
         end_payload: TickPayload = {
-            speaker.name: render_range_payload(speaker, (), advance=True)
+            speaker.name: render_range_payload(
+                speaker,
+                (),
+                advance=task.autoadvance,
+                stop=not task.autoadvance,
+            )
             for speaker in task.speaker_ranges
         }
         ticks[f"t{end_tick}"] = end_payload
@@ -213,6 +223,14 @@ def prepare_tasks(ctx: Context) -> list[SongTask]:
     )
     if not speaker_ranges:
         raise ValueError("At least one speaker range is required")
+
+    autoadvance = bool(ctx.meta.get("autoadvance_songs", True))
+    delay_seconds = ctx.meta.get("autoadvance_delay_seconds", 2.0)
+    if isinstance(delay_seconds, bool) or not isinstance(delay_seconds, (int, float)):
+        raise TypeError("autoadvance_delay_seconds must be a number")
+    if delay_seconds < 0:
+        raise ValueError("autoadvance_delay_seconds must be non-negative")
+    end_delay_ticks = int(delay_seconds * 20)
 
     region_indices: dict[str, int] = {}
     tasks: list[SongTask] = []
@@ -249,6 +267,8 @@ def prepare_tasks(ctx: Context) -> list[SongTask]:
                 path=path,
                 speaker_ranges=speaker_ranges,
                 max_playsounds_per_tick=ctx.meta["max_playsounds_per_tick"],
+                autoadvance=autoadvance,
+                end_delay_ticks=end_delay_ticks,
                 timing_settings=timing_settings_from_manifest(song_data),
             )
         )

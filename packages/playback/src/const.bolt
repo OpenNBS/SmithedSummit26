@@ -6,6 +6,7 @@ SPEAKER_RANGES = ctx.meta["speaker_ranges"]
 REGIONS = ctx.meta["regions"]
 SONG_MANIFEST = ctx.meta["song_manifest"]
 INCLUDE_ADVANCEMENTS = ctx.meta.get("include_advancements", True)
+SHUFFLE_SONGS = ctx.meta.get("shuffle_songs", False)
 SONG_STORAGE = {}
 
 for region in REGIONS:

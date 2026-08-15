@@ -31,7 +31,9 @@ meta:
   bolt:
     entrypoint: "nbs:main"
 
-  bake_entity_uuids: false
   include_advancements: true
+  autoadvance_songs: true
+  autoadvance_delay_seconds: 2.0
+  shuffle_songs: false
 
 output: dist

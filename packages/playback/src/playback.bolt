@@ -2,7 +2,14 @@ import logging
 
 from src.config import SPEAKER_RANGES
 
-from ./const import INCLUDE_ADVANCEMENTS, REGIONS, PLAYBACK, TEMP, SONG_STORAGE
+from ./const import (
+    INCLUDE_ADVANCEMENTS,
+    PLAYBACK,
+    REGIONS,
+    SHUFFLE_SONGS,
+    SONG_STORAGE,
+    TEMP,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -16,7 +23,11 @@ append function ~/load:
     merge function_tag minecraft:load {"values": [(~/)]}
 
     scoreboard objectives add nbs dummy
-    scoreboard players set shuffle nbs 0
+
+    if SHUFFLE_SONGS:
+        scoreboard players set shuffle nbs 1
+    else:
+        scoreboard players set shuffle nbs 0
 
     for region in REGIONS:
         # just in case
@@ -65,8 +76,10 @@ for region in REGIONS:
                     # empty tick
                     execute unless data storage TEMP[region] payload.count run return fail
 
-                    # advance
+                    # End-of-song lifecycle flags are baked into storage at render
+                    # time (advance → next/shuffle, stop → halt playback).
                     execute if data storage TEMP[region] payload{advance:1b} run function ~/../../advance
+                    execute if data storage TEMP[region] payload{stop:1b} run function ~/../../stop
 
                     execute
                         as @e[type=item_display,tag=f"nbs.speaker.{region}",tag=f"nbs.speaker.{speaker_range.name}"]
