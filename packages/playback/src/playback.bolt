@@ -1,7 +1,5 @@
 import logging
 
-from src.config import SPEAKER_RANGES
-
 from ./const import (
     INCLUDE_ADVANCEMENTS,
     PLAYBACK,
@@ -9,6 +7,7 @@ from ./const import (
     SHUFFLE_SONGS,
     SONG_STORAGE,
     SPEAKER_ANIM_VARIANT_COUNT,
+    SPEAKER_RANGES,
     TEMP,
 )
 
