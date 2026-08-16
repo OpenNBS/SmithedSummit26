@@ -18,10 +18,13 @@ data_pack:
   load:
     - data/nbs/module: src
     - data/nbs/module: ../event/src
+    - ../../vendor/event/nbs-summit26-event-anim-dp.zip
 
 resource_pack:
   name: nbs-summit26-event-rp
   description: "Animated note block music performance\nby OpenNBS"
+  load:
+    - ../../vendor/event/nbs-summit26-event-anim-rp.zip
 
 # Resolved from packages/playback → packages/event/dist
 output: "../event/dist"
@@ -29,6 +32,15 @@ output: "../event/dist"
 meta:
   include_advancements: false
   song_manifest_path: "manifest_event.json"
+
+  # The vendored animation pack ships ~14.7k functions (~190 MB) that Mecha
+  # would parse and re-serialize for no benefit. Skipping them keeps the files
+  # in the output pack verbatim.
+  mecha:
+    match:
+      - "*"
+      - "!animated_java:*"
+      - "!nbs_show:*"
 
   bolt:
     entrypoint:
