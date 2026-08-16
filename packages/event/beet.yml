@@ -58,3 +58,6 @@ meta:
       inner_range: 256
       stereo_separation: 8
       decay_volume: 1.0
+
+  region_colors:
+    event: "#9A45FF"
