@@ -45,4 +45,5 @@ meta:
   bolt:
     entrypoint:
       - nbs:main
+      - nbs:event
 

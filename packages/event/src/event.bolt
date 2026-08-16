@@ -1,0 +1,45 @@
+import logging
+
+
+STAGE_COORDS = "-173.5 60.5 112.5"
+SPEAKER_OFFSET_Y = 5.0
+WORLD_TIME = 13700
+
+
+logger = logging.getLogger(__name__)
+
+
+#> Load functions
+
+# merge function_tag minecraft:load {
+#     "values": [(~/load)]
+# }
+
+# append function ~/load:
+#     gamerule max_command_chain_length 1000000
+#     gamerule max_command_forks 1000000
+
+
+#> Stage setup functions
+
+function ~/stage/clear:
+    kill @e[tag=nbs.speaker,tag=nbs.speaker.event,tag=nbs.speaker.global]
+    function nbs_show:full_stage/remove/all
+
+function ~/stage/setup:
+    execute positioned STAGE_COORDS run summon minecraft:item_display f"~ ~{SPEAKER_OFFSET_Y} ~" {Tags:["nbs.speaker","nbs.speaker.event","nbs.speaker.global"]}
+    execute positioned STAGE_COORDS run function nbs_show:full_stage/summon {args:{}}
+    time set WORLD_TIME
+
+function ~/stage/reset:
+    execute positioned STAGE_COORDS positioned f"~ ~{SPEAKER_OFFSET_Y} ~" as @n[tag=nbs_show.full_stage.root] run function nbs_show:full_stage/animations/pose_init/play
+
+
+#> Show functions
+
+function ~/show/start:
+    execute positioned STAGE_COORDS as @n[tag=nbs_show.full_stage.root] run function nbs_show:full_stage/animations/pre_perform/play
+
+function ~/show/stop:
+    function nbs:playback/event/stop
+    execute positioned STAGE_COORDS as @n[tag=nbs_show.full_stage.root] run function nbs_show:full_stage/animations/perform/stop
