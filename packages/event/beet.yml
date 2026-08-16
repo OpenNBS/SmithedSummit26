@@ -30,7 +30,6 @@ resource_pack:
 output: "../event/dist"
 
 meta:
-  include_advancements: false
   song_manifest_path: "manifest_event.json"
 
   # The vendored animation pack ships ~14.7k functions (~190 MB) that Mecha
@@ -47,3 +46,15 @@ meta:
       - nbs:main
       - nbs:event
 
+  include_advancements: false
+  autostart_playback: false
+  autoadvance_songs: false
+  autoadvance_delay_seconds: 2.0
+  shuffle_songs: false
+
+  speaker_ranges:
+    - name: global
+      outer_range: 224
+      inner_range: 256
+      stereo_separation: 8
+      decay_volume: 1.0
