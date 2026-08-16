@@ -29,7 +29,7 @@ append function ~/load:
         if score f"{region}.songindex" nbs matches f"{REGIONS[region].song_count}.." run scoreboard players set f"{region}.songindex" nbs 0
         if score f"{region}.songindex" nbs matches ..-1 run scoreboard players set f"{region}.songindex" nbs 0
         
-        # load current song into storage if it's the first time loading the region
+        # register current song into storage if it's the first time loading the region
         function ~/../{region}/change_song
 
     if AUTOSTART_PLAYBACK:
