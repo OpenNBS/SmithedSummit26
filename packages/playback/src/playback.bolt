@@ -155,6 +155,8 @@ for region in REGIONS:
 
         function ~/play:
             merge function_tag (~/../../play) {"values": [(~/)]}
+            # trigger song title
+            function ~/../select_song with storage TEMP[region] input
             scoreboard players set f"{region}.playing" nbs 1
 
         function ~/stop:
